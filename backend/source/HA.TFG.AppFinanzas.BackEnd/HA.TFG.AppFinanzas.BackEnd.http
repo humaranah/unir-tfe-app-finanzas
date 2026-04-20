@@ -1,0 +1,6 @@
+@HA.TFG.AppFinanzas.BackEnd_HostAddress = https://localhost:7031
+
+GET {{HA.TFG.AppFinanzas.BackEnd_HostAddress}}/health
+Accept: text/plain
+
+###
