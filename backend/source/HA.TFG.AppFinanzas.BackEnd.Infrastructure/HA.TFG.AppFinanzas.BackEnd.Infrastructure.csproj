@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\HA.TFG.AppFinanzas.BackEnd.Application\HA.TFG.AppFinanzas.BackEnd.Application.csproj" />
+    <ProjectReference Include="..\HA.TFG.AppFinanzas.BackEnd.Domain\HA.TFG.AppFinanzas.BackEnd.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Persistence\Repositories\" />
+  </ItemGroup>
+
+</Project>
