@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/source/">
+    <Project Path="source/HA.TFG.AppFinanzas.App/HA.TFG.AppFinanzas.App.csproj" Id="4a64808d-7c82-4161-9ec8-d86d4ca0edab">
+      <Deploy Solution="Debug|*" />
+    </Project>
+  </Folder>
+  <Folder Name="/test/" />
+</Solution>
