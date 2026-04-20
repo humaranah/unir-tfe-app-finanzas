@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-namespace HA.TFG.AppFinanzas.App
+﻿namespace HA.TFG.AppFinanzas.App
 {
     public partial class App : Application
     {

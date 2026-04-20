@@ -3,6 +3,9 @@
     <Project Path="source/HA.TFG.AppFinanzas.App/HA.TFG.AppFinanzas.App.csproj" Id="4a64808d-7c82-4161-9ec8-d86d4ca0edab">
       <Deploy Solution="Debug|*" />
     </Project>
+    <Project Path="source/HA.TFG.AppFinanzas.Core/HA.TFG.AppFinanzas.Core.csproj" />
   </Folder>
-  <Folder Name="/test/" />
+  <Folder Name="/test/">
+    <Project Path="test/HA.TFG.AppFinanzas.App.UnitTests/HA.TFG.AppFinanzas.App.UnitTests.csproj" Id="842b9226-daec-4b4d-8399-af61a9bd8196" />
+  </Folder>
 </Solution>
