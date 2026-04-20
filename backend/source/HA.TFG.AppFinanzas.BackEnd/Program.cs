@@ -48,6 +48,7 @@ try
 catch (Exception ex)
 {
     Log.Fatal(ex, "La aplicación terminó inesperadamente");
+    throw;
 }
 finally
 {
