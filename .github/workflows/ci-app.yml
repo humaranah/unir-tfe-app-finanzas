@@ -10,7 +10,6 @@ jobs:
   build-android:
     name: Build Android
     runs-on: ubuntu-latest
-    if: contains(github.head_ref, 'APP-') || github.event_name == 'workflow_dispatch'
     permissions:
       contents: read
 
@@ -34,7 +33,6 @@ jobs:
   analyze:
     name: CodeQL Analysis
     runs-on: ubuntu-latest
-    if: contains(github.head_ref, 'APP-') || github.event_name == 'workflow_dispatch'
     permissions:
       contents: read
       security-events: write
@@ -65,7 +63,6 @@ jobs:
   build-windows:
     name: Build Windows
     runs-on: windows-latest
-    if: contains(github.head_ref, 'APP-') || github.event_name == 'workflow_dispatch'
     permissions:
       contents: read
 
