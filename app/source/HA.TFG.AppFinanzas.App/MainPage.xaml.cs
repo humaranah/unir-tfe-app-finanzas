@@ -1,4 +1,4 @@
-﻿using HA.TFG.AppFinanzas.App.ViewModels;
+﻿using HA.TFG.AppFinanzas.App.Core.ViewModels;
 
 namespace HA.TFG.AppFinanzas.App
 {

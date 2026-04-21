@@ -1,7 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
-namespace HA.TFG.AppFinanzas.App.ViewModels;
+namespace HA.TFG.AppFinanzas.App.Core.ViewModels;
 
 public partial class WelcomeViewModel : ObservableObject
 {

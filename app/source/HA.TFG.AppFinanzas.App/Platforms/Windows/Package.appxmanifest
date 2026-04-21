@@ -11,8 +11,8 @@
   <mp:PhoneIdentity PhoneProductId="A3166265-8600-4AC6-B268-C47AAD95CBBE" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>$placeholder$</DisplayName>
-    <PublisherDisplayName>User Name</PublisherDisplayName>
+    <DisplayName>AppFinanzas</DisplayName>
+    <PublisherDisplayName>Humberto Arana</PublisherDisplayName>
     <Logo>$placeholder$.png</Logo>
   </Properties>
 
@@ -28,8 +28,8 @@
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="$targetentrypoint$">
       <uap:VisualElements
-        DisplayName="$placeholder$"
-        Description="$placeholder$"
+        DisplayName="App Finanzas"
+        Description="Trabajo de fin de grado - Aplicación de finanzas con IA"
         Square150x150Logo="$placeholder$.png"
         Square44x44Logo="$placeholder$.png"
         BackgroundColor="transparent">

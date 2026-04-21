@@ -1,6 +1,6 @@
-using HA.TFG.AppFinanzas.App.ViewModels;
+using HA.TFG.AppFinanzas.App.Core.ViewModels;
 
-namespace HA.TFG.AppFinanzas.App.UnitTests;
+namespace HA.TFG.AppFinanzas.App.UnitTests.Core;
 
 public class WelcomeViewModelTests
 {
