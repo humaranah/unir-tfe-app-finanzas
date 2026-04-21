@@ -1,0 +1,61 @@
+name: CD - Backend → Azure
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.x'
+
+      - name: Build
+        run: dotnet build backend/HA.TFG.AppFinanzas.BackEnd.slnx -c Release
+
+      - name: Publish
+        run: dotnet publish backend/HA.TFG.AppFinanzas.BackEnd.slnx -c Release -o "${{ env.DOTNET_ROOT }}/myapp"
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v4
+        with:
+          name: .net-app
+          path: ${{ env.DOTNET_ROOT }}/myapp
+
+  deploy:
+    name: Deploy to Azure
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: .net-app
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_A4F188D7C30A467B9CF33A2F35680A2A }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_01A21CEDA23F4616908AD206BDCA3B27 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_4B5EFD4B4ED044C3B5A3232E756CF631 }}
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'ha-tfg-webapp-finanzas'
+          slot-name: 'Production'
+          package: .
