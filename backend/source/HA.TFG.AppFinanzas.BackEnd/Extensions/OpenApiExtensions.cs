@@ -10,6 +10,8 @@ public static class OpenApiExtensions
     {
         services.AddOpenApi(options =>
         {
+            options.OpenApiVersion = OpenApiSpecVersion.OpenApi3_0;
+
             options.AddDocumentTransformer((document, context, ct) =>
             {
                 document.Info ??= new OpenApiInfo();

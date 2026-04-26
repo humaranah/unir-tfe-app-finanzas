@@ -1,6 +1,6 @@
 using HA.TFG.AppFinanzas.BackEnd.Application.Features.Usuarios.Commands.SyncUsuario;
 
-namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Tests.Application;
+namespace HA.TFG.AppFinanzas.BackEnd.Application.Tests.Features.Usuarios;
 
 public class SyncUsuarioCommandValidatorTests
 {
