@@ -1,4 +1,5 @@
 using HA.TFG.AppFinanzas.BackEnd.Auth;
+using HA.TFG.AppFinanzas.BackEnd.Domain.Common;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -35,7 +36,12 @@ public static class AuthExtensions
                 };
             });
 
-        services.AddAuthorization();
+        services.AddAuthorization(options =>
+        {
+            options.AddPolicy(Roles.Usuario, policy =>
+                policy.RequireAuthenticatedUser()
+                      .RequireRole(Roles.Usuario));
+        });
         services.AddScoped<IClaimsTransformation, RolesClaimsTransformation>();
 
         return services;
