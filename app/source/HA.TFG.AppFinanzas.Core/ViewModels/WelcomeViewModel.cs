@@ -1,25 +1,53 @@
+using Auth0.OidcClient;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 namespace HA.TFG.AppFinanzas.App.Core.ViewModels;
 
-public partial class WelcomeViewModel : ObservableObject
+public partial class WelcomeViewModel(IAuth0Client client) : ObservableObject
 {
-    private int _count;
+    private readonly IAuth0Client _client = client;
 
     public string WelcomeTitle { get; } = "Hello, World!";
 
-    public string WelcomeSubtitle { get; } = "Welcome to\n.NET Multi-platform App UI";
+    [ObservableProperty]
+    private string _name;
 
     [ObservableProperty]
-    private string counterText = "Click me";
+    private string _email;
+
+    [ObservableProperty]
+    private string _error;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsNotAuthenticated))]
+    private bool _isAuthenticated;
+
+    public bool IsNotAuthenticated => !IsAuthenticated;
 
     [RelayCommand]
-    private void IncrementCounter()
+    private async Task LoginAsync()
     {
-        _count++;
-        CounterText = _count == 1
-            ? $"Clicked {_count} time"
-            : $"Clicked {_count} times";
+        Error = string.Empty;
+        var loginResult = await _client.LoginAsync();
+        if (loginResult.IsError)
+        {
+            if (loginResult.Error == "UserCancel")
+                return;
+            Error = $"Login failed: {loginResult.Error}";
+            return;
+        }
+        Name = loginResult.User?.FindFirst(c => c.Type == "name")?.Value ?? string.Empty;
+        Email = loginResult.User?.FindFirst(c => c.Type == "email")?.Value ?? string.Empty;
+        IsAuthenticated = true;
+    }
+
+    [RelayCommand]
+    private async Task LogoutAsync()
+    {
+        Error = string.Empty;
+        Name = string.Empty;
+        Email = string.Empty;
+        IsAuthenticated = false;
     }
 }

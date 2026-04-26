@@ -4,10 +4,10 @@ namespace HA.TFG.AppFinanzas.App
 {
     public partial class MainPage : ContentPage
     {
-        public MainPage()
+        public MainPage(WelcomeViewModel viewModel)
         {
             InitializeComponent();
-            BindingContext = new WelcomeViewModel();
+            BindingContext = viewModel;
         }
     }
 }
