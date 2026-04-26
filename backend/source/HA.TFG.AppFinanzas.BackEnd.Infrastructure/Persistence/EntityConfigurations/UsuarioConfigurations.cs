@@ -11,7 +11,8 @@ internal class UsuarioConfigurations : IEntityTypeConfiguration<Usuario>
         builder.ToTable("usuarios");
         builder.HasKey(x => x.Id);
 
-        builder.Property(x => x.IdAuth0).IsRequired();
+        builder.Property(x => x.IdAuth0).IsRequired().HasMaxLength(100);
+        builder.HasIndex(x => x.IdAuth0).IsUnique();
         builder.Property(x => x.Email).IsRequired().HasMaxLength(255);
         builder.Property(x => x.Nombre).IsRequired().HasMaxLength(255);
         builder.Property(x => x.Metadata).HasMaxLength(2000);
