@@ -1,4 +1,5 @@
 using HA.TFG.AppFinanzas.BackEnd.Application;
+using HA.TFG.AppFinanzas.BackEnd.Extensions;
 using HA.TFG.AppFinanzas.BackEnd.Infrastructure;
 using Microsoft.ApplicationInsights.Extensibility;
 using Serilog;
@@ -35,12 +36,15 @@ try
     builder.Services.AddApplication();
     builder.Services.AddInfrastructure(builder.Configuration);
     builder.Services.AddMediator();
+    builder.Services.AddAuth0(builder.Configuration);
     builder.Services.AddHealthChecks();
 
     var app = builder.Build();
 
     app.UseSerilogRequestLogging();
     app.UseHttpsRedirection();
+    app.UseAuthentication();
+    app.UseAuthorization();
     app.MapHealthChecks("/health");
 
     app.Run();
