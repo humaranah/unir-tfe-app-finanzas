@@ -53,7 +53,7 @@ public class ModelConfigurationTests : AppDbContextTestBase
     {
         var entityType = Context.Model.FindEntityType(typeof(Usuario));
 
-        Assert.NotNull(entityType!.GetQueryFilter());
+        Assert.NotNull(entityType!.GetDeclaredQueryFilters());
     }
 
     [Fact]
@@ -61,7 +61,7 @@ public class ModelConfigurationTests : AppDbContextTestBase
     {
         var entityType = Context.Model.FindEntityType(typeof(Rol));
 
-        Assert.NotNull(entityType!.GetQueryFilter());
+        Assert.NotNull(entityType!.GetDeclaredQueryFilters());
     }
 
     [Fact]
@@ -69,6 +69,6 @@ public class ModelConfigurationTests : AppDbContextTestBase
     {
         var entityType = Context.Model.FindEntityType(typeof(Cuenta));
 
-        Assert.NotNull(entityType!.GetQueryFilter());
+        Assert.NotNull(entityType!.GetDeclaredQueryFilters());
     }
 }
