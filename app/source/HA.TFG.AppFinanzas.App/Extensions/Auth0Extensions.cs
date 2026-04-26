@@ -1,4 +1,6 @@
 using Auth0.OidcClient;
+using HA.TFG.AppFinanzas.App.Authentication;
+using HA.TFG.AppFinanzas.Core.Authentication;
 
 namespace HA.TFG.AppFinanzas.App.Extensions;
 
@@ -13,6 +15,19 @@ internal static class Auth0Extensions
         var clientId = builder.Configuration["Auth0:ClientId"]
             ?? throw new InvalidOperationException("Auth0:ClientId is not configured.");
 
+#if WINDOWS
+        var browser = new EmbeddedBrowser();
+        builder.Services.AddSingleton<IBrowserCookieCleaner>(browser);
+        builder.Services.AddSingleton<IAuth0Client>(new Auth0Client(new Auth0ClientOptions
+        {
+            Domain = domain,
+            ClientId = clientId,
+            RedirectUri = RedirectUri,
+            PostLogoutRedirectUri = RedirectUri,
+            Browser = browser
+        }));
+#else
+        builder.Services.AddSingleton<IBrowserCookieCleaner>(new NullBrowserCookieCleaner());
         builder.Services.AddSingleton<IAuth0Client>(new Auth0Client(new Auth0ClientOptions
         {
             Domain = domain,
@@ -20,6 +35,7 @@ internal static class Auth0Extensions
             RedirectUri = RedirectUri,
             PostLogoutRedirectUri = RedirectUri
         }));
+#endif
 
         return builder;
     }

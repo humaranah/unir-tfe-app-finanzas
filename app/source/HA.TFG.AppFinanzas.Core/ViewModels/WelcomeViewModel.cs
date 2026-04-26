@@ -1,12 +1,14 @@
 using Auth0.OidcClient;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using HA.TFG.AppFinanzas.Core.Authentication;
 
 namespace HA.TFG.AppFinanzas.App.Core.ViewModels;
 
-public partial class WelcomeViewModel(IAuth0Client client) : ObservableObject
+public partial class WelcomeViewModel(IAuth0Client client, IBrowserCookieCleaner cookieCleaner) : ObservableObject
 {
     private readonly IAuth0Client _client = client;
+    private readonly IBrowserCookieCleaner _cookieCleaner = cookieCleaner;
 
     public string WelcomeTitle { get; } = "Hello, World!";
 
@@ -46,6 +48,8 @@ public partial class WelcomeViewModel(IAuth0Client client) : ObservableObject
     private async Task LogoutAsync()
     {
         Error = string.Empty;
+        _cookieCleaner.ClearCookies();
+        await _client.LogoutAsync();
         Name = string.Empty;
         Email = string.Empty;
         IsAuthenticated = false;
