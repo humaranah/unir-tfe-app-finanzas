@@ -19,7 +19,7 @@ internal class CuentaCategoriaConfigurations : IEntityTypeConfiguration<CuentaCa
         // Relación: CuentaCategoria -> Cuenta (muchos a uno)
         builder
             .HasOne(categoria => categoria.Cuenta)
-            .WithMany()
+            .WithMany(cuenta => cuenta.Categorias)
             .HasForeignKey(categoria => categoria.IdCuenta)
             .OnDelete(DeleteBehavior.Cascade);
 

@@ -18,23 +18,23 @@ internal class UsuarioConfigurations : IEntityTypeConfiguration<Usuario>
         builder.Property(x => x.FechaCreacion).IsRequired();
         builder.Property(x => x.FechaEliminacion).IsRequired(false);
 
-        // Relación many-to-many: Usuario -> Rol
+        // Relación many-to-many: Usuario -> Rol (skip navigation a través de UsuarioRol)
         builder
-            .HasMany<Rol>()
+            .HasMany(x => x.Roles)
             .WithMany(rol => rol.Usuarios)
             .UsingEntity<UsuarioRol>(
                 left => left.HasOne<Rol>().WithMany().HasForeignKey(x => x.IdRol),
-                right => right.HasOne<Usuario>().WithMany(x => x.Roles).HasForeignKey(x => x.IdUsuario))
+                right => right.HasOne<Usuario>().WithMany().HasForeignKey(x => x.IdUsuario))
             .ToTable("usuario_roles")
             .HasKey(x => new { x.IdUsuario, x.IdRol });
 
-        // Relación many-to-many: Usuario -> Cuenta
+        // Relación many-to-many: Usuario -> Cuenta (skip navigation a través de UsuarioCuenta)
         builder
-            .HasMany<Cuenta>()
+            .HasMany(x => x.Cuentas)
             .WithMany(cuenta => cuenta.Usuarios)
             .UsingEntity<UsuarioCuenta>(
                 left => left.HasOne<Cuenta>().WithMany().HasForeignKey(x => x.IdCuenta),
-                right => right.HasOne<Usuario>().WithMany(x => x.Cuentas).HasForeignKey(x => x.IdUsuario))
+                right => right.HasOne<Usuario>().WithMany().HasForeignKey(x => x.IdUsuario))
             .ToTable("usuario_cuentas")
             .HasKey(x => new { x.IdUsuario, x.IdCuenta });
     }

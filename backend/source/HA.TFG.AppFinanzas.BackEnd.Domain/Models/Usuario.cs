@@ -13,6 +13,6 @@ public record Usuario : ISoftDeleteable
     public DateTime? FechaModificacion { get; init; }
     public DateTime? FechaEliminacion { get; init; }
 
-    public ICollection<UsuarioRol> Roles { get; init; } = [];
-    public ICollection<UsuarioCuenta> Cuentas { get; init; } = [];
+    public ICollection<Rol> Roles { get; init; } = [];
+    public ICollection<Cuenta> Cuentas { get; init; } = [];
 }

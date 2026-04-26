@@ -9,8 +9,12 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("SqlServer")
-            ?? throw new InvalidOperationException("ConnectionStrings:SqlServer no está configurada.");
+        var connectionString = configuration.GetConnectionString("SqlServer");
+
+        if (string.IsNullOrWhiteSpace(connectionString))
+            throw new InvalidOperationException(
+                "ConnectionStrings:SqlServer no está configurada o está vacía. " +
+                "Revisa appsettings.json o las variables de entorno del entorno actual.");
 
         services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(connectionString, sqlServerOptions =>

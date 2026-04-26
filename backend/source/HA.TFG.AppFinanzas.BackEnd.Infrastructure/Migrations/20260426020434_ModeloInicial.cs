@@ -89,8 +89,7 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
                     Nombre = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Descripcion = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     FechaCreacion = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    FechaModificacion = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    CuentaId = table.Column<long>(type: "bigint", nullable: true)
+                    FechaModificacion = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -101,11 +100,6 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
                         principalTable: "categorias",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
-                    table.ForeignKey(
-                        name: "FK_cuenta_categorias_cuentas_CuentaId",
-                        column: x => x.CuentaId,
-                        principalTable: "cuentas",
-                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_cuenta_categorias_cuentas_IdCuenta",
                         column: x => x.IdCuenta,
@@ -196,11 +190,6 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_cuenta_categorias_CuentaId",
-                table: "cuenta_categorias",
-                column: "CuentaId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_cuenta_categorias_IdCuenta",

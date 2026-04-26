@@ -87,9 +87,6 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<long?>("CuentaId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("Descripcion")
                         .IsRequired()
                         .HasMaxLength(500)
@@ -118,8 +115,6 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CuentaId");
 
                     b.HasIndex("IdCuenta");
 
@@ -289,12 +284,8 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
 
             modelBuilder.Entity("HA.TFG.AppFinanzas.BackEnd.Domain.Models.CuentaCategoria", b =>
                 {
-                    b.HasOne("HA.TFG.AppFinanzas.BackEnd.Domain.Models.Cuenta", null)
-                        .WithMany("Categorias")
-                        .HasForeignKey("CuentaId");
-
                     b.HasOne("HA.TFG.AppFinanzas.BackEnd.Domain.Models.Cuenta", "Cuenta")
-                        .WithMany()
+                        .WithMany("Categorias")
                         .HasForeignKey("IdCuenta")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -337,7 +328,7 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("HA.TFG.AppFinanzas.BackEnd.Domain.Models.Usuario", null)
-                        .WithMany("Cuentas")
+                        .WithMany()
                         .HasForeignKey("IdUsuario")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -352,7 +343,7 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("HA.TFG.AppFinanzas.BackEnd.Domain.Models.Usuario", null)
-                        .WithMany("Roles")
+                        .WithMany()
                         .HasForeignKey("IdUsuario")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -366,13 +357,6 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
             modelBuilder.Entity("HA.TFG.AppFinanzas.BackEnd.Domain.Models.CuentaCategoria", b =>
                 {
                     b.Navigation("Transacciones");
-                });
-
-            modelBuilder.Entity("HA.TFG.AppFinanzas.BackEnd.Domain.Models.Usuario", b =>
-                {
-                    b.Navigation("Cuentas");
-
-                    b.Navigation("Roles");
                 });
 #pragma warning restore 612, 618
         }
