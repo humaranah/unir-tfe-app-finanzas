@@ -12,7 +12,7 @@ public class SoftDeleteTests : AppDbContextTestBase
         var usuario = new Usuario
         {
             Id = 1,
-            IdAuth0 = 100,
+            IdAuth0 = "auth0|100",
             Email = "test@test.com",
             Nombre = "Test",
             FechaCreacion = DateTime.UtcNow,
@@ -20,9 +20,9 @@ public class SoftDeleteTests : AppDbContextTestBase
         };
 
         Context.Usuarios.Add(usuario);
-        await Context.SaveChangesAsync();
+        await Context.SaveChangesAsync(CancellationToken.None);
 
-        var resultado = await Context.Usuarios.ToListAsync();
+        var resultado = await Context.Usuarios.ToListAsync(CancellationToken.None);
 
         Assert.Empty(resultado);
     }
@@ -33,7 +33,7 @@ public class SoftDeleteTests : AppDbContextTestBase
         var usuario = new Usuario
         {
             Id = 2,
-            IdAuth0 = 200,
+            IdAuth0 = "auth0|200",
             Email = "activo@test.com",
             Nombre = "Activo",
             FechaCreacion = DateTime.UtcNow,
@@ -41,9 +41,9 @@ public class SoftDeleteTests : AppDbContextTestBase
         };
 
         Context.Usuarios.Add(usuario);
-        await Context.SaveChangesAsync();
+        await Context.SaveChangesAsync(CancellationToken.None);
 
-        var resultado = await Context.Usuarios.ToListAsync();
+        var resultado = await Context.Usuarios.ToListAsync(CancellationToken.None);
 
         Assert.Single(resultado);
     }
@@ -54,7 +54,7 @@ public class SoftDeleteTests : AppDbContextTestBase
         var usuario = new Usuario
         {
             Id = 3,
-            IdAuth0 = 300,
+            IdAuth0 = "auth0|300",
             Email = "eliminado@test.com",
             Nombre = "Eliminado",
             FechaCreacion = DateTime.UtcNow,
@@ -62,9 +62,9 @@ public class SoftDeleteTests : AppDbContextTestBase
         };
 
         Context.Usuarios.Add(usuario);
-        await Context.SaveChangesAsync();
+        await Context.SaveChangesAsync(CancellationToken.None);
 
-        var resultado = await Context.Usuarios.IgnoreQueryFilters().ToListAsync();
+        var resultado = await Context.Usuarios.IgnoreQueryFilters().ToListAsync(CancellationToken.None);
 
         Assert.Single(resultado);
     }
@@ -80,9 +80,9 @@ public class SoftDeleteTests : AppDbContextTestBase
         };
 
         Context.Cuentas.Add(cuenta);
-        await Context.SaveChangesAsync();
+        await Context.SaveChangesAsync(CancellationToken.None);
 
-        var resultado = await Context.Cuentas.ToListAsync();
+        var resultado = await Context.Cuentas.ToListAsync(CancellationToken.None);
 
         Assert.Empty(resultado);
     }
@@ -99,9 +99,9 @@ public class SoftDeleteTests : AppDbContextTestBase
         };
 
         Context.Roles.Add(rol);
-        await Context.SaveChangesAsync();
+        await Context.SaveChangesAsync(CancellationToken.None);
 
-        var resultado = await Context.Roles.ToListAsync();
+        var resultado = await Context.Roles.ToListAsync(CancellationToken.None);
 
         Assert.Empty(resultado);
     }

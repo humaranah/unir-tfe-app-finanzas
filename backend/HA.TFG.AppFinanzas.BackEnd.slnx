@@ -6,6 +6,8 @@
     <Project Path="source/HA.TFG.AppFinanzas.BackEnd/HA.TFG.AppFinanzas.BackEnd.csproj" />
   </Folder>
   <Folder Name="/test/">
+    <Project Path="test/HA.TFG.AppFinanzas.BackEnd.Application.Tests/HA.TFG.AppFinanzas.BackEnd.Application.Tests.csproj" Id="09a75d13-2900-4f2b-9bbf-70ae230a28be" />
     <Project Path="test/HA.TFG.AppFinanzas.BackEnd.Infrastructure.Tests/HA.TFG.AppFinanzas.BackEnd.Infrastructure.Tests.csproj" />
+    <Project Path="test/HA.TFG.AppFinanzas.BackEnd.Tests/HA.TFG.AppFinanzas.BackEnd.Tests.csproj" Id="aa45bf08-ea40-4e9b-aed5-8c596f778d7a" />
   </Folder>
 </Solution>
