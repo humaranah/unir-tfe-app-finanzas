@@ -20,17 +20,47 @@
                 Style="{StaticResource Headline}"
                 SemanticProperties.HeadingLevel="Level1" />
 
-            <Label
-                Text="{Binding WelcomeSubtitle}"
-                Style="{StaticResource SubHeadline}"
-                SemanticProperties.HeadingLevel="Level2"
-                SemanticProperties.Description="Welcome to dot net Multi platform App U I" />
+            <Grid MaximumWidthRequest="500"
+                  ColumnDefinitions="Auto,*"
+                  ColumnSpacing="5"
+                  RowDefinitions="Auto, Auto, Auto, Auto"
+                  RowSpacing="5">
 
-            <Button
-                Text="{Binding CounterText}"
-                SemanticProperties.Hint="Counts the number of times you click"
-                Command="{Binding IncrementCounterCommand}"
-                HorizontalOptions="Fill" />
+                <Label Text="Correo"
+                       VerticalOptions="Center" />
+                
+                <Entry Text="{Binding Email, Mode=OneWay}"
+                       IsReadOnly="True"
+                       Grid.Column="1" />
+
+                <Label Text="Nombre"
+                       Grid.Row="1"
+                       VerticalOptions="Center" />
+                
+                <Entry Text="{Binding Name, Mode=OneWay}"
+                       IsReadOnly="True"
+                       Grid.Column="1"
+                       Grid.Row="1" />
+
+                <Label Text="{Binding Error}"
+                       TextColor="OrangeRed"
+                       Grid.Row="2"
+                       Grid.ColumnSpan="2"
+                       VerticalOptions="Center" />
+
+                <Button Text="Iniciar Sesión"
+                        Command="{Binding LoginCommand}"
+                        IsVisible="{Binding IsNotAuthenticated}"
+                        Grid.Row="3"
+                        Grid.ColumnSpan="2" />
+                
+                <Button Text="Cerrar Sesión"
+                        Command="{Binding LogoutCommand}"
+                        IsVisible="{Binding IsAuthenticated}"
+                        Grid.Row="3"
+                        Grid.ColumnSpan="2" />
+
+            </Grid>
         </VerticalStackLayout>
     </ScrollView>
 

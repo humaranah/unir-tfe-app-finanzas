@@ -4,10 +4,26 @@ namespace HA.TFG.AppFinanzas.App
 {
     public partial class MainPage : ContentPage
     {
-        public MainPage()
+        public MainPage(WelcomeViewModel viewModel)
         {
             InitializeComponent();
-            BindingContext = new WelcomeViewModel();
+            BindingContext = viewModel;
+        }
+
+        protected override async void OnAppearing()
+        {
+            base.OnAppearing();
+            if (BindingContext is WelcomeViewModel vm && !vm.IsAuthenticated)
+            {
+                try
+                {
+                    await vm.TryRestoreSessionAsync();
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Failed to restore session: {ex}");
+                }
+            }
         }
     }
 }
