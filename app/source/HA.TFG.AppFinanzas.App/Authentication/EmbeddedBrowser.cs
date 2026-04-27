@@ -1,13 +1,12 @@
 using Duende.IdentityModel.OidcClient.Browser;
-using HA.TFG.AppFinanzas.Core.Authentication;
 
 namespace HA.TFG.AppFinanzas.App.Authentication;
 
-internal sealed class EmbeddedBrowser : Duende.IdentityModel.OidcClient.Browser.IBrowser, IBrowserCookieCleaner
+internal sealed class EmbeddedBrowser : Duende.IdentityModel.OidcClient.Browser.IBrowser
 {
     public async Task<BrowserResult> InvokeAsync(BrowserOptions options, CancellationToken cancellationToken = default)
     {
-        var tcs = new TaskCompletionSource<string?>();
+        var tcs = new TaskCompletionSource<string?>(TaskCreationOptions.RunContinuationsAsynchronously);
 
         await MainThread.InvokeOnMainThreadAsync(async () =>
         {
@@ -15,6 +14,8 @@ internal sealed class EmbeddedBrowser : Duende.IdentityModel.OidcClient.Browser.
             var currentPage = Application.Current?.Windows.FirstOrDefault()?.Page;
             if (currentPage is not null)
                 await currentPage.Navigation.PushModalAsync(page);
+            else
+                tcs.TrySetResult(null);
         });
 
         using var registration = cancellationToken.Register(() => tcs.TrySetCanceled());
@@ -33,12 +34,5 @@ internal sealed class EmbeddedBrowser : Duende.IdentityModel.OidcClient.Browser.
             return new BrowserResult { ResultType = BrowserResultType.UserCancel };
 
         return new BrowserResult { ResultType = BrowserResultType.Success, Response = resultUrl };
-    }
-
-    void IBrowserCookieCleaner.ClearCookies()
-    {
-        // En Windows con WebView2, las cookies se gestionan por perfil de usuario.
-        // Limpiar el almacenamiento en memoria es suficiente; el logout de Auth0
-        // invalida el token en el servidor.
     }
 }

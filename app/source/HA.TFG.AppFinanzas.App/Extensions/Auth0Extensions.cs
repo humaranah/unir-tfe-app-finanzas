@@ -10,14 +10,15 @@ internal static class Auth0Extensions
 
     internal static MauiAppBuilder AddAuth0(this MauiAppBuilder builder)
     {
-        var domain = builder.Configuration["Auth0:Domain"]
-            ?? throw new InvalidOperationException("Auth0:Domain is not configured.");
-        var clientId = builder.Configuration["Auth0:ClientId"]
-            ?? throw new InvalidOperationException("Auth0:ClientId is not configured.");
+        var domain = builder.Configuration["Auth0:Domain"] ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(domain))
+            throw new InvalidOperationException("Auth0:Domain is not configured.");
+
+        var clientId = builder.Configuration["Auth0:ClientId"] ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(clientId))
+            throw new InvalidOperationException("Auth0:ClientId is not configured.");
 
 #if WINDOWS
-        var browser = new EmbeddedBrowser();
-        builder.Services.AddSingleton<IBrowserCookieCleaner>(browser);
         builder.Services.AddSingleton<IAuth0Client>(new Auth0Client(new Auth0ClientOptions
         {
             Domain = domain,
@@ -25,10 +26,9 @@ internal static class Auth0Extensions
             RedirectUri = RedirectUri,
             PostLogoutRedirectUri = RedirectUri,
             Scope = "openid profile email offline_access",
-            Browser = browser
+            Browser = new EmbeddedBrowser()
         }));
 #else
-        builder.Services.AddSingleton<IBrowserCookieCleaner>(new NullBrowserCookieCleaner());
         builder.Services.AddSingleton<IAuth0Client>(new Auth0Client(new Auth0ClientOptions
         {
             Domain = domain,

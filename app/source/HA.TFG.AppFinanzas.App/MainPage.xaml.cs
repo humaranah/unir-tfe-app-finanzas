@@ -14,7 +14,16 @@ namespace HA.TFG.AppFinanzas.App
         {
             base.OnAppearing();
             if (BindingContext is WelcomeViewModel vm && !vm.IsAuthenticated)
-                await vm.TryRestoreSessionAsync();
+            {
+                try
+                {
+                    await vm.TryRestoreSessionAsync();
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Failed to restore session: {ex}");
+                }
+            }
         }
     }
 }

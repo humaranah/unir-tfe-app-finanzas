@@ -2,32 +2,33 @@ using Auth0.OidcClient;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using HA.TFG.AppFinanzas.Core.Authentication;
+using System.Security.Claims;
+using System.Text;
+using System.Text.Json;
 
 namespace HA.TFG.AppFinanzas.App.Core.ViewModels;
 
 public partial class WelcomeViewModel(
     IAuth0Client client,
-    IBrowserCookieCleaner cookieCleaner,
     ISessionStore sessionStore) : ObservableObject
 {
     private readonly IAuth0Client _client = client;
-    private readonly IBrowserCookieCleaner _cookieCleaner = cookieCleaner;
     private readonly ISessionStore _sessionStore = sessionStore;
 
     public string WelcomeTitle { get; } = "Hello, World!";
 
     [ObservableProperty]
-    private string _name;
+    public partial string Name { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private string _email;
+    public partial string Email { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private string _error;
+    public partial string Error { get; set; } = string.Empty;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsNotAuthenticated))]
-    private bool _isAuthenticated;
+    public partial bool IsAuthenticated { get; set; } = false;
 
     public bool IsNotAuthenticated => !IsAuthenticated;
 
@@ -53,7 +54,7 @@ public partial class WelcomeViewModel(
         IsAuthenticated = true;
     }
 
-    private static IEnumerable<System.Security.Claims.Claim> ParseIdToken(string? idToken)
+    private static Claim[] ParseIdToken(string? idToken)
     {
         if (string.IsNullOrEmpty(idToken))
             return [];
@@ -62,13 +63,16 @@ public partial class WelcomeViewModel(
         if (parts.Length < 2)
             return [];
 
-        var payload = parts[1];
+        var payload = parts[1]
+            .Replace('-', '+')
+            .Replace('_', '/');
         var padded = payload.PadRight(payload.Length + (4 - payload.Length % 4) % 4, '=');
-        var json = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(padded));
-        var doc = System.Text.Json.JsonDocument.Parse(json);
+        var json = Encoding.UTF8.GetString(Convert.FromBase64String(padded));
 
-        return doc.RootElement.EnumerateObject()
-            .Select(p => new System.Security.Claims.Claim(p.Name, p.Value.ToString()));
+        using var doc = JsonDocument.Parse(json);
+        return [.. doc.RootElement
+            .EnumerateObject()
+            .Select(p => new Claim(p.Name, p.Value.ToString()))];
     }
 
     [RelayCommand]
@@ -96,7 +100,6 @@ public partial class WelcomeViewModel(
     private async Task LogoutAsync()
     {
         Error = string.Empty;
-        _cookieCleaner.ClearCookies();
         await _sessionStore.ClearAsync();
         await _client.LogoutAsync();
         Name = string.Empty;
