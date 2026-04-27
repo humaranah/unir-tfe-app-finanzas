@@ -24,6 +24,7 @@ internal static class Auth0Extensions
             ClientId = clientId,
             RedirectUri = RedirectUri,
             PostLogoutRedirectUri = RedirectUri,
+            Scope = "openid profile email offline_access",
             Browser = browser
         }));
 #else
@@ -33,9 +34,12 @@ internal static class Auth0Extensions
             Domain = domain,
             ClientId = clientId,
             RedirectUri = RedirectUri,
-            PostLogoutRedirectUri = RedirectUri
+            PostLogoutRedirectUri = RedirectUri,
+            Scope = "openid profile email offline_access"
         }));
 #endif
+
+        builder.Services.AddSingleton<ISessionStore, SecureSessionStore>();
 
         return builder;
     }

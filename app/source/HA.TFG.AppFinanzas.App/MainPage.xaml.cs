@@ -9,5 +9,12 @@ namespace HA.TFG.AppFinanzas.App
             InitializeComponent();
             BindingContext = viewModel;
         }
+
+        protected override async void OnAppearing()
+        {
+            base.OnAppearing();
+            if (BindingContext is WelcomeViewModel vm && !vm.IsAuthenticated)
+                await vm.TryRestoreSessionAsync();
+        }
     }
 }
