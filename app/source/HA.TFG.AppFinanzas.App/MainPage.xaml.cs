@@ -10,20 +10,10 @@ namespace HA.TFG.AppFinanzas.App
             BindingContext = viewModel;
         }
 
-        protected override async void OnAppearing()
+        private async void OnLogoutClicked(object sender, EventArgs e)
         {
-            base.OnAppearing();
-            if (BindingContext is WelcomeViewModel vm && !vm.IsAuthenticated)
-            {
-                try
-                {
-                    await vm.TryRestoreSessionAsync();
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"Failed to restore session: {ex}");
-                }
-            }
+            if (Shell.Current is AppShell appShell)
+                await appShell.LogoutAndReturnToLoginAsync();
         }
     }
 }

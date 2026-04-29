@@ -7,8 +7,14 @@
     Title="App Finanzas">
 
     <ShellContent
-        Title="Home"
+        Title="Iniciar sesión"
+        ContentTemplate="{DataTemplate local:LoginPage}"
+        Route="login"
+        Shell.NavBarIsVisible="False" />
+
+    <ShellContent
+        Title="Inicio"
         ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+        Route="home" />
 
 </Shell>

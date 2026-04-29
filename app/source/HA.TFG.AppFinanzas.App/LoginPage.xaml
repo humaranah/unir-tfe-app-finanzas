@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="clr-namespace:HA.TFG.AppFinanzas.App.Core.ViewModels;assembly=HA.TFG.AppFinanzas.Core"
+             x:Class="HA.TFG.AppFinanzas.App.LoginPage"
+             x:DataType="viewModels:LoginViewModel"
+             Title="Iniciar sesión">
+
+    <VerticalStackLayout Padding="40" Spacing="20" VerticalOptions="Center">
+
+        <Label Text="App Finanzas"
+               Style="{StaticResource Headline}"
+               HorizontalOptions="Center" />
+
+        <Label Text="{Binding Error}"
+               TextColor="OrangeRed"
+               HorizontalOptions="Center"
+               IsVisible="{Binding HasError}" />
+
+        <Button Text="Iniciar sesión"
+                Command="{Binding LoginCommand}"
+                HorizontalOptions="Fill" />
+
+    </VerticalStackLayout>
+
+</ContentPage>

@@ -24,13 +24,24 @@ public partial class WelcomeViewModel(
     public partial string Email { get; set; } = string.Empty;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasError))]
     public partial string Error { get; set; } = string.Empty;
+
+    public bool HasError => !string.IsNullOrEmpty(Error);
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsNotAuthenticated))]
     public partial bool IsAuthenticated { get; set; } = false;
 
     public bool IsNotAuthenticated => !IsAuthenticated;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsNotBusy))]
+    public partial bool IsBusy { get; set; } = false;
+
+    public bool IsNotBusy => !IsBusy;
+
+    public event EventHandler? LoginSucceeded;
 
     public async Task TryRestoreSessionAsync()
     {
@@ -47,6 +58,9 @@ public partial class WelcomeViewModel(
 
         if (!string.IsNullOrEmpty(result.RefreshToken))
             await _sessionStore.SaveRefreshTokenAsync(result.RefreshToken);
+
+        if (!string.IsNullOrEmpty(result.AccessToken))
+            await _sessionStore.SaveAccessTokenAsync(result.AccessToken);
 
         var claims = ParseIdToken(result.IdentityToken);
         Name = claims.FirstOrDefault(c => c.Type == "name")?.Value ?? string.Empty;
@@ -79,21 +93,33 @@ public partial class WelcomeViewModel(
     private async Task LoginAsync()
     {
         Error = string.Empty;
-        var loginResult = await _client.LoginAsync();
-        if (loginResult.IsError)
+        IsBusy = true;
+        try
         {
-            if (loginResult.Error == "UserCancel")
+            var loginResult = await _client.LoginAsync();
+            if (loginResult.IsError)
+            {
+                if (loginResult.Error != "UserCancel")
+                    Error = $"Error al iniciar sesión: {loginResult.Error}";
                 return;
-            Error = $"Login failed: {loginResult.Error}";
-            return;
+            }
+
+            if (!string.IsNullOrEmpty(loginResult.RefreshToken))
+                await _sessionStore.SaveRefreshTokenAsync(loginResult.RefreshToken);
+
+            if (!string.IsNullOrEmpty(loginResult.AccessToken))
+                await _sessionStore.SaveAccessTokenAsync(loginResult.AccessToken);
+
+            Name = loginResult.User?.FindFirst(c => c.Type == "name")?.Value ?? string.Empty;
+            Email = loginResult.User?.FindFirst(c => c.Type == "email")?.Value ?? string.Empty;
+            IsAuthenticated = true;
+
+            LoginSucceeded?.Invoke(this, EventArgs.Empty);
         }
-
-        if (!string.IsNullOrEmpty(loginResult.RefreshToken))
-            await _sessionStore.SaveRefreshTokenAsync(loginResult.RefreshToken);
-
-        Name = loginResult.User?.FindFirst(c => c.Type == "name")?.Value ?? string.Empty;
-        Email = loginResult.User?.FindFirst(c => c.Type == "email")?.Value ?? string.Empty;
-        IsAuthenticated = true;
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     [RelayCommand]

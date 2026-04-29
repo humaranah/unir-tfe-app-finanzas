@@ -3,32 +3,23 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewModels="clr-namespace:HA.TFG.AppFinanzas.App.Core.ViewModels;assembly=HA.TFG.AppFinanzas.Core"
              x:Class="HA.TFG.AppFinanzas.App.MainPage"
-             x:DataType="viewModels:WelcomeViewModel">
+             x:DataType="viewModels:WelcomeViewModel"
+             Title="{Binding WelcomeTitle}">
 
     <ScrollView>
         <VerticalStackLayout
             Padding="30,0"
             Spacing="25">
-            <Image
-                Source="dotnet_bot.png"
-                HeightRequest="185"
-                Aspect="AspectFit"
-                SemanticProperties.Description="dot net bot in a submarine number ten" />
-
-            <Label
-                Text="{Binding WelcomeTitle}"
-                Style="{StaticResource Headline}"
-                SemanticProperties.HeadingLevel="Level1" />
 
             <Grid MaximumWidthRequest="500"
                   ColumnDefinitions="Auto,*"
                   ColumnSpacing="5"
-                  RowDefinitions="Auto, Auto, Auto, Auto"
+                  RowDefinitions="Auto, Auto"
                   RowSpacing="5">
 
                 <Label Text="Correo"
                        VerticalOptions="Center" />
-                
+
                 <Entry Text="{Binding Email, Mode=OneWay}"
                        IsReadOnly="True"
                        Grid.Column="1" />
@@ -36,31 +27,18 @@
                 <Label Text="Nombre"
                        Grid.Row="1"
                        VerticalOptions="Center" />
-                
+
                 <Entry Text="{Binding Name, Mode=OneWay}"
                        IsReadOnly="True"
                        Grid.Column="1"
                        Grid.Row="1" />
 
-                <Label Text="{Binding Error}"
-                       TextColor="OrangeRed"
-                       Grid.Row="2"
-                       Grid.ColumnSpan="2"
-                       VerticalOptions="Center" />
-
-                <Button Text="Iniciar Sesión"
-                        Command="{Binding LoginCommand}"
-                        IsVisible="{Binding IsNotAuthenticated}"
-                        Grid.Row="3"
-                        Grid.ColumnSpan="2" />
-                
-                <Button Text="Cerrar Sesión"
-                        Command="{Binding LogoutCommand}"
-                        IsVisible="{Binding IsAuthenticated}"
-                        Grid.Row="3"
-                        Grid.ColumnSpan="2" />
-
             </Grid>
+
+            <Button Text="Cerrar sesión"
+                    Clicked="OnLogoutClicked"
+                    HorizontalOptions="Fill" />
+
         </VerticalStackLayout>
     </ScrollView>
 
