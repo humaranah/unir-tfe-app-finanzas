@@ -18,25 +18,33 @@ internal static class Auth0Extensions
         if (string.IsNullOrWhiteSpace(clientId))
             throw new InvalidOperationException("Auth0:ClientId is not configured.");
 
+        var audience = builder.Configuration["Auth0:Audience"] ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(audience))
+            throw new InvalidOperationException("Auth0:Audience is not configured.");
+
 #if WINDOWS
-        builder.Services.AddSingleton<IAuth0Client>(new Auth0Client(new Auth0ClientOptions
-        {
-            Domain = domain,
-            ClientId = clientId,
-            RedirectUri = RedirectUri,
-            PostLogoutRedirectUri = RedirectUri,
-            Scope = "openid profile email offline_access",
-            Browser = new EmbeddedBrowser()
-        }));
+        builder.Services.AddSingleton<IAuth0Client>(new AudienceAwareAuth0Client(
+            new Auth0Client(new Auth0ClientOptions
+            {
+                Domain = domain,
+                ClientId = clientId,
+                RedirectUri = RedirectUri,
+                PostLogoutRedirectUri = RedirectUri,
+                Scope = "openid profile email offline_access",
+                Browser = new EmbeddedBrowser()
+            }),
+            audience));
 #else
-        builder.Services.AddSingleton<IAuth0Client>(new Auth0Client(new Auth0ClientOptions
-        {
-            Domain = domain,
-            ClientId = clientId,
-            RedirectUri = RedirectUri,
-            PostLogoutRedirectUri = RedirectUri,
-            Scope = "openid profile email offline_access"
-        }));
+        builder.Services.AddSingleton<IAuth0Client>(new AudienceAwareAuth0Client(
+            new Auth0Client(new Auth0ClientOptions
+            {
+                Domain = domain,
+                ClientId = clientId,
+                RedirectUri = RedirectUri,
+                PostLogoutRedirectUri = RedirectUri,
+                Scope = "openid profile email offline_access"
+            }),
+            audience));
 #endif
 
         builder.Services.AddSingleton<ISessionStore, SecureSessionStore>();

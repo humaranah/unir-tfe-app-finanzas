@@ -3,13 +3,20 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewModels="clr-namespace:HA.TFG.AppFinanzas.App.Core.ViewModels;assembly=HA.TFG.AppFinanzas.Core"
              x:Class="HA.TFG.AppFinanzas.App.LoginPage"
-             x:DataType="viewModels:LoginViewModel"
-             Title="Iniciar sesión">
+             x:DataType="viewModels:WelcomeViewModel"
+             Title="App Finanzas"
+             Shell.NavBarIsVisible="False">
 
-    <VerticalStackLayout Padding="40" Spacing="20" VerticalOptions="Center">
+    <VerticalStackLayout Padding="40" Spacing="24" VerticalOptions="Center">
 
         <Label Text="App Finanzas"
-               Style="{StaticResource Headline}"
+               FontSize="32"
+               FontAttributes="Bold"
+               HorizontalOptions="Center" />
+
+        <Label Text="Inicia sesión para continuar"
+               FontSize="16"
+               TextColor="Gray"
                HorizontalOptions="Center" />
 
         <Label Text="{Binding Error}"
@@ -17,8 +24,13 @@
                HorizontalOptions="Center"
                IsVisible="{Binding HasError}" />
 
-        <Button Text="Iniciar sesión"
+        <ActivityIndicator IsRunning="{Binding IsBusy}"
+                           IsVisible="{Binding IsBusy}"
+                           HorizontalOptions="Center" />
+
+        <Button Text="Iniciar sesión con Auth0"
                 Command="{Binding LoginCommand}"
+                IsEnabled="{Binding IsNotBusy}"
                 HorizontalOptions="Fill" />
 
     </VerticalStackLayout>

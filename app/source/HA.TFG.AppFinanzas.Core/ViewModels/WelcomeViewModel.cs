@@ -10,10 +10,12 @@ namespace HA.TFG.AppFinanzas.App.Core.ViewModels;
 
 public partial class WelcomeViewModel(
     IAuth0Client client,
-    ISessionStore sessionStore) : ObservableObject
+    ISessionStore sessionStore,
+    IUsuarioSyncService usuarioSyncService) : ObservableObject
 {
     private readonly IAuth0Client _client = client;
     private readonly ISessionStore _sessionStore = sessionStore;
+    private readonly IUsuarioSyncService _usuarioSyncService = usuarioSyncService;
 
     public string WelcomeTitle { get; } = "Hello, World!";
 
@@ -43,7 +45,7 @@ public partial class WelcomeViewModel(
 
     public event EventHandler? LoginSucceeded;
 
-    public async Task TryRestoreSessionAsync()
+    public async Task TryRestoreSessionAsync(CancellationToken cancellationToken = default)
     {
         var refreshToken = await _sessionStore.LoadRefreshTokenAsync();
         if (string.IsNullOrEmpty(refreshToken))
@@ -62,10 +64,29 @@ public partial class WelcomeViewModel(
         if (!string.IsNullOrEmpty(result.AccessToken))
             await _sessionStore.SaveAccessTokenAsync(result.AccessToken);
 
-        var claims = ParseIdToken(result.IdentityToken);
-        Name = claims.FirstOrDefault(c => c.Type == "name")?.Value ?? string.Empty;
-        Email = claims.FirstOrDefault(c => c.Type == "email")?.Value ?? string.Empty;
-        IsAuthenticated = true;
+        try
+        {
+            var claims = ParseIdToken(result.IdentityToken);
+            var usuarioInfo = BuildUsuarioInfo(claims);
+
+            try
+            {
+                await _usuarioSyncService.SyncUsuarioAsync(usuarioInfo, cancellationToken);
+            }
+            catch
+            {
+                await _sessionStore.ClearAsync();
+                return;
+            }
+
+            Name = usuarioInfo.Nombre;
+            Email = usuarioInfo.Email;
+            IsAuthenticated = true;
+        }
+        catch
+        {
+            await _sessionStore.ClearAsync();
+        }
     }
 
     private static Claim[] ParseIdToken(string? idToken)
@@ -89,6 +110,24 @@ public partial class WelcomeViewModel(
             .Select(p => new Claim(p.Name, p.Value.ToString()))];
     }
 
+    private static UsuarioInfo BuildUsuarioInfo(IEnumerable<Claim> claims)
+    {
+        string? Get(string type) => claims.FirstOrDefault(c => c.Type == type)?.Value;
+
+        var updatedAtRaw = Get("updated_at");
+        DateTimeOffset? updatedAt = updatedAtRaw is not null && DateTimeOffset.TryParse(updatedAtRaw, out var parsed)
+            ? parsed
+            : null;
+
+        return new UsuarioInfo(
+            Email: Get("email") ?? string.Empty,
+            Nombre: Get("name") ?? string.Empty,
+            FotoPerfil: Get("picture"),
+            Proveedor: Get("sub")?.Split('|')[0],
+            EmailVerificado: Get("email_verified") == "true",
+            UltimaActualizacion: updatedAt);
+    }
+
     [RelayCommand]
     private async Task LoginAsync()
     {
@@ -110,8 +149,21 @@ public partial class WelcomeViewModel(
             if (!string.IsNullOrEmpty(loginResult.AccessToken))
                 await _sessionStore.SaveAccessTokenAsync(loginResult.AccessToken);
 
-            Name = loginResult.User?.FindFirst(c => c.Type == "name")?.Value ?? string.Empty;
-            Email = loginResult.User?.FindFirst(c => c.Type == "email")?.Value ?? string.Empty;
+            var usuarioInfo = BuildUsuarioInfo(loginResult.User?.Claims ?? []);
+
+            try
+            {
+                await _usuarioSyncService.SyncUsuarioAsync(usuarioInfo);
+            }
+            catch
+            {
+                await _sessionStore.ClearAsync();
+                Error = "No se pudo sincronizar tu usuario con el backend.";
+                return;
+            }
+
+            Name = usuarioInfo.Nombre;
+            Email = usuarioInfo.Email;
             IsAuthenticated = true;
 
             LoginSucceeded?.Invoke(this, EventArgs.Empty);

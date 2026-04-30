@@ -7,6 +7,10 @@ internal sealed class AuthTokenProvider(IAuth0Client auth0Client, ISessionStore 
 {
     public async Task<string?> GetAccessTokenAsync(CancellationToken cancellationToken = default)
     {
+        var accessToken = await sessionStore.LoadAccessTokenAsync();
+        if (!string.IsNullOrEmpty(accessToken))
+            return accessToken;
+
         var refreshToken = await sessionStore.LoadRefreshTokenAsync();
         if (string.IsNullOrEmpty(refreshToken))
             return null;
