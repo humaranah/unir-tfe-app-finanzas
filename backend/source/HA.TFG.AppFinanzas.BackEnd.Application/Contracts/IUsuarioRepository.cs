@@ -4,7 +4,7 @@ namespace HA.TFG.AppFinanzas.BackEnd.Application.Contracts;
 
 public interface IUsuarioRepository
 {
-    Task<Usuario?> ObtenerPorIdAuth0Async(string idAuth0, CancellationToken cancellationToken);
-    Task<Usuario> CrearAsync(Usuario usuario, CancellationToken cancellationToken);
-    Task<Usuario> ActualizarAsync(Usuario usuario, CancellationToken cancellationToken);
+    Task<Usuario?> GetByIdAuth0Async(string idAuth0, CancellationToken cancellationToken);
+    Task<Usuario> CreateAsync(Usuario usuario, CancellationToken cancellationToken);
+    Task<Usuario> UpdateAsync(Usuario usuario, CancellationToken cancellationToken);
 }

@@ -8,6 +8,10 @@ public record Usuario : ISoftDeleteable
     public string IdAuth0 { get; init; } = string.Empty;
     public string Email { get; init; } = string.Empty;
     public string Nombre { get; init; } = string.Empty;
+    public string? FotoPerfil { get; init; }
+    public string? Proveedor { get; init; }
+    public bool EmailVerificado { get; init; }
+    public DateTimeOffset? UltimaActualizacion { get; init; }
     public string Metadata { get; init; } = string.Empty;
     public DateTime FechaCreacion { get; init; }
     public DateTime? FechaModificacion { get; init; }

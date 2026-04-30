@@ -3,6 +3,7 @@ using HA.TFG.AppFinanzas.BackEnd.Domain.Common;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 
 namespace HA.TFG.AppFinanzas.BackEnd.Extensions;
 
@@ -33,6 +34,29 @@ public static class AuthExtensions
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true
+                };
+                options.Events = new JwtBearerEvents
+                {
+                    OnAuthenticationFailed = ctx =>
+                    {
+                        Log.Warning("[JWT] Autenticación fallida: {ExceptionType} — {Message}",
+                            ctx.Exception.GetType().Name,
+                            ctx.Exception.Message);
+                        return Task.CompletedTask;
+                    },
+                    OnChallenge = ctx =>
+                    {
+                        Log.Warning("[JWT] Challenge enviado: {Error} — {ErrorDescription}",
+                            ctx.Error,
+                            ctx.ErrorDescription);
+                        return Task.CompletedTask;
+                    },
+                    OnTokenValidated = ctx =>
+                    {
+                        Log.Debug("[JWT] Token validado correctamente para subject: {Subject}",
+                            ctx.Principal?.FindFirst("sub")?.Value);
+                        return Task.CompletedTask;
+                    }
                 };
             });
 

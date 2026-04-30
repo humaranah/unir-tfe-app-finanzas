@@ -15,6 +15,10 @@ internal class UsuarioConfigurations : IEntityTypeConfiguration<Usuario>
         builder.HasIndex(x => x.IdAuth0).IsUnique();
         builder.Property(x => x.Email).IsRequired().HasMaxLength(255);
         builder.Property(x => x.Nombre).IsRequired().HasMaxLength(255);
+        builder.Property(x => x.FotoPerfil).HasMaxLength(2048).IsRequired(false);
+        builder.Property(x => x.Proveedor).HasMaxLength(100).IsRequired(false);
+        builder.Property(x => x.EmailVerificado).IsRequired();
+        builder.Property(x => x.UltimaActualizacion).IsRequired(false);
         builder.Property(x => x.Metadata).HasMaxLength(2000);
         builder.Property(x => x.FechaCreacion).IsRequired();
         builder.Property(x => x.FechaEliminacion).IsRequired(false);

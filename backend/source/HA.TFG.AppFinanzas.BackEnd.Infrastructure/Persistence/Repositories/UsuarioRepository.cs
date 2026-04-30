@@ -6,19 +6,19 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Persistence.Repositories;
 
 public sealed class UsuarioRepository(AppDbContext context) : IUsuarioRepository
 {
-    public Task<Usuario?> ObtenerPorIdAuth0Async(string idAuth0, CancellationToken cancellationToken) =>
+    public Task<Usuario?> GetByIdAuth0Async(string idAuth0, CancellationToken cancellationToken) =>
         context.Usuarios
             .Include(u => u.Roles)
             .FirstOrDefaultAsync(u => u.IdAuth0 == idAuth0, cancellationToken);
 
-    public async Task<Usuario> CrearAsync(Usuario usuario, CancellationToken cancellationToken)
+    public async Task<Usuario> CreateAsync(Usuario usuario, CancellationToken cancellationToken)
     {
         context.Usuarios.Add(usuario);
         await context.SaveChangesAsync(cancellationToken);
         return usuario;
     }
 
-    public async Task<Usuario> ActualizarAsync(Usuario usuario, CancellationToken cancellationToken)
+    public async Task<Usuario> UpdateAsync(Usuario usuario, CancellationToken cancellationToken)
     {
         var entry = context.Entry(usuario);
         if (entry.State == EntityState.Detached)
