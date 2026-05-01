@@ -6,6 +6,7 @@ using HA.TFG.AppFinanzas.BackEnd.Middleware;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Azure.Identity;
 
 Log.Logger = new LoggerConfiguration()
     .Enrich.FromLogContext()
