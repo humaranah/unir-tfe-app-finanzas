@@ -28,7 +28,7 @@ public class EnsureUsuarioCommandHandlerTests
     public async Task Handle_UsuarioNuevo_CreaUsuarioConRolUsuario()
     {
         // Arrange
-        var command = new EnsureUsuarioCommand("auth0|123", "test@test.com", "Test User", null, null, true, null);
+        var command = new EnsureUsuarioCommand("auth0|123", "test@test.com", "Test User", null, true, null);
 
         _usuarioRepository.GetByIdAuth0Async(command.IdAuth0, Arg.Any<CancellationToken>()).Returns((Usuario?)null);
         _rolRepository.GetByNombreAsync(Roles.Usuario, Arg.Any<CancellationToken>()).Returns(RolUsuario);
@@ -43,6 +43,7 @@ public class EnsureUsuarioCommandHandlerTests
         Assert.Equal(command.IdAuth0, result.IdAuth0);
         Assert.Equal(command.Email, result.Email);
         Assert.Equal(command.Nombre, result.Nombre);
+        Assert.Equal("auth0", result.Proveedor);
         await _usuarioRepository.Received(1).CreateAsync(
             Arg.Is<Usuario>(u => u.Roles.Any(r => r.Nombre == Roles.Usuario)),
             CancellationToken.None);
@@ -52,7 +53,7 @@ public class EnsureUsuarioCommandHandlerTests
     public async Task Handle_UsuarioNuevo_LanzaExcepcionSiNoExisteRolUsuario()
     {
         // Arrange
-        var command = new EnsureUsuarioCommand("auth0|123", "test@test.com", "Test User", null, null, true, null);
+        var command = new EnsureUsuarioCommand("auth0|123", "test@test.com", "Test User", null, true, null);
 
         _usuarioRepository.GetByIdAuth0Async(command.IdAuth0, Arg.Any<CancellationToken>()).Returns((Usuario?)null);
         _rolRepository.GetByNombreAsync(Roles.Usuario, Arg.Any<CancellationToken>()).Returns((Rol?)null);
@@ -66,7 +67,7 @@ public class EnsureUsuarioCommandHandlerTests
     public async Task Handle_UsuarioExistente_DevuelveUsuarioSinCrearNiActualizar()
     {
         // Arrange
-        var command = new EnsureUsuarioCommand("auth0|456", "existente@test.com", "Existente", null, null, true, null);
+        var command = new EnsureUsuarioCommand("auth0|456", "existente@test.com", "Existente", null, true, null);
         var usuarioExistente = new Usuario
         {
             Id = 5,

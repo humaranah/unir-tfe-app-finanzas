@@ -36,7 +36,7 @@ public class UsuariosControllerTests
     }
 
     private static EnsureUsuarioRequest DefaultRequest(string email = "test@test.com", string nombre = "Test User") =>
-        new(email, nombre, null, null, true, null);
+        new(email, nombre, null, true, null);
 
     [Fact]
     public async Task Sync_UsuarioNuevo_DevuelveCreated()
@@ -101,7 +101,7 @@ public class UsuariosControllerTests
         _mediator.Send(Arg.Any<EnsureUsuarioCommand>(), Arg.Any<CancellationToken>())
             .Returns(commandResult);
 
-        var request = new EnsureUsuarioRequest(email, nombre, null, "google-oauth2", true, null);
+        var request = new EnsureUsuarioRequest(email, nombre, null, true, null);
 
         // Act
         await _sut.Ensure(request, CancellationToken.None);
@@ -111,8 +111,7 @@ public class UsuariosControllerTests
             Arg.Is<EnsureUsuarioCommand>(c =>
                 c.IdAuth0 == idAuth0 &&
                 c.Email == email &&
-                c.Nombre == nombre &&
-                c.Proveedor == "google-oauth2"),
+                c.Nombre == nombre),
             Arg.Any<CancellationToken>());
     }
 }
