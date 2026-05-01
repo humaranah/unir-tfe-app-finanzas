@@ -39,14 +39,14 @@ public static class AuthExtensions
                 {
                     OnAuthenticationFailed = ctx =>
                     {
-                        Log.Warning("[JWT] Autenticación fallida: {ExceptionType} — {Message}",
+                        Log.Debug("[JWT] Autenticación fallida: {ExceptionType} — {Message}",
                             ctx.Exception.GetType().Name,
                             ctx.Exception.Message);
                         return Task.CompletedTask;
                     },
                     OnChallenge = ctx =>
                     {
-                        Log.Warning("[JWT] Challenge enviado: {Error} — {ErrorDescription}",
+                        Log.Debug("[JWT] Challenge enviado: {Error} — {ErrorDescription}",
                             ctx.Error,
                             ctx.ErrorDescription);
                         return Task.CompletedTask;

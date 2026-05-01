@@ -7,6 +7,5 @@ public record EnsureUsuarioCommand(
     string Email,
     string Nombre,
     string? FotoPerfil,
-    string? Proveedor,
     bool EmailVerificado,
     DateTimeOffset? UltimaActualizacion) : IRequest<EnsureUsuarioResult>;

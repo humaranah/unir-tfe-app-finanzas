@@ -10,17 +10,22 @@ public sealed class EnsureUsuarioCommandHandler(
     IRolRepository rolRepository)
     : IRequestHandler<EnsureUsuarioCommand, EnsureUsuarioResult>
 {
+    private readonly IUsuarioRepository _usuarioRepository = usuarioRepository;
+    private readonly IRolRepository _rolRepository = rolRepository;
+
     public async ValueTask<EnsureUsuarioResult> Handle(
         EnsureUsuarioCommand command,
         CancellationToken cancellationToken)
     {
-        var usuario = await usuarioRepository.GetByIdAuth0Async(command.IdAuth0, cancellationToken);
+        var proveedor = ExtractProveedorFromSub(command.IdAuth0);
+
+        var usuario = await _usuarioRepository.GetByIdAuth0Async(command.IdAuth0, cancellationToken);
 
         if (usuario is not null)
             return ToResult(usuario, EsNuevo: false);
 
         // Usuario nuevo: obtener rol "usuario" y asignárselo
-        var rolUsuario = await rolRepository.GetByNombreAsync(Roles.Usuario, cancellationToken)
+        var rolUsuario = await _rolRepository.GetByNombreAsync(Roles.Usuario, cancellationToken)
             ?? throw new InvalidOperationException(
                 $"El rol '{Roles.Usuario}' no existe en la base de datos. Ejecuta el seed de datos.");
 
@@ -30,14 +35,14 @@ public sealed class EnsureUsuarioCommandHandler(
             Email = command.Email,
             Nombre = command.Nombre,
             FotoPerfil = command.FotoPerfil,
-            Proveedor = command.Proveedor,
+            Proveedor = proveedor,
             EmailVerificado = command.EmailVerificado,
             UltimaActualizacion = command.UltimaActualizacion,
             FechaCreacion = DateTime.UtcNow,
             Roles = [rolUsuario]
         };
 
-        nuevo = await usuarioRepository.CreateAsync(nuevo, cancellationToken);
+        nuevo = await _usuarioRepository.CreateAsync(nuevo, cancellationToken);
         return ToResult(nuevo, EsNuevo: true);
     }
 
@@ -45,4 +50,13 @@ public sealed class EnsureUsuarioCommandHandler(
         new(u.Id, u.IdAuth0, u.Email, u.Nombre,
             u.FotoPerfil, u.Proveedor, u.EmailVerificado, u.UltimaActualizacion,
             EsNuevo);
+
+    private static string? ExtractProveedorFromSub(string sub)
+    {
+        var separatorIndex = sub.IndexOf('|');
+        if (separatorIndex <= 0)
+            return null;
+
+        return sub[..separatorIndex];
+    }
 }

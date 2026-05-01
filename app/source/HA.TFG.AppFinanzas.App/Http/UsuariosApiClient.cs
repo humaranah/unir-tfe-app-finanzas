@@ -18,7 +18,7 @@ internal sealed class UsuariosApiClient(IHttpClientFactory httpClientFactory) : 
         var client = httpClientFactory.CreateClient("Backend");
 
         using var response = await client.PostAsJsonAsync(
-            "api/usuarios/sync",
+            "api/usuarios/ensure",
             new SyncRequest(
                 usuario.Email,
                 usuario.Nombre,
