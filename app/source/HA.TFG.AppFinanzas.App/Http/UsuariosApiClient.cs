@@ -5,25 +5,23 @@ namespace HA.TFG.AppFinanzas.App.Http;
 
 internal sealed class UsuariosApiClient(IHttpClientFactory httpClientFactory) : IUsuarioSyncService
 {
-    private record SyncRequest(
+    private record EnsureRequest(
         string Email,
         string Nombre,
         string? FotoPerfil,
-        string? Proveedor,
         bool EmailVerificado,
         DateTimeOffset? UltimaActualizacion);
 
-    public async Task SyncUsuarioAsync(UsuarioInfo usuario, CancellationToken cancellationToken = default)
+    public async Task EnsureUsuarioAsync(UsuarioInfo usuario, CancellationToken cancellationToken = default)
     {
         var client = httpClientFactory.CreateClient("Backend");
 
         using var response = await client.PostAsJsonAsync(
             "api/usuarios/ensure",
-            new SyncRequest(
+            new EnsureRequest(
                 usuario.Email,
                 usuario.Nombre,
                 usuario.FotoPerfil,
-                usuario.Proveedor,
                 usuario.EmailVerificado,
                 usuario.UltimaActualizacion),
             cancellationToken);

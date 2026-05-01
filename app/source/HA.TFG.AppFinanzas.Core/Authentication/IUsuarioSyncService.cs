@@ -2,5 +2,5 @@ namespace HA.TFG.AppFinanzas.Core.Authentication;
 
 public interface IUsuarioSyncService
 {
-    Task SyncUsuarioAsync(UsuarioInfo usuario, CancellationToken cancellationToken = default);
+    Task EnsureUsuarioAsync(UsuarioInfo usuario, CancellationToken cancellationToken = default);
 }

@@ -112,7 +112,7 @@ public class WelcomeViewModelTests
         var sut = CreateSut();
         await sut.LoginCommand.ExecuteAsync(null);
 
-        await _usuarioSyncService.Received(1).SyncUsuarioAsync(Arg.Any<UsuarioInfo>(), Arg.Any<CancellationToken>());
+        await _usuarioSyncService.Received(1).EnsureUsuarioAsync(Arg.Any<UsuarioInfo>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -260,7 +260,7 @@ public class WelcomeViewModelTests
         var sut = CreateSut();
         await sut.TryRestoreSessionAsync();
 
-        await _usuarioSyncService.Received(1).SyncUsuarioAsync(
+        await _usuarioSyncService.Received(1).EnsureUsuarioAsync(
             Arg.Is<UsuarioInfo>(u => u.Email == "hugo@test.com" && u.Nombre == "Hugo"),
             Arg.Any<CancellationToken>());
     }

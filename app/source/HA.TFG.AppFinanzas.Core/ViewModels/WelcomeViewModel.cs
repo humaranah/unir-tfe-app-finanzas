@@ -51,7 +51,7 @@ public partial class WelcomeViewModel(
         if (string.IsNullOrEmpty(refreshToken))
             return;
 
-        var result = await _client.RefreshTokenAsync(refreshToken, cancellationToken: default);
+        var result = await _client.RefreshTokenAsync(refreshToken, cancellationToken);
         if (result.IsError)
         {
             await _sessionStore.ClearAsync();
@@ -71,7 +71,7 @@ public partial class WelcomeViewModel(
 
             try
             {
-                await _usuarioSyncService.SyncUsuarioAsync(usuarioInfo, cancellationToken);
+                await _usuarioSyncService.EnsureUsuarioAsync(usuarioInfo, cancellationToken);
             }
             catch
             {
@@ -124,12 +124,12 @@ public partial class WelcomeViewModel(
             Nombre: Get("name") ?? string.Empty,
             FotoPerfil: Get("picture"),
             Proveedor: Get("sub")?.Split('|')[0],
-            EmailVerificado: Get("email_verified") == "true",
+            EmailVerificado: string.Equals(Get("email_verified"), "true", StringComparison.OrdinalIgnoreCase),
             UltimaActualizacion: updatedAt);
     }
 
     [RelayCommand]
-    private async Task LoginAsync()
+    private async Task LoginAsync(CancellationToken cancellationToken)
     {
         Error = string.Empty;
         IsBusy = true;
@@ -153,7 +153,7 @@ public partial class WelcomeViewModel(
 
             try
             {
-                await _usuarioSyncService.SyncUsuarioAsync(usuarioInfo);
+                await _usuarioSyncService.EnsureUsuarioAsync(usuarioInfo, cancellationToken);
             }
             catch
             {
