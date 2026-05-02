@@ -23,7 +23,7 @@ public sealed class UsuariosController(IMediator mediator) : ControllerBase
     {
         var idAuth0 = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
         if (string.IsNullOrWhiteSpace(idAuth0))
-            return BadRequest("El token no contiene el claim 'sub' requerido.");
+            return BadRequest("Ha ocurrido un error validando la información del usuario.");
 
         var command = request.ToEnsureUsuarioCommand() with { IdAuth0 = idAuth0 };
 
