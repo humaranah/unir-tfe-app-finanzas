@@ -22,7 +22,7 @@ public class RolRepositoryTests : AppDbContextTestBase
         await Context.SaveChangesAsync(CancellationToken.None);
 
         // Act
-        var result = await _sut.ObtenerPorNombreAsync("usuario", TestContext.Current.CancellationToken);
+        var result = await _sut.GetByNombreAsync("usuario", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.NotNull(result);
@@ -33,7 +33,7 @@ public class RolRepositoryTests : AppDbContextTestBase
     public async Task ObtenerPorNombreAsync_RolNoExistente_DevuelveNull()
     {
         // Act
-        var result = await _sut.ObtenerPorNombreAsync("noexiste", TestContext.Current.CancellationToken);
+        var result = await _sut.GetByNombreAsync("noexiste", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Null(result);
@@ -54,7 +54,7 @@ public class RolRepositoryTests : AppDbContextTestBase
         await Context.SaveChangesAsync(CancellationToken.None);
 
         // Act
-        var result = await _sut.ObtenerPorNombreAsync("eliminado", TestContext.Current.CancellationToken);
+        var result = await _sut.GetByNombreAsync("eliminado", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Null(result);
@@ -69,7 +69,7 @@ public class RolRepositoryTests : AppDbContextTestBase
         await Context.SaveChangesAsync(CancellationToken.None);
 
         // Act — búsqueda con nombre diferente
-        var result = await _sut.ObtenerPorNombreAsync("admin", TestContext.Current.CancellationToken);
+        var result = await _sut.GetByNombreAsync("admin", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Null(result);

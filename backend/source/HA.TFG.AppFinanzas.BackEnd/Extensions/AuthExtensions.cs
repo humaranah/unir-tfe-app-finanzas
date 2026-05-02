@@ -3,12 +3,13 @@ using HA.TFG.AppFinanzas.BackEnd.Domain.Common;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 
 namespace HA.TFG.AppFinanzas.BackEnd.Extensions;
 
 public static class AuthExtensions
 {
-    public static IServiceCollection AddAuth0(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddAuth0(this IServiceCollection services, IConfiguration configuration, IHostEnvironment env)
     {
         var domain = configuration["Auth0:Domain"];
         var audience = configuration["Auth0:Audience"];
@@ -34,14 +35,18 @@ public static class AuthExtensions
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true
                 };
+                options.Events.OnAuthenticationFailed = ctx =>
+                {
+                    if (env.IsDevelopment())
+                        Log.Debug(ctx.Exception, "[JWT] Autenticación fallida");
+                    return Task.CompletedTask;
+                };
             });
 
-        services.AddAuthorization(options =>
-        {
-            options.AddPolicy(Roles.Usuario, policy =>
+        services.AddAuthorizationBuilder()
+            .AddPolicy(Roles.Usuario, policy =>
                 policy.RequireAuthenticatedUser()
                       .RequireRole(Roles.Usuario));
-        });
         services.AddScoped<IClaimsTransformation, RolesClaimsTransformation>();
 
         return services;

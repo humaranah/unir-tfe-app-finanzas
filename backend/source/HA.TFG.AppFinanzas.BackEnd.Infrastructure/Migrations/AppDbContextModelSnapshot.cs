@@ -225,6 +225,9 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<bool>("EmailVerificado")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("datetime2");
 
@@ -233,6 +236,10 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
 
                     b.Property<DateTime?>("FechaModificacion")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("FotoPerfil")
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
 
                     b.Property<string>("IdAuth0")
                         .IsRequired()
@@ -248,6 +255,13 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Proveedor")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTimeOffset?>("UltimaActualizacion")
+                        .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
 

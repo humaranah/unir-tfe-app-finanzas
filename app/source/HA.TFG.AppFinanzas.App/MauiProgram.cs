@@ -29,9 +29,13 @@ public static class MauiProgram
             builder.Configuration.AddJsonStream(secretsStream);
 
         builder.AddAuth0();
+        builder.AddBackend();
 
-        builder.Services.AddTransient<MainPage>();
-        builder.Services.AddTransient<WelcomeViewModel>();
+        builder.Services.AddSingleton<WelcomeViewModel>();
+        builder.Services.AddSingleton<LoginPage>();
+        builder.Services.AddSingleton<MainPage>();
+        builder.Services.AddSingleton<AppShell>();
+        builder.Services.AddSingleton<App>();
 
 #if DEBUG
         builder.Logging.AddDebug();

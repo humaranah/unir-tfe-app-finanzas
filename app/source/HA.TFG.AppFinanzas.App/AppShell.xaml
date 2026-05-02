@@ -6,9 +6,22 @@
     xmlns:local="clr-namespace:HA.TFG.AppFinanzas.App"
     Title="App Finanzas">
 
+    <!-- Página inicial: solo visible mientras se comprueba la sesión -->
     <ShellContent
-        Title="Home"
+        Title=""
+        ContentTemplate="{DataTemplate local:SplashLoadingPage}"
+        Route="splash"
+        Shell.NavBarIsVisible="False" />
+
+    <ShellContent
+        Title="Iniciar sesión"
+        ContentTemplate="{DataTemplate local:LoginPage}"
+        Route="login"
+        Shell.NavBarIsVisible="False" />
+
+    <ShellContent
+        Title="Inicio"
         ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+        Route="home" />
 
 </Shell>

@@ -29,7 +29,7 @@ public class UsuarioRepositoryTests : AppDbContextTestBase
         await Context.SaveChangesAsync(CancellationToken.None);
 
         // Act
-        var result = await _sut.ObtenerPorIdAuth0Async("auth0|123", TestContext.Current.CancellationToken);
+        var result = await _sut.GetByIdAuth0Async("auth0|123", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.NotNull(result);
@@ -41,7 +41,7 @@ public class UsuarioRepositoryTests : AppDbContextTestBase
     public async Task ObtenerPorIdAuth0Async_UsuarioNoExistente_DevuelveNull()
     {
         // Act
-        var result = await _sut.ObtenerPorIdAuth0Async("auth0|noexiste", TestContext.Current.CancellationToken);
+        var result = await _sut.GetByIdAuth0Async("auth0|noexiste", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Null(result);
@@ -64,7 +64,7 @@ public class UsuarioRepositoryTests : AppDbContextTestBase
         await Context.SaveChangesAsync(CancellationToken.None);
 
         // Act
-        var result = await _sut.ObtenerPorIdAuth0Async("auth0|eliminado", TestContext.Current.CancellationToken);
+        var result = await _sut.GetByIdAuth0Async("auth0|eliminado", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Null(result);
@@ -88,7 +88,7 @@ public class UsuarioRepositoryTests : AppDbContextTestBase
         await Context.SaveChangesAsync(CancellationToken.None);
 
         // Act
-        var result = await _sut.ObtenerPorIdAuth0Async("auth0|conroles", TestContext.Current.CancellationToken);
+        var result = await _sut.GetByIdAuth0Async("auth0|conroles", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.NotNull(result);
@@ -110,7 +110,7 @@ public class UsuarioRepositoryTests : AppDbContextTestBase
         };
 
         // Act
-        var result = await _sut.CrearAsync(usuario, TestContext.Current.CancellationToken);
+        var result = await _sut.CreateAsync(usuario, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.NotNull(result);
@@ -142,7 +142,7 @@ public class UsuarioRepositoryTests : AppDbContextTestBase
         };
 
         // Act
-        var result = await _sut.ActualizarAsync(usuarioActualizado, TestContext.Current.CancellationToken);
+        var result = await _sut.UpdateAsync(usuarioActualizado, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal("nuevo@test.com", result.Email);

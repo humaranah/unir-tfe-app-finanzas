@@ -1,10 +1,10 @@
 using FluentValidation;
 
-namespace HA.TFG.AppFinanzas.BackEnd.Application.Features.Usuarios.Commands.SyncUsuario;
+namespace HA.TFG.AppFinanzas.BackEnd.Application.Features.Usuarios.Commands.EnsureUsuario;
 
-public sealed class SyncUsuarioCommandValidator : AbstractValidator<SyncUsuarioCommand>
+public sealed class EnsureUsuarioCommandValidator : AbstractValidator<EnsureUsuarioCommand>
 {
-    public SyncUsuarioCommandValidator()
+    public EnsureUsuarioCommandValidator()
     {
         RuleFor(x => x.IdAuth0)
             .NotEmpty().WithMessage("El IdAuth0 es obligatorio.")

@@ -1,8 +1,10 @@
 using HA.TFG.AppFinanzas.BackEnd.Application;
 using HA.TFG.AppFinanzas.BackEnd.Extensions;
 using HA.TFG.AppFinanzas.BackEnd.Infrastructure;
+using HA.TFG.AppFinanzas.BackEnd.Infrastructure.Persistence;
 using HA.TFG.AppFinanzas.BackEnd.Middleware;
 using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -40,7 +42,7 @@ try
     {
         options.ServiceLifetime = ServiceLifetime.Scoped;
     });
-    builder.Services.AddAuth0(builder.Configuration);
+    builder.Services.AddAuth0(builder.Configuration, builder.Environment);
     builder.Services.AddControllers();
     builder.Services.AddOpenApiWithAuth0();
     builder.Services.AddHealthChecks();
@@ -55,10 +57,16 @@ try
     app.MapHealthChecks("/health");
     app.MapControllers();
 
+    using (var scope = app.Services.CreateScope())
+    {
+        var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        await dbContext.Database.MigrateAsync();
+    }
+
     if (app.Environment.IsDevelopment())
         app.MapOpenApiAndScalar();
 
-    app.Run();
+    await app.RunAsync();
 }
 catch (Exception ex)
 {

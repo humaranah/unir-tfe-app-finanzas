@@ -1,5 +1,6 @@
-using HA.TFG.AppFinanzas.BackEnd.Application.Features.Usuarios.Commands.SyncUsuario;
+using HA.TFG.AppFinanzas.BackEnd.Application.Features.Usuarios.Commands.EnsureUsuario;
 using HA.TFG.AppFinanzas.BackEnd.Controllers;
+using HA.TFG.AppFinanzas.BackEnd.Controllers.Requests;
 using Mediator;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -34,18 +35,21 @@ public class UsuariosControllerTests
         };
     }
 
+    private static EnsureUsuarioRequest DefaultRequest(string email = "test@test.com", string nombre = "Test User") =>
+        new(email, nombre, null, true, null);
+
     [Fact]
     public async Task Sync_UsuarioNuevo_DevuelveCreated()
     {
         // Arrange
         SetUser("auth0|123", "test@test.com", "Test User");
-        var commandResult = new SyncUsuarioResult(1, "auth0|123", "test@test.com", "Test User", EsNuevo: true);
+        var commandResult = new EnsureUsuarioResult(1, "auth0|123", "test@test.com", "Test User", null, null, true, null, EsNuevo: true);
 
-        _mediator.Send(Arg.Any<SyncUsuarioCommand>(), Arg.Any<CancellationToken>())
+        _mediator.Send(Arg.Any<EnsureUsuarioCommand>(), Arg.Any<CancellationToken>())
             .Returns(commandResult);
 
         // Act
-        var result = await _sut.Sync(CancellationToken.None);
+        var result = await _sut.Ensure(DefaultRequest(), CancellationToken.None);
 
         // Assert
         var created = Assert.IsType<CreatedAtActionResult>(result);
@@ -57,13 +61,13 @@ public class UsuariosControllerTests
     {
         // Arrange
         SetUser("auth0|456", "existente@test.com", "Existente");
-        var commandResult = new SyncUsuarioResult(5, "auth0|456", "existente@test.com", "Existente", EsNuevo: false);
+        var commandResult = new EnsureUsuarioResult(5, "auth0|456", "existente@test.com", "Existente", null, null, true, null, EsNuevo: false);
 
-        _mediator.Send(Arg.Any<SyncUsuarioCommand>(), Arg.Any<CancellationToken>())
+        _mediator.Send(Arg.Any<EnsureUsuarioCommand>(), Arg.Any<CancellationToken>())
             .Returns(commandResult);
 
         // Act
-        var result = await _sut.Sync(CancellationToken.None);
+        var result = await _sut.Ensure(DefaultRequest("existente@test.com", "Existente"), CancellationToken.None);
 
         // Assert
         var ok = Assert.IsType<OkObjectResult>(result);
@@ -77,43 +81,15 @@ public class UsuariosControllerTests
         SetUser(null);
 
         // Act
-        var result = await _sut.Sync(CancellationToken.None);
+        var result = await _sut.Ensure(DefaultRequest(), CancellationToken.None);
 
         // Assert
         Assert.IsType<BadRequestObjectResult>(result);
-        await _mediator.DidNotReceive().Send(Arg.Any<SyncUsuarioCommand>(), Arg.Any<CancellationToken>());
+        await _mediator.DidNotReceive().Send(Arg.Any<EnsureUsuarioCommand>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
-    public async Task Sync_SinClaimEmail_DevuelveBadRequest()
-    {
-        // Arrange
-        SetUser("auth0|123", email: null, nombre: "Test");
-
-        // Act
-        var result = await _sut.Sync(CancellationToken.None);
-
-        // Assert
-        Assert.IsType<BadRequestObjectResult>(result);
-        await _mediator.DidNotReceive().Send(Arg.Any<SyncUsuarioCommand>(), Arg.Any<CancellationToken>());
-    }
-
-    [Fact]
-    public async Task Sync_SinClaimNombre_DevuelveBadRequest()
-    {
-        // Arrange
-        SetUser("auth0|123", email: "test@test.com", nombre: null);
-
-        // Act
-        var result = await _sut.Sync(CancellationToken.None);
-
-        // Assert
-        Assert.IsType<BadRequestObjectResult>(result);
-        await _mediator.DidNotReceive().Send(Arg.Any<SyncUsuarioCommand>(), Arg.Any<CancellationToken>());
-    }
-
-    [Fact]
-    public async Task Sync_EnviaCommandConDatosDelToken()
+    public async Task Sync_EnviaCommandConDatosDelTokenYBody()
     {
         // Arrange
         const string idAuth0 = "auth0|999";
@@ -121,16 +97,18 @@ public class UsuariosControllerTests
         const string nombre = "Test User";
         SetUser(idAuth0, email, nombre);
 
-        var commandResult = new SyncUsuarioResult(1, idAuth0, email, nombre, EsNuevo: true);
-        _mediator.Send(Arg.Any<SyncUsuarioCommand>(), Arg.Any<CancellationToken>())
+        var commandResult = new EnsureUsuarioResult(1, idAuth0, email, nombre, null, null, true, null, EsNuevo: true);
+        _mediator.Send(Arg.Any<EnsureUsuarioCommand>(), Arg.Any<CancellationToken>())
             .Returns(commandResult);
 
+        var request = new EnsureUsuarioRequest(email, nombre, null, true, null);
+
         // Act
-        await _sut.Sync(CancellationToken.None);
+        await _sut.Ensure(request, CancellationToken.None);
 
         // Assert
         await _mediator.Received(1).Send(
-            Arg.Is<SyncUsuarioCommand>(c =>
+            Arg.Is<EnsureUsuarioCommand>(c =>
                 c.IdAuth0 == idAuth0 &&
                 c.Email == email &&
                 c.Nombre == nombre),

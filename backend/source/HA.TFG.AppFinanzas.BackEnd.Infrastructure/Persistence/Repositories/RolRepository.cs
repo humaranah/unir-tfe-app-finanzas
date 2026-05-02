@@ -6,7 +6,7 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Persistence.Repositories;
 
 public sealed class RolRepository(AppDbContext context) : IRolRepository
 {
-    public Task<Rol?> ObtenerPorNombreAsync(string nombre, CancellationToken cancellationToken) =>
+    public Task<Rol?> GetByNombreAsync(string nombre, CancellationToken cancellationToken) =>
         context.Roles
             .FirstOrDefaultAsync(r => r.Nombre == nombre, cancellationToken);
 }
