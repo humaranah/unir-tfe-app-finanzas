@@ -16,9 +16,13 @@ public class WelcomeViewModelTests
     private readonly IAuth0Client _auth0Client = Substitute.For<IAuth0Client>();
     private readonly ISessionStore _sessionStore = Substitute.For<ISessionStore>();
     private readonly IUsuarioSyncService _usuarioSyncService = Substitute.For<IUsuarioSyncService>();
+    private readonly IBackendHealthService _backendHealthService = Substitute.For<IBackendHealthService>();
 
-    private WelcomeViewModel CreateSut() =>
-        new(_auth0Client, _sessionStore, _usuarioSyncService);
+    private WelcomeViewModel CreateSut(bool backendAvailable = true)
+    {
+        _backendHealthService.IsAvailableAsync(Arg.Any<CancellationToken>()).Returns(backendAvailable);
+        return new(_auth0Client, _sessionStore, _usuarioSyncService, _backendHealthService);
+    }
 
     private static string BuildIdToken(string name, string email)
     {
@@ -112,7 +116,7 @@ public class WelcomeViewModelTests
         var sut = CreateSut();
         await sut.LoginCommand.ExecuteAsync(null);
 
-        await _usuarioSyncService.Received(1).EnsureUsuarioAsync(Arg.Any<UsuarioInfo>(), Arg.Any<CancellationToken>());
+        await _usuarioSyncService.Received(1).SyncUsuarioAsync(Arg.Any<UsuarioInfo>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -260,7 +264,7 @@ public class WelcomeViewModelTests
         var sut = CreateSut();
         await sut.TryRestoreSessionAsync();
 
-        await _usuarioSyncService.Received(1).EnsureUsuarioAsync(
+        await _usuarioSyncService.Received(1).SyncUsuarioAsync(
             Arg.Is<UsuarioInfo>(u => u.Email == "hugo@test.com" && u.Nombre == "Hugo"),
             Arg.Any<CancellationToken>());
     }

@@ -27,13 +27,15 @@ namespace HA.TFG.AppFinanzas.App
             try
             {
                 await _welcomeViewModel.TryRestoreSessionAsync();
-                if (_welcomeViewModel.IsAuthenticated)
-                    await GoToAsync("//home");
-                // Si no está autenticado, permanece en //login (ruta inicial del Shell)
+
+                // Navega directamente a home o login, sin pasar por la pantalla de splash
+                var destino = _welcomeViewModel.IsAuthenticated ? "//home" : "//login";
+                await GoToAsync(destino);
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Session restore failed: {ex}");
+                await GoToAsync("//login");
             }
         }
 

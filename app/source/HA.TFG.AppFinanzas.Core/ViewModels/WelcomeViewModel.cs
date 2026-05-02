@@ -11,11 +11,13 @@ namespace HA.TFG.AppFinanzas.App.Core.ViewModels;
 public partial class WelcomeViewModel(
     IAuth0Client client,
     ISessionStore sessionStore,
-    IUsuarioSyncService usuarioSyncService) : ObservableObject
+    IUsuarioSyncService usuarioSyncService,
+    IBackendHealthService backendHealthService) : ObservableObject
 {
     private readonly IAuth0Client _client = client;
     private readonly ISessionStore _sessionStore = sessionStore;
     private readonly IUsuarioSyncService _usuarioSyncService = usuarioSyncService;
+    private readonly IBackendHealthService _backendHealthService = backendHealthService;
 
     public string WelcomeTitle { get; } = "Hello, World!";
 
@@ -69,9 +71,18 @@ public partial class WelcomeViewModel(
             var claims = ParseIdToken(result.IdentityToken);
             var usuarioInfo = BuildUsuarioInfo(claims);
 
+            if (!await _backendHealthService.IsAvailableAsync(cancellationToken))
+            {
+                // Backend no disponible: restauramos sesión sin sincronizar
+                Name = usuarioInfo.Nombre;
+                Email = usuarioInfo.Email;
+                IsAuthenticated = true;
+                return;
+            }
+
             try
             {
-                await _usuarioSyncService.EnsureUsuarioAsync(usuarioInfo, cancellationToken);
+                await _usuarioSyncService.SyncUsuarioAsync(usuarioInfo, cancellationToken);
             }
             catch
             {
@@ -135,7 +146,7 @@ public partial class WelcomeViewModel(
         IsBusy = true;
         try
         {
-            var loginResult = await _client.LoginAsync();
+            var loginResult = await _client.LoginAsync(cancellationToken: cancellationToken);
             if (loginResult.IsError)
             {
                 if (loginResult.Error != "UserCancel")
@@ -151,9 +162,16 @@ public partial class WelcomeViewModel(
 
             var usuarioInfo = BuildUsuarioInfo(loginResult.User?.Claims ?? []);
 
+            if (!await _backendHealthService.IsAvailableAsync(cancellationToken))
+            {
+                Error = "El servidor no está disponible. Inténtalo de nuevo más tarde.";
+                await _sessionStore.ClearAsync();
+                return;
+            }
+
             try
             {
-                await _usuarioSyncService.EnsureUsuarioAsync(usuarioInfo, cancellationToken);
+                await _usuarioSyncService.SyncUsuarioAsync(usuarioInfo, cancellationToken);
             }
             catch
             {

@@ -14,6 +14,7 @@ internal static class BackendExtensions
 
         builder.Services.AddSingleton<ITokenProvider, AuthTokenProvider>();
         builder.Services.AddSingleton<IUsuarioSyncService, UsuariosApiClient>();
+        builder.Services.AddSingleton<IBackendHealthService, BackendHealthClient>();
         builder.Services.AddTransient<AuthHeaderHandler>();
 
         builder.Services.AddHttpClient("Backend", client =>
@@ -21,6 +22,13 @@ internal static class BackendExtensions
             client.BaseAddress = new Uri(baseUrl);
         })
         .AddHttpMessageHandler<AuthHeaderHandler>();
+
+        // Cliente sin autenticación, solo para /health
+        builder.Services.AddHttpClient("BackendHealth", client =>
+        {
+            client.BaseAddress = new Uri(baseUrl);
+            client.Timeout = TimeSpan.FromSeconds(5);
+        });
 
         return builder;
     }

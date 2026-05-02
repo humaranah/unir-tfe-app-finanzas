@@ -12,7 +12,7 @@ internal sealed class UsuariosApiClient(IHttpClientFactory httpClientFactory) : 
         bool EmailVerificado,
         DateTimeOffset? UltimaActualizacion);
 
-    public async Task EnsureUsuarioAsync(UsuarioInfo usuario, CancellationToken cancellationToken = default)
+    public async Task SyncUsuarioAsync(UsuarioInfo usuario, CancellationToken cancellationToken = default)
     {
         var client = httpClientFactory.CreateClient("Backend");
 
