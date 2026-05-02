@@ -9,7 +9,7 @@ namespace HA.TFG.AppFinanzas.BackEnd.Extensions;
 
 public static class AuthExtensions
 {
-    public static IServiceCollection AddAuth0(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddAuth0(this IServiceCollection services, IConfiguration configuration, IHostEnvironment env)
     {
         var domain = configuration["Auth0:Domain"];
         var audience = configuration["Auth0:Audience"];
@@ -35,37 +35,18 @@ public static class AuthExtensions
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true
                 };
-                options.Events = new JwtBearerEvents
+                options.Events.OnAuthenticationFailed = ctx =>
                 {
-                    OnAuthenticationFailed = ctx =>
-                    {
-                        Log.Debug("[JWT] Autenticación fallida: {ExceptionType} — {Message}",
-                            ctx.Exception.GetType().Name,
-                            ctx.Exception.Message);
-                        return Task.CompletedTask;
-                    },
-                    OnChallenge = ctx =>
-                    {
-                        Log.Debug("[JWT] Challenge enviado: {Error} — {ErrorDescription}",
-                            ctx.Error,
-                            ctx.ErrorDescription);
-                        return Task.CompletedTask;
-                    },
-                    OnTokenValidated = ctx =>
-                    {
-                        Log.Debug("[JWT] Token validado correctamente para subject: {Subject}",
-                            ctx.Principal?.FindFirst("sub")?.Value);
-                        return Task.CompletedTask;
-                    }
+                    if (env.IsDevelopment())
+                        Log.Debug(ctx.Exception, "[JWT] Autenticación fallida");
+                    return Task.CompletedTask;
                 };
             });
 
-        services.AddAuthorization(options =>
-        {
-            options.AddPolicy(Roles.Usuario, policy =>
+        services.AddAuthorizationBuilder()
+            .AddPolicy(Roles.Usuario, policy =>
                 policy.RequireAuthenticatedUser()
                       .RequireRole(Roles.Usuario));
-        });
         services.AddScoped<IClaimsTransformation, RolesClaimsTransformation>();
 
         return services;

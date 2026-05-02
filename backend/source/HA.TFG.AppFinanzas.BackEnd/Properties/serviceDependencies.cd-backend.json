@@ -12,7 +12,7 @@
       "secretStore": "AzureAppSettings",
       "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/ha-tfg-db-server/databases/ha-tfg-db-finanzas",
       "type": "mssql.azure",
-      "connectionId": "ConnectionStrings:DatabaseConnection",
+      "connectionId": "ConnectionStrings:SqlServer"
       "dynamicId": null
     },
     "secrets1": {

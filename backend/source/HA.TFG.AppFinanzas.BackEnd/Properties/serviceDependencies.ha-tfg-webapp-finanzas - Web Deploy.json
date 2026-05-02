@@ -5,7 +5,7 @@
       "secretStore": "AzureAppSettings",
       "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/ha-tfg-db-server/databases/ha-tfg-db-finanzas",
       "type": "mssql.azure",
-      "connectionId": "ConnectionStrings:DatabaseConnection"
+      "connectionId": "ConnectionStrings:SqlServer"
     },
     "secrets1": {
       "serviceConnectorResourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('serviceConnectorResourceGroupName')]/providers/Microsoft.Web/sites/ha-tfg-webapp-finanzas/providers/Microsoft.ServiceLinker/linkers/VaultUri_77A6F0D301",

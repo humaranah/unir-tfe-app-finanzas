@@ -6,7 +6,6 @@ using HA.TFG.AppFinanzas.BackEnd.Middleware;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using Azure.Identity;
 
 Log.Logger = new LoggerConfiguration()
     .Enrich.FromLogContext()
@@ -43,7 +42,7 @@ try
     {
         options.ServiceLifetime = ServiceLifetime.Scoped;
     });
-    builder.Services.AddAuth0(builder.Configuration);
+    builder.Services.AddAuth0(builder.Configuration, builder.Environment);
     builder.Services.AddControllers();
     builder.Services.AddOpenApiWithAuth0();
     builder.Services.AddHealthChecks();
