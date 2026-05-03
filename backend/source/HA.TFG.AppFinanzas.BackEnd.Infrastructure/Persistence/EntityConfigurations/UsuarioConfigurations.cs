@@ -11,17 +11,22 @@ internal class UsuarioConfigurations : IEntityTypeConfiguration<Usuario>
         builder.ToTable("usuarios");
         builder.HasKey(x => x.Id);
 
-        builder.Property(x => x.IdAuth0).IsRequired().HasMaxLength(100);
-        builder.HasIndex(x => x.IdAuth0).IsUnique();
         builder.Property(x => x.Email).IsRequired().HasMaxLength(255);
+        builder.HasIndex(x => x.Email).IsUnique();
         builder.Property(x => x.Nombre).IsRequired().HasMaxLength(255);
         builder.Property(x => x.FotoPerfil).HasMaxLength(2048).IsRequired(false);
-        builder.Property(x => x.Proveedor).HasMaxLength(100).IsRequired(false);
         builder.Property(x => x.EmailVerificado).IsRequired();
         builder.Property(x => x.UltimaActualizacion).IsRequired(false);
         builder.Property(x => x.Metadata).HasMaxLength(2000);
         builder.Property(x => x.FechaCreacion).IsRequired();
         builder.Property(x => x.FechaEliminacion).IsRequired(false);
+
+        // Relación one-to-many: Usuario -> UsuarioIdentidad
+        builder
+            .HasMany(x => x.Identidades)
+            .WithOne()
+            .HasForeignKey(x => x.IdUsuario)
+            .OnDelete(DeleteBehavior.Cascade);
 
         // Relación many-to-many: Usuario -> Rol (skip navigation a través de UsuarioRol)
         builder

@@ -4,6 +4,7 @@ using HA.TFG.AppFinanzas.BackEnd.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260503013125_UniqueIndex_Usuario_Email")]
+    partial class UniqueIndex_Usuario_Email
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -241,6 +244,11 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
                         .HasMaxLength(2048)
                         .HasColumnType("nvarchar(2048)");
 
+                    b.Property<string>("IdAuth0")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<string>("Metadata")
                         .IsRequired()
                         .HasMaxLength(2000)
@@ -251,12 +259,19 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<string>("Proveedor")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<DateTimeOffset?>("UltimaActualizacion")
                         .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
 
                     b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("IdAuth0")
                         .IsUnique();
 
                     b.ToTable("usuarios", (string)null);
@@ -275,36 +290,6 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
                     b.HasIndex("IdCuenta");
 
                     b.ToTable("usuario_cuentas", (string)null);
-                });
-
-            modelBuilder.Entity("HA.TFG.AppFinanzas.BackEnd.Domain.Models.UsuarioIdentidad", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("IdAuth0")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<long>("IdUsuario")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Proveedor")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IdAuth0")
-                        .IsUnique();
-
-                    b.HasIndex("IdUsuario");
-
-                    b.ToTable("usuario_identidades", (string)null);
                 });
 
             modelBuilder.Entity("HA.TFG.AppFinanzas.BackEnd.Domain.Models.UsuarioRol", b =>
@@ -374,15 +359,6 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("HA.TFG.AppFinanzas.BackEnd.Domain.Models.UsuarioIdentidad", b =>
-                {
-                    b.HasOne("HA.TFG.AppFinanzas.BackEnd.Domain.Models.Usuario", null)
-                        .WithMany("Identidades")
-                        .HasForeignKey("IdUsuario")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("HA.TFG.AppFinanzas.BackEnd.Domain.Models.UsuarioRol", b =>
                 {
                     b.HasOne("HA.TFG.AppFinanzas.BackEnd.Domain.Models.Rol", null)
@@ -406,11 +382,6 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
             modelBuilder.Entity("HA.TFG.AppFinanzas.BackEnd.Domain.Models.CuentaCategoria", b =>
                 {
                     b.Navigation("Transacciones");
-                });
-
-            modelBuilder.Entity("HA.TFG.AppFinanzas.BackEnd.Domain.Models.Usuario", b =>
-                {
-                    b.Navigation("Identidades");
                 });
 #pragma warning restore 612, 618
         }

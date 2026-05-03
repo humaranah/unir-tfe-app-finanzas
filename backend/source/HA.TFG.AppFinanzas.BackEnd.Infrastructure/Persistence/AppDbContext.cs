@@ -8,6 +8,7 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Persistence;
 public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
     public DbSet<Usuario> Usuarios { get; set; }
+    public DbSet<UsuarioIdentidad> UsuarioIdentidades { get; set; }
     public DbSet<Rol> Roles { get; set; }
     public DbSet<UsuarioRol> UsuariosRoles { get; set; }
     public DbSet<Categoria> Categorias { get; set; }

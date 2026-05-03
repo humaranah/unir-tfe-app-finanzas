@@ -31,8 +31,9 @@ public class EnsureUsuarioCommandHandlerTests
         var command = new EnsureUsuarioCommand("auth0|123", "test@test.com", "Test User", null, true, null);
 
         _usuarioRepository.GetByIdAuth0Async(command.IdAuth0, Arg.Any<CancellationToken>()).Returns((Usuario?)null);
+        _usuarioRepository.GetByEmailAsync(command.Email, Arg.Any<CancellationToken>()).Returns((Usuario?)null);
         _rolRepository.GetByNombreAsync(Roles.Usuario, Arg.Any<CancellationToken>()).Returns(RolUsuario);
-        _usuarioRepository.CreateAsync(Arg.Any<Usuario>(), Arg.Any<CancellationToken>()).Returns(call =>
+        _usuarioRepository.CreateAsync(Arg.Any<Usuario>(), Arg.Any<UsuarioIdentidad>(), Arg.Any<CancellationToken>()).Returns(call =>
             call.Arg<Usuario>() with { Id = 10 });
 
         // Act
@@ -40,12 +41,11 @@ public class EnsureUsuarioCommandHandlerTests
 
         // Assert
         Assert.True(result.EsNuevo);
-        Assert.Equal(command.IdAuth0, result.IdAuth0);
         Assert.Equal(command.Email, result.Email);
         Assert.Equal(command.Nombre, result.Nombre);
-        Assert.Equal("auth0", result.Proveedor);
         await _usuarioRepository.Received(1).CreateAsync(
             Arg.Is<Usuario>(u => u.Roles.Any(r => r.Nombre == Roles.Usuario)),
+            Arg.Is<UsuarioIdentidad>(i => i.IdAuth0 == command.IdAuth0 && i.Proveedor == "auth0"),
             CancellationToken.None);
     }
 
@@ -56,11 +56,42 @@ public class EnsureUsuarioCommandHandlerTests
         var command = new EnsureUsuarioCommand("auth0|123", "test@test.com", "Test User", null, true, null);
 
         _usuarioRepository.GetByIdAuth0Async(command.IdAuth0, Arg.Any<CancellationToken>()).Returns((Usuario?)null);
+        _usuarioRepository.GetByEmailAsync(command.Email, Arg.Any<CancellationToken>()).Returns((Usuario?)null);
         _rolRepository.GetByNombreAsync(Roles.Usuario, Arg.Any<CancellationToken>()).Returns((Rol?)null);
 
         // Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(
             () => _sut.Handle(command, CancellationToken.None).AsTask());
+    }
+
+    [Fact]
+    public async Task Handle_EmailExistenteNuevoProveedor_AnadeIdentidadSinCrearUsuario()
+    {
+        // Arrange
+        var command = new EnsureUsuarioCommand("microsoft|456", "test@test.com", "Test User", null, true, null);
+        var usuarioExistente = new Usuario
+        {
+            Id = 5,
+            Email = command.Email,
+            Nombre = command.Nombre,
+            FechaCreacion = DateTime.UtcNow
+        };
+
+        _usuarioRepository.GetByIdAuth0Async(command.IdAuth0, Arg.Any<CancellationToken>()).Returns((Usuario?)null);
+        _usuarioRepository.GetByEmailAsync(command.Email, Arg.Any<CancellationToken>()).Returns(usuarioExistente);
+
+        // Act
+        var result = await _sut.Handle(command, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.EsNuevo);
+        Assert.Equal(usuarioExistente.Id, result.Id);
+        await _usuarioRepository.Received(1).AddIdentidadAsync(
+            usuarioExistente.Id,
+            Arg.Is<UsuarioIdentidad>(i => i.IdAuth0 == command.IdAuth0 && i.Proveedor == "microsoft"),
+            CancellationToken.None);
+        await _usuarioRepository.DidNotReceive().CreateAsync(
+            Arg.Any<Usuario>(), Arg.Any<UsuarioIdentidad>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -71,7 +102,6 @@ public class EnsureUsuarioCommandHandlerTests
         var usuarioExistente = new Usuario
         {
             Id = 5,
-            IdAuth0 = command.IdAuth0,
             Email = command.Email,
             Nombre = command.Nombre,
             FechaCreacion = DateTime.UtcNow

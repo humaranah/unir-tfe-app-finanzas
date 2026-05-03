@@ -10,53 +10,58 @@ public sealed class EnsureUsuarioCommandHandler(
     IRolRepository rolRepository)
     : IRequestHandler<EnsureUsuarioCommand, EnsureUsuarioResult>
 {
-    private readonly IUsuarioRepository _usuarioRepository = usuarioRepository;
-    private readonly IRolRepository _rolRepository = rolRepository;
-
     public async ValueTask<EnsureUsuarioResult> Handle(
         EnsureUsuarioCommand command,
         CancellationToken cancellationToken)
     {
         var proveedor = ExtractProveedorFromSub(command.IdAuth0);
+        var identidad = new UsuarioIdentidad
+        {
+            IdAuth0 = command.IdAuth0,
+            Proveedor = proveedor
+        };
 
-        var usuario = await _usuarioRepository.GetByIdAuth0Async(command.IdAuth0, cancellationToken);
-
+        // Caso 1: la identidad (IdAuth0) ya existe → devolver usuario tal cual
+        var usuario = await usuarioRepository.GetByIdAuth0Async(command.IdAuth0, cancellationToken);
         if (usuario is not null)
             return ToResult(usuario, EsNuevo: false);
 
-        // Usuario nuevo: obtener rol "usuario" y asignárselo
-        var rolUsuario = await _rolRepository.GetByNombreAsync(Roles.Usuario, cancellationToken)
+        // Caso 2: el email existe pero con otro proveedor → añadir nueva identidad
+        var usuarioPorEmail = await usuarioRepository.GetByEmailAsync(command.Email, cancellationToken);
+        if (usuarioPorEmail is not null)
+        {
+            await usuarioRepository.AddIdentidadAsync(usuarioPorEmail.Id, identidad, cancellationToken);
+            return ToResult(usuarioPorEmail, EsNuevo: false);
+        }
+
+        // Caso 3: usuario nuevo → crear usuario e identidad
+        var rolUsuario = await rolRepository.GetByNombreAsync(Roles.Usuario, cancellationToken)
             ?? throw new InvalidOperationException(
                 $"El rol '{Roles.Usuario}' no existe en la base de datos. Ejecuta el seed de datos.");
 
         var nuevo = new Usuario
         {
-            IdAuth0 = command.IdAuth0,
             Email = command.Email,
             Nombre = command.Nombre,
             FotoPerfil = command.FotoPerfil,
-            Proveedor = proveedor,
             EmailVerificado = command.EmailVerificado,
             UltimaActualizacion = command.UltimaActualizacion,
             FechaCreacion = DateTime.UtcNow,
             Roles = [rolUsuario]
         };
 
-        nuevo = await _usuarioRepository.CreateAsync(nuevo, cancellationToken);
+        nuevo = await usuarioRepository.CreateAsync(nuevo, identidad, cancellationToken);
         return ToResult(nuevo, EsNuevo: true);
     }
 
     private static EnsureUsuarioResult ToResult(Usuario u, bool EsNuevo) =>
-        new(u.Id, u.IdAuth0, u.Email, u.Nombre,
-            u.FotoPerfil, u.Proveedor, u.EmailVerificado, u.UltimaActualizacion,
+        new(u.Id, u.Email, u.Nombre,
+            u.FotoPerfil, u.EmailVerificado, u.UltimaActualizacion,
             EsNuevo);
 
     private static string? ExtractProveedorFromSub(string sub)
     {
         var separatorIndex = sub.IndexOf('|');
-        if (separatorIndex <= 0)
-            return null;
-
-        return sub[..separatorIndex];
+        return separatorIndex > 0 ? sub[..separatorIndex] : null;
     }
 }

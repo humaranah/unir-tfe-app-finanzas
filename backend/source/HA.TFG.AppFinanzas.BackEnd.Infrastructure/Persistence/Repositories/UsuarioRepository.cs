@@ -8,14 +8,35 @@ public sealed class UsuarioRepository(AppDbContext context) : IUsuarioRepository
 {
     public Task<Usuario?> GetByIdAuth0Async(string idAuth0, CancellationToken cancellationToken) =>
         context.Usuarios
+            .Include(u => u.Identidades)
             .Include(u => u.Roles)
-            .FirstOrDefaultAsync(u => u.IdAuth0 == idAuth0, cancellationToken);
+            .FirstOrDefaultAsync(
+                u => u.Identidades.Any(i => i.IdAuth0 == idAuth0),
+                cancellationToken);
 
-    public async Task<Usuario> CreateAsync(Usuario usuario, CancellationToken cancellationToken)
+    public Task<Usuario?> GetByEmailAsync(string email, CancellationToken cancellationToken) =>
+        context.Usuarios
+            .Include(u => u.Identidades)
+            .Include(u => u.Roles)
+            .FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
+
+    public async Task<Usuario> CreateAsync(Usuario usuario, UsuarioIdentidad identidad, CancellationToken cancellationToken)
     {
         context.Usuarios.Add(usuario);
         await context.SaveChangesAsync(cancellationToken);
+
+        var identidadConId = identidad with { IdUsuario = usuario.Id };
+        context.UsuarioIdentidades.Add(identidadConId);
+        await context.SaveChangesAsync(cancellationToken);
+
         return usuario;
+    }
+
+    public async Task AddIdentidadAsync(long idUsuario, UsuarioIdentidad identidad, CancellationToken cancellationToken)
+    {
+        var identidadConId = identidad with { IdUsuario = idUsuario };
+        context.UsuarioIdentidades.Add(identidadConId);
+        await context.SaveChangesAsync(cancellationToken);
     }
 
     public async Task<Usuario> UpdateAsync(Usuario usuario, CancellationToken cancellationToken)
