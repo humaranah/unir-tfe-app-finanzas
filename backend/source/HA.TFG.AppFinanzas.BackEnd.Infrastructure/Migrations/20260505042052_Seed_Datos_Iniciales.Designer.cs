@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260426034625_Seed_Rol_Usuario")]
-    partial class Seed_Rol_Usuario
+    [Migration("20260505042052_Seed_Datos_Iniciales")]
+    partial class Seed_Datos_Iniciales
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,6 +54,104 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("categorias", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            Descripcion = "Cualquier tipo de ingreso",
+                            FechaCreacion = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Nombre = "Ingresos",
+                            Slug = "ingresos"
+                        },
+                        new
+                        {
+                            Id = 2L,
+                            Descripcion = "Alquiler, hipoteca y gastos del hogar",
+                            FechaCreacion = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Nombre = "Vivienda",
+                            Slug = "gastos-vivienda"
+                        },
+                        new
+                        {
+                            Id = 3L,
+                            Descripcion = "Compras en supermercado y alimentación en casa",
+                            FechaCreacion = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Nombre = "Supermercado",
+                            Slug = "gastos-supermercado"
+                        },
+                        new
+                        {
+                            Id = 4L,
+                            Descripcion = "Restaurantes, bares y comida para llevar",
+                            FechaCreacion = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Nombre = "Restaurantes",
+                            Slug = "gastos-restaurantes"
+                        },
+                        new
+                        {
+                            Id = 5L,
+                            Descripcion = "Combustible, transporte público y vehículo",
+                            FechaCreacion = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Nombre = "Transporte",
+                            Slug = "gastos-transporte"
+                        },
+                        new
+                        {
+                            Id = 6L,
+                            Descripcion = "Médico, farmacia y seguros de salud",
+                            FechaCreacion = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Nombre = "Salud",
+                            Slug = "gastos-salud"
+                        },
+                        new
+                        {
+                            Id = 7L,
+                            Descripcion = "Cursos, libros y formación",
+                            FechaCreacion = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Nombre = "Educación",
+                            Slug = "gastos-educacion"
+                        },
+                        new
+                        {
+                            Id = 8L,
+                            Descripcion = "Cine, viajes, hobbies y deportes",
+                            FechaCreacion = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Nombre = "Ocio y entretenimiento",
+                            Slug = "gastos-ocio"
+                        },
+                        new
+                        {
+                            Id = 9L,
+                            Descripcion = "Prendas de vestir y complementos",
+                            FechaCreacion = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Nombre = "Ropa y calzado",
+                            Slug = "gastos-ropa"
+                        },
+                        new
+                        {
+                            Id = 10L,
+                            Descripcion = "Dispositivos, software y suscripciones digitales",
+                            FechaCreacion = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Nombre = "Tecnología",
+                            Slug = "gastos-tecnologia"
+                        },
+                        new
+                        {
+                            Id = 11L,
+                            Descripcion = "Electricidad, agua, gas e internet",
+                            FechaCreacion = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Nombre = "Servicios",
+                            Slug = "gastos-servicios"
+                        },
+                        new
+                        {
+                            Id = 12L,
+                            Descripcion = "Gastos no clasificados",
+                            FechaCreacion = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Nombre = "Otros gastos",
+                            Slug = "gastos-otros"
+                        });
                 });
 
             modelBuilder.Entity("HA.TFG.AppFinanzas.BackEnd.Domain.Models.Cuenta", b =>
@@ -153,6 +251,15 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("roles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            Descripcion = "Rol base asignado a todos los usuarios registrados",
+                            FechaCreacion = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Nombre = "usuario"
+                        });
                 });
 
             modelBuilder.Entity("HA.TFG.AppFinanzas.BackEnd.Domain.Models.Transaccion", b =>
@@ -228,6 +335,9 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<bool>("EmailVerificado")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("datetime2");
 
@@ -237,10 +347,9 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
                     b.Property<DateTime?>("FechaModificacion")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("IdAuth0")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                    b.Property<string>("FotoPerfil")
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
 
                     b.Property<string>("Metadata")
                         .IsRequired()
@@ -252,9 +361,12 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<DateTimeOffset?>("UltimaActualizacion")
+                        .HasColumnType("datetimeoffset");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("IdAuth0")
+                    b.HasIndex("Email")
                         .IsUnique();
 
                     b.ToTable("usuarios", (string)null);
@@ -273,6 +385,36 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
                     b.HasIndex("IdCuenta");
 
                     b.ToTable("usuario_cuentas", (string)null);
+                });
+
+            modelBuilder.Entity("HA.TFG.AppFinanzas.BackEnd.Domain.Models.UsuarioIdentidad", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("IdAuth0")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<long>("IdUsuario")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Proveedor")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdAuth0")
+                        .IsUnique();
+
+                    b.HasIndex("IdUsuario");
+
+                    b.ToTable("usuario_identidades", (string)null);
                 });
 
             modelBuilder.Entity("HA.TFG.AppFinanzas.BackEnd.Domain.Models.UsuarioRol", b =>
@@ -342,6 +484,15 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("HA.TFG.AppFinanzas.BackEnd.Domain.Models.UsuarioIdentidad", b =>
+                {
+                    b.HasOne("HA.TFG.AppFinanzas.BackEnd.Domain.Models.Usuario", null)
+                        .WithMany("Identidades")
+                        .HasForeignKey("IdUsuario")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("HA.TFG.AppFinanzas.BackEnd.Domain.Models.UsuarioRol", b =>
                 {
                     b.HasOne("HA.TFG.AppFinanzas.BackEnd.Domain.Models.Rol", null)
@@ -365,6 +516,11 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
             modelBuilder.Entity("HA.TFG.AppFinanzas.BackEnd.Domain.Models.CuentaCategoria", b =>
                 {
                     b.Navigation("Transacciones");
+                });
+
+            modelBuilder.Entity("HA.TFG.AppFinanzas.BackEnd.Domain.Models.Usuario", b =>
+                {
+                    b.Navigation("Identidades");
                 });
 #pragma warning restore 612, 618
         }

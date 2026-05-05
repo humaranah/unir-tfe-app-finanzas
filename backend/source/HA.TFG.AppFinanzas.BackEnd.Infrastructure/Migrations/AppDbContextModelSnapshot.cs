@@ -51,6 +51,104 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("categorias", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            Descripcion = "Cualquier tipo de ingreso",
+                            FechaCreacion = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Nombre = "Ingresos",
+                            Slug = "ingresos"
+                        },
+                        new
+                        {
+                            Id = 2L,
+                            Descripcion = "Alquiler, hipoteca y gastos del hogar",
+                            FechaCreacion = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Nombre = "Vivienda",
+                            Slug = "gastos-vivienda"
+                        },
+                        new
+                        {
+                            Id = 3L,
+                            Descripcion = "Compras en supermercado y alimentación en casa",
+                            FechaCreacion = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Nombre = "Supermercado",
+                            Slug = "gastos-supermercado"
+                        },
+                        new
+                        {
+                            Id = 4L,
+                            Descripcion = "Restaurantes, bares y comida para llevar",
+                            FechaCreacion = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Nombre = "Restaurantes",
+                            Slug = "gastos-restaurantes"
+                        },
+                        new
+                        {
+                            Id = 5L,
+                            Descripcion = "Combustible, transporte público y vehículo",
+                            FechaCreacion = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Nombre = "Transporte",
+                            Slug = "gastos-transporte"
+                        },
+                        new
+                        {
+                            Id = 6L,
+                            Descripcion = "Médico, farmacia y seguros de salud",
+                            FechaCreacion = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Nombre = "Salud",
+                            Slug = "gastos-salud"
+                        },
+                        new
+                        {
+                            Id = 7L,
+                            Descripcion = "Cursos, libros y formación",
+                            FechaCreacion = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Nombre = "Educación",
+                            Slug = "gastos-educacion"
+                        },
+                        new
+                        {
+                            Id = 8L,
+                            Descripcion = "Cine, viajes, hobbies y deportes",
+                            FechaCreacion = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Nombre = "Ocio y entretenimiento",
+                            Slug = "gastos-ocio"
+                        },
+                        new
+                        {
+                            Id = 9L,
+                            Descripcion = "Prendas de vestir y complementos",
+                            FechaCreacion = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Nombre = "Ropa y calzado",
+                            Slug = "gastos-ropa"
+                        },
+                        new
+                        {
+                            Id = 10L,
+                            Descripcion = "Dispositivos, software y suscripciones digitales",
+                            FechaCreacion = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Nombre = "Tecnología",
+                            Slug = "gastos-tecnologia"
+                        },
+                        new
+                        {
+                            Id = 11L,
+                            Descripcion = "Electricidad, agua, gas e internet",
+                            FechaCreacion = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Nombre = "Servicios",
+                            Slug = "gastos-servicios"
+                        },
+                        new
+                        {
+                            Id = 12L,
+                            Descripcion = "Gastos no clasificados",
+                            FechaCreacion = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Nombre = "Otros gastos",
+                            Slug = "gastos-otros"
+                        });
                 });
 
             modelBuilder.Entity("HA.TFG.AppFinanzas.BackEnd.Domain.Models.Cuenta", b =>
@@ -150,6 +248,15 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("roles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            Descripcion = "Rol base asignado a todos los usuarios registrados",
+                            FechaCreacion = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Nombre = "usuario"
+                        });
                 });
 
             modelBuilder.Entity("HA.TFG.AppFinanzas.BackEnd.Domain.Models.Transaccion", b =>
