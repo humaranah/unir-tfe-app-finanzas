@@ -1,6 +1,8 @@
-﻿namespace HA.TFG.AppFinanzas.BackEnd.Domain.Models;
+﻿using HA.TFG.AppFinanzas.BackEnd.Domain.Common;
 
-public record CuentaCategoria
+namespace HA.TFG.AppFinanzas.BackEnd.Domain.Models;
+
+public record CuentaCategoria : IAuditable
 {
     public long Id { get; init; }
     public long IdCuenta { get; init; }

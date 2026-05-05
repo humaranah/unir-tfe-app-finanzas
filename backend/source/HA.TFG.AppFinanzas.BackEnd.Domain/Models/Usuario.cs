@@ -2,7 +2,7 @@
 
 namespace HA.TFG.AppFinanzas.BackEnd.Domain.Models;
 
-public record Usuario : ISoftDeleteable
+public record Usuario : IAuditable, ISoftDeleteable
 {
     public long Id { get; init; }
     public string Email { get; init; } = string.Empty;

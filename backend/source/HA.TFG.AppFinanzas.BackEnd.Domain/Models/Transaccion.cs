@@ -1,6 +1,8 @@
-﻿namespace HA.TFG.AppFinanzas.BackEnd.Domain.Models;
+﻿using HA.TFG.AppFinanzas.BackEnd.Domain.Common;
 
-public record Transaccion
+namespace HA.TFG.AppFinanzas.BackEnd.Domain.Models;
+
+public record Transaccion : IAuditable, ISoftDeleteable
 {
     public long Id { get; init; }
     public long IdCuenta { get; init; }
@@ -13,8 +15,9 @@ public record Transaccion
     public string Notas { get; init; } = string.Empty;
     public DateTime Fecha { get; init; }
     public DateTime FechaCreacion { get; init; }
-    public DateTime? FechaModificacion { get; set; }
+    public DateTime? FechaModificacion { get; init; }
+    public DateTime? FechaEliminacion { get; init; }
 
-    public Cuenta? Cuenta { get; set; }
-    public CuentaCategoria? Categoria { get; set; }
+    public Cuenta? Cuenta { get; init; }
+    public CuentaCategoria? Categoria { get; init; }
 }
