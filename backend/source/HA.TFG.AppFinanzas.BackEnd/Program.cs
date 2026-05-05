@@ -54,6 +54,7 @@ try
     app.UseHttpsRedirection();
     app.UseAuthentication();
     app.UseAuthorization();
+    app.UseMiddleware<ResolveUsuarioMiddleware>();
     app.MapHealthChecks("/health");
     app.MapControllers();
 
