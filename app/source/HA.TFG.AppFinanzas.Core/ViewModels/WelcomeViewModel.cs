@@ -11,12 +11,12 @@ namespace HA.TFG.AppFinanzas.App.Core.ViewModels;
 public partial class WelcomeViewModel(
     IAuth0Client client,
     ISessionStore sessionStore,
-    IUsuarioSyncService usuarioSyncService,
+    IUsuarioEnsureService usuarioEnsureService,
     IBackendHealthService backendHealthService) : ObservableObject
 {
     private readonly IAuth0Client _client = client;
     private readonly ISessionStore _sessionStore = sessionStore;
-    private readonly IUsuarioSyncService _usuarioSyncService = usuarioSyncService;
+    private readonly IUsuarioEnsureService _usuarioEnsureService = usuarioEnsureService;
     private readonly IBackendHealthService _backendHealthService = backendHealthService;
 
     public string WelcomeTitle { get; } = "Hello, World!";
@@ -82,7 +82,7 @@ public partial class WelcomeViewModel(
 
             try
             {
-                await _usuarioSyncService.SyncUsuarioAsync(usuarioInfo, cancellationToken);
+                await _usuarioEnsureService.EnsureUsuarioAsync(cancellationToken);
             }
             catch
             {
@@ -171,12 +171,12 @@ public partial class WelcomeViewModel(
 
             try
             {
-                await _usuarioSyncService.SyncUsuarioAsync(usuarioInfo, cancellationToken);
+                await _usuarioEnsureService.EnsureUsuarioAsync(cancellationToken);
             }
             catch
             {
                 await _sessionStore.ClearAsync();
-                Error = "No se pudo sincronizar tu usuario con el backend.";
+                Error = "No se pudo verificar tu usuario con el backend.";
                 return;
             }
 

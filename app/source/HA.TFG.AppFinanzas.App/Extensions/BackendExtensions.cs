@@ -13,7 +13,7 @@ internal static class BackendExtensions
             throw new InvalidOperationException("Backend:BaseUrl is not configured.");
 
         builder.Services.AddSingleton<ITokenProvider, AuthTokenProvider>();
-        builder.Services.AddSingleton<IUsuarioSyncService, UsuariosApiClient>();
+        builder.Services.AddSingleton<IUsuarioEnsureService, UsuariosApiClient>();
         builder.Services.AddSingleton<IBackendHealthService, BackendHealthClient>();
         builder.Services.AddTransient<AuthHeaderHandler>();
 
