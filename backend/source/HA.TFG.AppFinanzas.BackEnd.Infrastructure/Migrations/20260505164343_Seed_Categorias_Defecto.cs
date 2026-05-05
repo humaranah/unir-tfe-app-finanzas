@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class Seed_Datos_Iniciales : Migration
+    public partial class Seed_Categorias_Defecto : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -31,11 +31,6 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
                     { 11L, "Electricidad, agua, gas e internet", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Servicios", "gastos-servicios" },
                     { 12L, "Gastos no clasificados", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Otros gastos", "gastos-otros" }
                 });
-
-            migrationBuilder.InsertData(
-                table: "roles",
-                columns: new[] { "Id", "Descripcion", "FechaCreacion", "FechaEliminacion", "Nombre" },
-                values: new object[] { 1L, "Rol base asignado a todos los usuarios registrados", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "usuario" });
         }
 
         /// <inheritdoc />
@@ -100,11 +95,6 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
                 table: "categorias",
                 keyColumn: "Id",
                 keyValue: 12L);
-
-            migrationBuilder.DeleteData(
-                table: "roles",
-                keyColumn: "Id",
-                keyValue: 1L);
         }
     }
 }

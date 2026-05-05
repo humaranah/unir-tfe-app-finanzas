@@ -44,10 +44,6 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
     {
         var fecha = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-        modelBuilder.Entity<Rol>().HasData(
-            new Rol { Id = 1, Nombre = "usuario", Descripcion = "Rol base asignado a todos los usuarios registrados", FechaCreacion = fecha }
-        );
-
         modelBuilder.Entity<Categoria>().HasData(
             new Categoria { Id = 1, Slug = "ingresos", Nombre = "Ingresos", Descripcion = "Cualquier tipo de ingreso", FechaCreacion = fecha },
             new Categoria { Id = 2, Slug = "gastos-vivienda", Nombre = "Vivienda", Descripcion = "Alquiler, hipoteca y gastos del hogar", FechaCreacion = fecha },
