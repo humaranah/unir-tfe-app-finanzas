@@ -7,7 +7,8 @@ namespace HA.TFG.AppFinanzas.BackEnd.Application.Features.Usuarios.Commands.Ensu
 
 public sealed class EnsureUsuarioCommandHandler(
     IUsuarioRepository usuarioRepository,
-    IRolRepository rolRepository)
+    IRolRepository rolRepository,
+    IAuth0UserInfoService auth0UserInfoService)
     : IRequestHandler<EnsureUsuarioCommand, EnsureUsuarioResult>
 {
     public async ValueTask<EnsureUsuarioResult> Handle(
@@ -21,13 +22,16 @@ public sealed class EnsureUsuarioCommandHandler(
             Proveedor = proveedor
         };
 
-        // Caso 1: la identidad (IdAuth0) ya existe → devolver usuario tal cual
+        // Caso 1: la identidad (IdAuth0) ya existe → devolver usuario sin llamar a /userinfo
         var usuario = await usuarioRepository.GetByIdAuth0Async(command.IdAuth0, cancellationToken);
         if (usuario is not null)
             return ToResult(usuario, EsNuevo: false);
 
+        // Casos 2 y 3 requieren datos de perfil → obtener desde Auth0 /userinfo
+        var userInfo = await auth0UserInfoService.GetUserInfoAsync(command.AccessToken, cancellationToken);
+
         // Caso 2: el email existe pero con otro proveedor → añadir nueva identidad
-        var usuarioPorEmail = await usuarioRepository.GetByEmailAsync(command.Email, cancellationToken);
+        var usuarioPorEmail = await usuarioRepository.GetByEmailAsync(userInfo.Email, cancellationToken);
         if (usuarioPorEmail is not null)
         {
             await usuarioRepository.AddIdentidadAsync(usuarioPorEmail.Id, identidad, cancellationToken);
@@ -41,11 +45,11 @@ public sealed class EnsureUsuarioCommandHandler(
 
         var nuevo = new Usuario
         {
-            Email = command.Email,
-            Nombre = command.Nombre,
-            FotoPerfil = command.FotoPerfil,
-            EmailVerificado = command.EmailVerificado,
-            UltimaActualizacion = command.UltimaActualizacion,
+            Email = userInfo.Email,
+            Nombre = userInfo.Nombre,
+            FotoPerfil = userInfo.FotoPerfil,
+            EmailVerificado = userInfo.EmailVerificado,
+            UltimaActualizacion = userInfo.UltimaActualizacion,
             FechaCreacion = DateTime.UtcNow,
             Roles = [rolUsuario]
         };

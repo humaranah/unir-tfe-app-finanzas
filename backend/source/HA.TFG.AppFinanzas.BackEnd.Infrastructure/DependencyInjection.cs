@@ -1,4 +1,5 @@
 using HA.TFG.AppFinanzas.BackEnd.Application.Contracts;
+using HA.TFG.AppFinanzas.BackEnd.Infrastructure.ExternalServices.Auth0;
 using HA.TFG.AppFinanzas.BackEnd.Infrastructure.Persistence;
 using HA.TFG.AppFinanzas.BackEnd.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -27,6 +28,13 @@ public static class DependencyInjection
 
         services.AddScoped<IUsuarioRepository, UsuarioRepository>();
         services.AddScoped<IRolRepository, RolRepository>();
+
+        var auth0Domain = configuration["Auth0:Domain"]
+            ?? throw new InvalidOperationException("Auth0:Domain no está configurado. Revisa appsettings.json o las variables de entorno.");
+        services.AddHttpClient<IAuth0UserInfoService, Auth0UserInfoService>(client =>
+        {
+            client.BaseAddress = new Uri(auth0Domain.TrimEnd('/') + "/");
+        });
 
         return services;
     }
