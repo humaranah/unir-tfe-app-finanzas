@@ -42,7 +42,7 @@ try
     {
         options.ServiceLifetime = ServiceLifetime.Scoped;
     });
-    builder.Services.AddAuth0(builder.Configuration, builder.Environment);
+    builder.Services.AddAuth0(builder.Environment);
     builder.Services.AddControllers();
     builder.Services.AddOpenApiWithAuth0();
     builder.Services.AddHealthChecks();
@@ -54,6 +54,7 @@ try
     app.UseHttpsRedirection();
     app.UseAuthentication();
     app.UseAuthorization();
+    app.UseMiddleware<ResolveUsuarioMiddleware>();
     app.MapHealthChecks("/health");
     app.MapControllers();
 

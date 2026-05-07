@@ -1,9 +1,11 @@
 using HA.TFG.AppFinanzas.BackEnd.Application.Contracts;
+using HA.TFG.AppFinanzas.BackEnd.Infrastructure.ExternalServices.Auth0;
 using HA.TFG.AppFinanzas.BackEnd.Infrastructure.Persistence;
 using HA.TFG.AppFinanzas.BackEnd.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure;
 
@@ -27,6 +29,20 @@ public static class DependencyInjection
 
         services.AddScoped<IUsuarioRepository, UsuarioRepository>();
         services.AddScoped<IRolRepository, RolRepository>();
+        services.AddScoped<ICuentaRepository, CuentaRepository>();
+        services.AddScoped<ICategoriaRepository, CategoriaRepository>();
+        services.AddScoped<ITransaccionRepository, TransaccionRepository>();
+
+        services.AddOptions<Auth0Config>()
+            .Bind(configuration.GetSection(Auth0Config.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        services.AddHttpClient<IAuth0UserInfoService, Auth0UserInfoService>((sp, client) =>
+        {
+            var auth0Config = sp.GetRequiredService<IOptions<Auth0Config>>().Value;
+            client.BaseAddress = new Uri(auth0Config.Domain.TrimEnd('/') + "/");
+        });
 
         return services;
     }

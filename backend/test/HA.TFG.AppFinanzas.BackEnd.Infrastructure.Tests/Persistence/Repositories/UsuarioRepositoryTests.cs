@@ -20,12 +20,13 @@ public class UsuarioRepositoryTests : AppDbContextTestBase
         var usuario = new Usuario
         {
             Id = 1,
-            IdAuth0 = "auth0|123",
             Email = "test@test.com",
             Nombre = "Test",
             FechaCreacion = DateTime.UtcNow
         };
+        var identidad = new UsuarioIdentidad { Id = 1, IdAuth0 = "auth0|123", Proveedor = "auth0", IdUsuario = 1 };
         Context.Usuarios.Add(usuario);
+        Context.UsuarioIdentidades.Add(identidad);
         await Context.SaveChangesAsync(CancellationToken.None);
 
         // Act
@@ -33,7 +34,6 @@ public class UsuarioRepositoryTests : AppDbContextTestBase
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(usuario.IdAuth0, result.IdAuth0);
         Assert.Equal(usuario.Email, result.Email);
     }
 
@@ -54,13 +54,14 @@ public class UsuarioRepositoryTests : AppDbContextTestBase
         var usuario = new Usuario
         {
             Id = 2,
-            IdAuth0 = "auth0|eliminado",
             Email = "eliminado@test.com",
             Nombre = "Eliminado",
             FechaCreacion = DateTime.UtcNow,
             FechaEliminacion = DateTime.UtcNow
         };
+        var identidad = new UsuarioIdentidad { Id = 2, IdAuth0 = "auth0|eliminado", IdUsuario = 2 };
         Context.Usuarios.Add(usuario);
+        Context.UsuarioIdentidades.Add(identidad);
         await Context.SaveChangesAsync(CancellationToken.None);
 
         // Act
@@ -78,13 +79,14 @@ public class UsuarioRepositoryTests : AppDbContextTestBase
         var usuario = new Usuario
         {
             Id = 3,
-            IdAuth0 = "auth0|conroles",
             Email = "conroles@test.com",
             Nombre = "Con Roles",
             FechaCreacion = DateTime.UtcNow,
             Roles = [rol]
         };
+        var identidad = new UsuarioIdentidad { Id = 3, IdAuth0 = "auth0|conroles", IdUsuario = 3 };
         Context.Usuarios.Add(usuario);
+        Context.UsuarioIdentidades.Add(identidad);
         await Context.SaveChangesAsync(CancellationToken.None);
 
         // Act
@@ -103,20 +105,23 @@ public class UsuarioRepositoryTests : AppDbContextTestBase
         var usuario = new Usuario
         {
             Id = 10,
-            IdAuth0 = "auth0|nuevo",
             Email = "nuevo@test.com",
             Nombre = "Nuevo",
             FechaCreacion = DateTime.UtcNow
         };
+        var identidad = new UsuarioIdentidad { IdAuth0 = "auth0|nuevo", Proveedor = "auth0" };
 
         // Act
-        var result = await _sut.CreateAsync(usuario, TestContext.Current.CancellationToken);
+        var result = await _sut.CreateAsync(usuario, identidad, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.NotNull(result);
         var enBD = await Context.Usuarios.FindAsync([result.Id], TestContext.Current.CancellationToken);
         Assert.NotNull(enBD);
-        Assert.Equal(usuario.IdAuth0, enBD.IdAuth0);
+        Assert.Equal(usuario.Email, enBD.Email);
+        var identidadEnBD = Context.UsuarioIdentidades.FirstOrDefault(i => i.IdUsuario == result.Id);
+        Assert.NotNull(identidadEnBD);
+        Assert.Equal("auth0|nuevo", identidadEnBD.IdAuth0);
     }
 
     [Fact]
@@ -126,7 +131,6 @@ public class UsuarioRepositoryTests : AppDbContextTestBase
         var usuario = new Usuario
         {
             Id = 20,
-            IdAuth0 = "auth0|actualizar",
             Email = "viejo@test.com",
             Nombre = "Viejo",
             FechaCreacion = DateTime.UtcNow

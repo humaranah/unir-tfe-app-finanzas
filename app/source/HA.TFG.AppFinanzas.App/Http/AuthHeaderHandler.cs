@@ -3,7 +3,7 @@ using System.Net.Http.Headers;
 
 namespace HA.TFG.AppFinanzas.App.Http;
 
-internal sealed class AuthHeaderHandler(ITokenProvider tokenProvider) : DelegatingHandler
+internal sealed partial class AuthHeaderHandler(ITokenProvider tokenProvider) : DelegatingHandler
 {
     protected override async Task<HttpResponseMessage> SendAsync(
         HttpRequestMessage request,

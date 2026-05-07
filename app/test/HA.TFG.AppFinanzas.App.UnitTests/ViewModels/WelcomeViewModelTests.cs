@@ -15,13 +15,13 @@ public class WelcomeViewModelTests
 {
     private readonly IAuth0Client _auth0Client = Substitute.For<IAuth0Client>();
     private readonly ISessionStore _sessionStore = Substitute.For<ISessionStore>();
-    private readonly IUsuarioSyncService _usuarioSyncService = Substitute.For<IUsuarioSyncService>();
+    private readonly IUsuarioEnsureService _usuarioEnsureService = Substitute.For<IUsuarioEnsureService>();
     private readonly IBackendHealthService _backendHealthService = Substitute.For<IBackendHealthService>();
 
     private WelcomeViewModel CreateSut(bool backendAvailable = true)
     {
         _backendHealthService.IsAvailableAsync(Arg.Any<CancellationToken>()).Returns(backendAvailable);
-        return new(_auth0Client, _sessionStore, _usuarioSyncService, _backendHealthService);
+        return new(_auth0Client, _sessionStore, _usuarioEnsureService, _backendHealthService);
     }
 
     private static string BuildIdToken(string name, string email)
@@ -108,7 +108,7 @@ public class WelcomeViewModelTests
     }
 
     [Fact]
-    public async Task LoginAsync_WhenSuccessful_CallsSyncUsuario()
+    public async Task LoginAsync_WhenSuccessful_CallsEnsureUsuario()
     {
         _auth0Client.LoginAsync(Arg.Any<object>(), Arg.Any<CancellationToken>())
             .Returns(BuildLoginResult(refreshToken: "rt_abc"));
@@ -116,7 +116,7 @@ public class WelcomeViewModelTests
         var sut = CreateSut();
         await sut.LoginCommand.ExecuteAsync(null);
 
-        await _usuarioSyncService.Received(1).SyncUsuarioAsync(Arg.Any<UsuarioInfo>(), Arg.Any<CancellationToken>());
+        await _usuarioEnsureService.Received(1).EnsureUsuarioAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -254,7 +254,7 @@ public class WelcomeViewModelTests
     }
 
     [Fact]
-    public async Task TryRestoreSessionAsync_WhenRefreshSucceeds_CallsSyncUsuario()
+    public async Task TryRestoreSessionAsync_WhenRefreshSucceeds_CallsEnsureUsuario()
     {
         var idToken = BuildIdToken("Hugo", "hugo@test.com");
         _sessionStore.LoadRefreshTokenAsync().Returns("rt_old");
@@ -264,9 +264,7 @@ public class WelcomeViewModelTests
         var sut = CreateSut();
         await sut.TryRestoreSessionAsync();
 
-        await _usuarioSyncService.Received(1).SyncUsuarioAsync(
-            Arg.Is<UsuarioInfo>(u => u.Email == "hugo@test.com" && u.Nombre == "Hugo"),
-            Arg.Any<CancellationToken>());
+        await _usuarioEnsureService.Received(1).EnsureUsuarioAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]

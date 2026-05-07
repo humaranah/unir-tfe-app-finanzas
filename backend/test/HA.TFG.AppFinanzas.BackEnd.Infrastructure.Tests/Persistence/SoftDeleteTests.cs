@@ -12,7 +12,6 @@ public class SoftDeleteTests : AppDbContextTestBase
         var usuario = new Usuario
         {
             Id = 1,
-            IdAuth0 = "auth0|100",
             Email = "test@test.com",
             Nombre = "Test",
             FechaCreacion = DateTime.UtcNow,
@@ -33,7 +32,6 @@ public class SoftDeleteTests : AppDbContextTestBase
         var usuario = new Usuario
         {
             Id = 2,
-            IdAuth0 = "auth0|200",
             Email = "activo@test.com",
             Nombre = "Activo",
             FechaCreacion = DateTime.UtcNow,
@@ -54,7 +52,6 @@ public class SoftDeleteTests : AppDbContextTestBase
         var usuario = new Usuario
         {
             Id = 3,
-            IdAuth0 = "auth0|300",
             Email = "eliminado@test.com",
             Nombre = "Eliminado",
             FechaCreacion = DateTime.UtcNow,

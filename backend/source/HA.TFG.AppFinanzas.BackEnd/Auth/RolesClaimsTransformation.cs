@@ -15,9 +15,11 @@ public sealed class RolesClaimsTransformation(AppDbContext context) : IClaimsTra
         if (string.IsNullOrWhiteSpace(idAuth0))
             return principal;
 
-        var roles = await context.Usuarios
-            .Where(u => u.IdAuth0 == idAuth0)
-            .SelectMany(u => u.Roles)
+        var roles = await context.UsuarioIdentidades
+            .Where(i => i.IdAuth0 == idAuth0)
+            .SelectMany(i => context.Usuarios
+                .Where(u => u.Id == i.IdUsuario)
+                .SelectMany(u => u.Roles))
             .Select(r => r.Nombre)
             .ToListAsync();
 
