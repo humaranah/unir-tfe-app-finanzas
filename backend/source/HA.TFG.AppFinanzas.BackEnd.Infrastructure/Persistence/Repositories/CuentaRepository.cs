@@ -32,26 +32,20 @@ public class CuentaRepository(AppDbContext context) : ICuentaRepository
         var cuenta = new Cuenta
         {
             Nombre = "Mi cuenta",
-            Descripcion = "Cuenta principal"
+            Descripcion = "Cuenta principal",
+            FechaCreacion = DateTime.UtcNow,
+            Usuarios = [usuario],
+            Categorias = [.. categorias.Select(c => new CuentaCategoria
+            {
+                IdOrigen = c.Id,
+                Slug = c.Slug,
+                Nombre = c.Nombre,
+                Descripcion = c.Descripcion,
+                FechaCreacion = DateTime.UtcNow
+            })]
         };
 
         _context.Cuentas.Add(cuenta);
-        await _context.SaveChangesAsync(cancellationToken);
-
-        var usuarioCuenta = new UsuarioCuenta { IdUsuario = idUsuario, IdCuenta = cuenta.Id };
-        _context.UsuariosCuentas.Add(usuarioCuenta);
-
-        var cuentaCategorias = categorias.Select(c => new CuentaCategoria
-        {
-            IdCuenta = cuenta.Id,
-            IdOrigen = c.Id,
-            Slug = c.Slug,
-            Nombre = c.Nombre,
-            Descripcion = c.Descripcion,
-            FechaCreacion = DateTime.UtcNow
-        });
-
-        _context.CuentaCategorias.AddRange(cuentaCategorias);
         await _context.SaveChangesAsync(cancellationToken);
 
         return cuenta;

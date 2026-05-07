@@ -2,11 +2,8 @@
 
 namespace HA.TFG.AppFinanzas.BackEnd.Controllers.Requests;
 
-public record GetTransaccionesRequest
+public record GetTransaccionesRequestFilters
 {
-    [FromRoute(Name = "idCuenta")]
-    public required long IdCuenta { get; init; }
-
     [FromQuery(Name = "idCategoria")]
     public long? IdCategoria { get; init; }
 

@@ -24,10 +24,13 @@ public sealed class CuentasController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("{idCuenta:long}/transacciones")]
-    public async Task<IActionResult> GetTransacciones(GetTransaccionesRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetTransacciones(
+        [FromRoute] long idCuenta,
+        [FromQuery] GetTransaccionesRequestFilters filters,
+        CancellationToken cancellationToken)
     {
         var email = User.Identity?.Name ?? string.Empty;
-        var query = request.ToQuery(email);
+        var query = filters.ToQuery(idCuenta, email);
         var result = await _mediator.Send(query, cancellationToken);
         return Ok(result);
     }

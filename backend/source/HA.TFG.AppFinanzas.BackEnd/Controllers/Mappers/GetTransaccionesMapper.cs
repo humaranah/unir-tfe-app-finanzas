@@ -5,10 +5,13 @@ namespace HA.TFG.AppFinanzas.BackEnd.Controllers.Mappers;
 
 public static class GetTransaccionesMapper
 {
-    public static GetTransaccionesQuery ToQuery(this GetTransaccionesRequest request, string emailUsuario) =>
+    public static GetTransaccionesQuery ToQuery(
+        this GetTransaccionesRequestFilters request,
+        long idCuenta,
+        string emailUsuario) =>
         new()
         {
-            IdCuenta = request.IdCuenta,
+            IdCuenta = idCuenta,
             EmailUsuario = emailUsuario,
             IdCategoria = request.IdCategoria,
             FechaDesde = request.FechaDesde,

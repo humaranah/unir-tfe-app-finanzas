@@ -22,14 +22,10 @@ public sealed class UsuarioRepository(AppDbContext context) : IUsuarioRepository
 
     public async Task<Usuario> CreateAsync(Usuario usuario, UsuarioIdentidad identidad, CancellationToken cancellationToken)
     {
-        context.Usuarios.Add(usuario);
+        var usuarioConIdentidad = usuario with { Identidades = [identidad] };
+        context.Usuarios.Add(usuarioConIdentidad);
         await context.SaveChangesAsync(cancellationToken);
-
-        var identidadConId = identidad with { IdUsuario = usuario.Id };
-        context.UsuarioIdentidades.Add(identidadConId);
-        await context.SaveChangesAsync(cancellationToken);
-
-        return usuario;
+        return usuarioConIdentidad;
     }
 
     public async Task AddIdentidadAsync(long idUsuario, UsuarioIdentidad identidad, CancellationToken cancellationToken)
