@@ -1,4 +1,6 @@
 ﻿using HA.TFG.AppFinanzas.BackEnd.Application.Features.Cuentas.GetCuentasQuery;
+using HA.TFG.AppFinanzas.BackEnd.Controllers.Mappers;
+using HA.TFG.AppFinanzas.BackEnd.Controllers.Requests;
 using HA.TFG.AppFinanzas.BackEnd.Domain.Common;
 using Mediator;
 using Microsoft.AspNetCore.Authorization;
@@ -17,6 +19,15 @@ public sealed class CuentasController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> GetCuentas(CancellationToken cancellationToken)
     {
         var query = new GetCuentasQuery(User.Identity?.Name ?? string.Empty);
+        var result = await _mediator.Send(query, cancellationToken);
+        return Ok(result);
+    }
+
+    [HttpGet("{idCuenta:long}/transacciones")]
+    public async Task<IActionResult> GetTransacciones(GetTransaccionesRequest request, CancellationToken cancellationToken)
+    {
+        var email = User.Identity?.Name ?? string.Empty;
+        var query = request.ToQuery(email);
         var result = await _mediator.Send(query, cancellationToken);
         return Ok(result);
     }
