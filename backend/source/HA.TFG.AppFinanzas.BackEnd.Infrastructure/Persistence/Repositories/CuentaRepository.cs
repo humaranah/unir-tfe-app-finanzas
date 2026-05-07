@@ -8,20 +8,26 @@ public class CuentaRepository(AppDbContext context) : ICuentaRepository
 {
     private readonly AppDbContext _context = context;
 
-    public async Task<IReadOnlyList<Cuenta>> GetCuentasByUsuarioIdAsync(long usuarioId, CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<Cuenta>> GetCuentasByUsuarioIdAsync(long idUsuario, CancellationToken cancellationToken)
     {
         var cuentas = await _context.Usuarios
-            .Where(u => u.Id == usuarioId)
+            .Where(u => u.Id == idUsuario)
             .SelectMany(u => u.Cuentas)
             .ToListAsync(cancellationToken);
 
         return cuentas ?? [];
     }
 
-    public async Task<Cuenta> CreateCuentaConCategoriasAsync(long usuarioId, IReadOnlyList<Categoria> categorias, CancellationToken cancellationToken)
+    public Task<Cuenta?> GetCuentaByIdAsync(long idUsuario, long idCuenta, CancellationToken cancellationToken) =>
+        _context.Usuarios
+            .Where(u => u.Id == idUsuario)
+            .SelectMany(u => u.Cuentas)
+            .FirstOrDefaultAsync(c => c.Id == idCuenta, cancellationToken);
+
+    public async Task<Cuenta> CreateCuentaConCategoriasAsync(long idUsuario, IReadOnlyList<Categoria> categorias, CancellationToken cancellationToken)
     {
-        var usuario = await _context.Usuarios.FindAsync([usuarioId], cancellationToken)
-            ?? throw new InvalidOperationException($"No se encontró el usuario con Id {usuarioId}.");
+        var usuario = await _context.Usuarios.FindAsync([idUsuario], cancellationToken)
+            ?? throw new InvalidOperationException($"No se encontró el usuario con Id {idUsuario}.");
 
         var cuenta = new Cuenta
         {
@@ -32,7 +38,7 @@ public class CuentaRepository(AppDbContext context) : ICuentaRepository
         _context.Cuentas.Add(cuenta);
         await _context.SaveChangesAsync(cancellationToken);
 
-        var usuarioCuenta = new UsuarioCuenta { IdUsuario = usuarioId, IdCuenta = cuenta.Id };
+        var usuarioCuenta = new UsuarioCuenta { IdUsuario = idUsuario, IdCuenta = cuenta.Id };
         _context.UsuariosCuentas.Add(usuarioCuenta);
 
         var cuentaCategorias = categorias.Select(c => new CuentaCategoria

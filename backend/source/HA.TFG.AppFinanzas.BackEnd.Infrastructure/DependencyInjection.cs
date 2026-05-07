@@ -30,6 +30,7 @@ public static class DependencyInjection
         services.AddScoped<IRolRepository, RolRepository>();
         services.AddScoped<ICuentaRepository, CuentaRepository>();
         services.AddScoped<ICategoriaRepository, CategoriaRepository>();
+        services.AddScoped<ITransaccionRepository, TransaccionRepository>();
 
         var auth0Domain = configuration["Auth0:Domain"]
             ?? throw new InvalidOperationException("Auth0:Domain no está configurado. Revisa appsettings.json o las variables de entorno.");
