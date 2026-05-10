@@ -1,5 +1,7 @@
+using HA.TFG.AppFinanzas.BackEnd.Application.Features.Cuentas.CreateCuentaCommand;
 using HA.TFG.AppFinanzas.BackEnd.Application.Features.Cuentas.GetCuentasQuery;
 using HA.TFG.AppFinanzas.BackEnd.Controllers;
+using HA.TFG.AppFinanzas.BackEnd.Controllers.Requests;
 using Mediator;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -65,6 +67,42 @@ public class CuentasControllerTests
         // Assert
         await _mediator.Received(1).Send(
             Arg.Is<GetCuentasQuery>(q => q.Email == email),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task CreateCuenta_DevuelveOk_ConResultado()
+    {
+        // Arrange
+        SetUser("test@test.com");
+        var request = new CreateCuentaRequest { Moneda = "EUR", Descripcion = "Mi cuenta" };
+        var createResult = new CreateCuentaResult { IdCuenta = 1, Moneda = "EUR", Descripcion = "Mi cuenta" };
+        _mediator.Send(Arg.Any<CreateCuentaCommand>(), Arg.Any<CancellationToken>()).Returns(createResult);
+
+        // Act
+        var result = await _sut.CreateCuenta(request, CancellationToken.None);
+
+        // Assert
+        var ok = Assert.IsType<OkObjectResult>(result);
+        Assert.Equal(createResult, ok.Value);
+    }
+
+    [Fact]
+    public async Task CreateCuenta_EnviaCommandConEmailDelUsuario()
+    {
+        // Arrange
+        const string email = "test@test.com";
+        SetUser(email);
+        var request = new CreateCuentaRequest { Moneda = "USD" };
+        _mediator.Send(Arg.Any<CreateCuentaCommand>(), Arg.Any<CancellationToken>())
+            .Returns(new CreateCuentaResult());
+
+        // Act
+        await _sut.CreateCuenta(request, CancellationToken.None);
+
+        // Assert
+        await _mediator.Received(1).Send(
+            Arg.Is<CreateCuentaCommand>(c => c.Email == email && c.Moneda == "USD"),
             Arg.Any<CancellationToken>());
     }
 }
