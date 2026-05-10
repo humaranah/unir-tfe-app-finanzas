@@ -24,8 +24,8 @@ public class GetCuentasQueryHandlerTests
         var usuario = new Usuario { Id = 1, Email = "test@test.com", Nombre = "Test" };
         var cuentas = new List<Cuenta>
         {
-            new() { Id = 10, Nombre = "Cuenta A", Descripcion = "Desc A" },
-            new() { Id = 11, Nombre = "Cuenta B", Descripcion = "Desc B" }
+            new() { Id = 10, Moneda = "EUR", Descripcion = "Desc A" },
+            new() { Id = 11, Moneda = "EUR", Descripcion = "Desc B" }
         };
 
         _usuarioRepository.GetByEmailAsync(usuario.Email, Arg.Any<CancellationToken>()).Returns(usuario);
@@ -36,8 +36,8 @@ public class GetCuentasQueryHandlerTests
 
         // Assert
         Assert.Equal(2, result.Count);
-        Assert.Contains(result, r => r.Id == 10 && r.Nombre == "Cuenta A" && r.Descripcion == "Desc A");
-        Assert.Contains(result, r => r.Id == 11 && r.Nombre == "Cuenta B" && r.Descripcion == "Desc B");
+        Assert.Contains(result, r => r.Id == 10 && r.Descripcion == "Desc A");
+        Assert.Contains(result, r => r.Id == 11 && r.Descripcion == "Desc B");
     }
 
     [Fact]

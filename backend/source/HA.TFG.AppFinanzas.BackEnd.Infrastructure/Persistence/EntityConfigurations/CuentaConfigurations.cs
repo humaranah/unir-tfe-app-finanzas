@@ -11,7 +11,7 @@ internal class CuentaConfigurations : IEntityTypeConfiguration<Cuenta>
         builder.ToTable("cuentas");
         builder.HasKey(cuenta => cuenta.Id);
 
-        builder.Property(cuenta => cuenta.Nombre).IsRequired().HasMaxLength(100);
+        builder.Property(cuenta => cuenta.Moneda).IsRequired().HasMaxLength(10);
         builder.Property(cuenta => cuenta.Descripcion).HasMaxLength(500);
         builder.Property(cuenta => cuenta.FechaEliminacion).IsRequired(false);
     }

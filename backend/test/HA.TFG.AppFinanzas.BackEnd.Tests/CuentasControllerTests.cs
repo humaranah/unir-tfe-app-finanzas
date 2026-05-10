@@ -39,7 +39,7 @@ public class CuentasControllerTests
         SetUser("test@test.com");
         var cuentas = new List<GetCuentasResultItem>
         {
-            new() { Id = 1, Nombre = "Cuenta A", Descripcion = "Desc A" }
+            new() { Id = 1, Descripcion = "Desc A" }
         };
         _mediator.Send(Arg.Any<GetCuentasQuery>(), Arg.Any<CancellationToken>()).Returns(cuentas);
 

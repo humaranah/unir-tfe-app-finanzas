@@ -24,17 +24,13 @@ public class CuentaRepository(AppDbContext context) : ICuentaRepository
             .SelectMany(u => u.Cuentas)
             .FirstOrDefaultAsync(c => c.Id == idCuenta, cancellationToken);
 
-    public async Task<Cuenta> CreateCuentaConCategoriasAsync(long idUsuario, IReadOnlyList<Categoria> categorias, CancellationToken cancellationToken)
+    public async Task<Cuenta> CreateCuentaConCategoriasAsync(Cuenta cuenta, CancellationToken cancellationToken)
     {
-        var usuario = await _context.Usuarios.FindAsync([idUsuario], cancellationToken)
-            ?? throw new InvalidOperationException($"No se encontró el usuario con Id {idUsuario}.");
+        var categorias = await _context.Categorias.ToListAsync(cancellationToken);
 
-        var cuenta = new Cuenta
+        cuenta = cuenta with
         {
-            Nombre = "Mi cuenta",
-            Descripcion = "Cuenta principal",
             FechaCreacion = DateTime.UtcNow,
-            Usuarios = [usuario],
             Categorias = [.. categorias.Select(c => new CuentaCategoria
             {
                 IdOrigen = c.Id,
