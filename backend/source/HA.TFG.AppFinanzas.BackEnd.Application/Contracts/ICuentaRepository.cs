@@ -6,5 +6,5 @@ public interface ICuentaRepository
 {
     Task<IReadOnlyList<Cuenta>> GetCuentasByUsuarioIdAsync(long idUsuario, CancellationToken cancellationToken);
     Task<Cuenta?> GetCuentaByIdAsync(long idUsuario, long idCuenta, CancellationToken cancellationToken);
-    Task<Cuenta> CreateCuentaConCategoriasAsync(long idUsuario, IReadOnlyList<Categoria> categorias, CancellationToken cancellationToken);
+    Task<Cuenta> CreateCuentaConCategoriasAsync(Cuenta cuenta, CancellationToken cancellationToken);
 }

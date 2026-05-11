@@ -17,8 +17,8 @@ public class CuentaRepositoryTests : AppDbContextTestBase
     public async Task GetCuentasByUsuarioIdAsync_UsuarioConCuentas_DevuelveCuentas()
     {
         // Arrange
-        var cuenta1 = new Cuenta { Id = 1, Nombre = "Cuenta 1", Descripcion = "Desc 1" };
-        var cuenta2 = new Cuenta { Id = 2, Nombre = "Cuenta 2", Descripcion = "Desc 2" };
+        var cuenta1 = new Cuenta { Id = 1, Moneda = "EUR", Descripcion = "Desc 1" };
+        var cuenta2 = new Cuenta { Id = 2, Moneda = "EUR", Descripcion = "Desc 2" };
         var usuario = new Usuario
         {
             Id = 1,
@@ -36,8 +36,8 @@ public class CuentaRepositoryTests : AppDbContextTestBase
         // Assert
         Assert.NotNull(result);
         Assert.Equal(2, result.Count);
-        Assert.Contains(result, c => c.Nombre == "Cuenta 1");
-        Assert.Contains(result, c => c.Nombre == "Cuenta 2");
+        Assert.Contains(result, c => c.Descripcion == "Desc 1");
+        Assert.Contains(result, c => c.Descripcion == "Desc 2");
     }
 
     [Fact]
@@ -77,8 +77,8 @@ public class CuentaRepositoryTests : AppDbContextTestBase
     public async Task GetCuentasByUsuarioIdAsync_SoloDevuelveCuentasDelUsuarioSolicitado()
     {
         // Arrange
-        var cuentaU1 = new Cuenta { Id = 3, Nombre = "Cuenta Usuario 1", Descripcion = "Desc" };
-        var cuentaU2 = new Cuenta { Id = 4, Nombre = "Cuenta Usuario 2", Descripcion = "Desc" };
+        var cuentaU1 = new Cuenta { Id = 3, Moneda = "EUR", Descripcion = "Desc Usuario 1" };
+        var cuentaU2 = new Cuenta { Id = 4, Moneda = "EUR", Descripcion = "Desc Usuario 2" };
         var usuario1 = new Usuario
         {
             Id = 3,
@@ -103,6 +103,6 @@ public class CuentaRepositoryTests : AppDbContextTestBase
 
         // Assert
         Assert.Single(result);
-        Assert.Equal("Cuenta Usuario 1", result[0].Nombre);
+        Assert.Equal("Desc Usuario 1", result[0].Descripcion);
     }
 }

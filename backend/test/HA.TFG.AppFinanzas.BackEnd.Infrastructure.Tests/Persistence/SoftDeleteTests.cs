@@ -72,7 +72,8 @@ public class SoftDeleteTests : AppDbContextTestBase
         var cuenta = new Cuenta
         {
             Id = 1,
-            Nombre = "Cuenta Test",
+            Moneda = "EUR",
+            Descripcion = "Cuenta test",
             FechaEliminacion = DateTime.UtcNow
         };
 

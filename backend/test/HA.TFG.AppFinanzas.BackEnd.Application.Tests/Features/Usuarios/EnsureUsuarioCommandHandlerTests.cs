@@ -10,8 +10,6 @@ public class EnsureUsuarioCommandHandlerTests
 {
     private readonly IUsuarioRepository _usuarioRepository = Substitute.For<IUsuarioRepository>();
     private readonly IRolRepository _rolRepository = Substitute.For<IRolRepository>();
-    private readonly ICuentaRepository _cuentaRepository = Substitute.For<ICuentaRepository>();
-    private readonly ICategoriaRepository _categoriaRepository = Substitute.For<ICategoriaRepository>();
     private readonly IAuth0UserInfoService _auth0UserInfoService = Substitute.For<IAuth0UserInfoService>();
     private readonly EnsureUsuarioCommandHandler _sut;
 
@@ -27,9 +25,7 @@ public class EnsureUsuarioCommandHandlerTests
 
     public EnsureUsuarioCommandHandlerTests()
     {
-        _categoriaRepository.GetAllAsync(Arg.Any<CancellationToken>()).Returns([]);
-        _cuentaRepository.CreateCuentaConCategoriasAsync(Arg.Any<long>(), Arg.Any<IReadOnlyList<Categoria>>(), Arg.Any<CancellationToken>()).Returns(new Cuenta { Nombre = "Mi cuenta", Descripcion = "Cuenta principal" });
-        _sut = new EnsureUsuarioCommandHandler(_usuarioRepository, _rolRepository, _cuentaRepository, _categoriaRepository, _auth0UserInfoService);
+        _sut = new EnsureUsuarioCommandHandler(_usuarioRepository, _rolRepository, _auth0UserInfoService);
     }
 
     [Fact]

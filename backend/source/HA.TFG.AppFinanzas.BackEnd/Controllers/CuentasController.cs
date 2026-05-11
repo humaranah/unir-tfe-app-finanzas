@@ -1,4 +1,6 @@
-﻿using HA.TFG.AppFinanzas.BackEnd.Application.Features.Cuentas.GetCuentasQuery;
+﻿using HA.TFG.AppFinanzas.BackEnd.Application.Features.Cuentas.CreateCuentaCommand;
+using HA.TFG.AppFinanzas.BackEnd.Application.Features.Cuentas.GetCuentasQuery;
+using HA.TFG.AppFinanzas.BackEnd.Application.Features.Transacciones.GetTransaccionesQuery;
 using HA.TFG.AppFinanzas.BackEnd.Controllers.Mappers;
 using HA.TFG.AppFinanzas.BackEnd.Controllers.Requests;
 using HA.TFG.AppFinanzas.BackEnd.Domain.Common;
@@ -24,6 +26,7 @@ public sealed class CuentasController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("{idCuenta:long}/transacciones")]
+    [ProducesResponseType<IReadOnlyList<GetTransaccionesResultItem>>(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetTransacciones(
         [FromRoute] long idCuenta,
         [FromQuery] GetTransaccionesRequestFilters filters,
@@ -32,6 +35,18 @@ public sealed class CuentasController(IMediator mediator) : ControllerBase
         var email = User.Identity?.Name ?? string.Empty;
         var query = filters.ToQuery(idCuenta, email);
         var result = await _mediator.Send(query, cancellationToken);
+        return Ok(result);
+    }
+
+    [HttpPost]
+    [ProducesResponseType<CreateCuentaResult>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
+    public async Task<IActionResult> CreateCuenta([FromBody] CreateCuentaRequest request, CancellationToken cancellationToken)
+    {
+        var email = User.Identity?.Name ?? string.Empty;
+        var command = request.ToCommand(email);
+        var result = await _mediator.Send(command, cancellationToken);
         return Ok(result);
     }
 }

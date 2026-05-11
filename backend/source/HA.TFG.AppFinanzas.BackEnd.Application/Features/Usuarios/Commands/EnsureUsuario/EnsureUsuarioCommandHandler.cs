@@ -8,8 +8,6 @@ namespace HA.TFG.AppFinanzas.BackEnd.Application.Features.Usuarios.Commands.Ensu
 public sealed class EnsureUsuarioCommandHandler(
     IUsuarioRepository usuarioRepository,
     IRolRepository rolRepository,
-    ICuentaRepository cuentaRepository,
-    ICategoriaRepository categoriaRepository,
     IAuth0UserInfoService auth0UserInfoService)
     : IRequestHandler<EnsureUsuarioCommand, EnsureUsuarioResult>
 {
@@ -57,9 +55,6 @@ public sealed class EnsureUsuarioCommandHandler(
         };
 
         nuevo = await usuarioRepository.CreateAsync(nuevo, identidad, cancellationToken);
-
-        var categorias = await categoriaRepository.GetAllAsync(cancellationToken);
-        await cuentaRepository.CreateCuentaConCategoriasAsync(nuevo.Id, categorias, cancellationToken);
 
         return ToResult(nuevo, EsNuevo: true);
     }

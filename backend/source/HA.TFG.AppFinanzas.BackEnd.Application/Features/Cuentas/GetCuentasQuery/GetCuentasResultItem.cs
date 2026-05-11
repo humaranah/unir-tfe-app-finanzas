@@ -3,6 +3,6 @@
 public record GetCuentasResultItem
 {
     public long Id { get; init; }
-    public string Nombre { get; init; } = string.Empty;
+    public string Moneda { get; init; } = string.Empty;
     public string Descripcion { get; init; } = string.Empty;
 }

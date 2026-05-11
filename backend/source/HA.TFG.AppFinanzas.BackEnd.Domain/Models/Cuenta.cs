@@ -5,8 +5,8 @@ namespace HA.TFG.AppFinanzas.BackEnd.Domain.Models;
 public record Cuenta : IAuditable, ISoftDeleteable
 {
     public long Id { get; init; }
-    public string Nombre { get; init; } = string.Empty;
-    public string Descripcion { get; init; } = string.Empty;
+    public required string Moneda { get; init; }
+    public required string Descripcion { get; init; }
     public DateTime FechaCreacion { get; init; }
     public DateTime? FechaModificacion { get; init; }
     public DateTime? FechaEliminacion { get; init; }
