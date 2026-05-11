@@ -42,7 +42,7 @@ public class CreateCuentaCommandHandlerTests
     {
         // Arrange
         var usuario = new Usuario { Id = 1, Email = "test@test.com", Nombre = "Test" };
-        var command = new CreateCuentaCommand { Email = usuario.Email, Moneda = "USD" };
+        var command = new CreateCuentaCommand { Email = usuario.Email, Moneda = "USD", Descripcion = "Mi cuenta" };
 
         _usuarioRepository.GetByEmailAsync(usuario.Email, Arg.Any<CancellationToken>()).Returns(usuario);
         _cuentaRepository.CreateCuentaConCategoriasAsync(Arg.Any<Cuenta>(), Arg.Any<CancellationToken>())
@@ -62,7 +62,7 @@ public class CreateCuentaCommandHandlerTests
     {
         // Arrange
         _usuarioRepository.GetByEmailAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns((Usuario?)null);
-        var command = new CreateCuentaCommand { Email = "noexiste@test.com", Moneda = "EUR" };
+        var command = new CreateCuentaCommand { Email = "noexiste@test.com", Moneda = "EUR", Descripcion = "Mi cuenta" };
 
         // Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
