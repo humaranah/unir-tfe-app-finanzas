@@ -93,7 +93,7 @@ public class CuentasControllerTests
         // Arrange
         const string email = "test@test.com";
         SetUser(email);
-        var request = new CreateCuentaRequest { Moneda = "USD" };
+        var request = new CreateCuentaRequest { Moneda = "USD", Descripcion = "Mi cuenta" };
         _mediator.Send(Arg.Any<CreateCuentaCommand>(), Arg.Any<CancellationToken>())
             .Returns(new CreateCuentaResult());
 

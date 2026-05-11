@@ -73,6 +73,7 @@ public class SoftDeleteTests : AppDbContextTestBase
         {
             Id = 1,
             Moneda = "EUR",
+            Descripcion = "Cuenta test",
             FechaEliminacion = DateTime.UtcNow
         };
 

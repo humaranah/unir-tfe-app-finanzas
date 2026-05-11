@@ -3,5 +3,5 @@
 public record CreateCuentaRequest
 {
     public required string Moneda { get; init; }
-    public string Descripcion { get; init; } = string.Empty;
+    public required string Descripcion { get; init; }
 }
