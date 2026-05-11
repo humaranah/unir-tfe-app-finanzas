@@ -32,8 +32,9 @@ public static class MauiProgram
         builder.AddBackend();
 
         builder.Services.AddSingleton<WelcomeViewModel>();
-        builder.Services.AddSingleton<LoginPage>();
-        builder.Services.AddSingleton<MainPage>();
+        builder.Services.AddSingleton<Views.LoginPage>();
+        builder.Services.AddSingleton<Views.MainPage>();
+        builder.Services.AddSingleton<Views.SplashLoadingPage>();
         builder.Services.AddSingleton<AppShell>();
         builder.Services.AddSingleton<App>();
 

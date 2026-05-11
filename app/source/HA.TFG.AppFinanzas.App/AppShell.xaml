@@ -4,24 +4,25 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:HA.TFG.AppFinanzas.App"
+    xmlns:views="clr-namespace:HA.TFG.AppFinanzas.App.Views"
     Title="App Finanzas">
 
     <!-- Página inicial: solo visible mientras se comprueba la sesión -->
     <ShellContent
         Title=""
-        ContentTemplate="{DataTemplate local:SplashLoadingPage}"
+        ContentTemplate="{DataTemplate views:SplashLoadingPage}"
         Route="splash"
         Shell.NavBarIsVisible="False" />
 
     <ShellContent
         Title="Iniciar sesión"
-        ContentTemplate="{DataTemplate local:LoginPage}"
+        ContentTemplate="{DataTemplate views:LoginPage}"
         Route="login"
         Shell.NavBarIsVisible="False" />
 
     <ShellContent
         Title="Inicio"
-        ContentTemplate="{DataTemplate local:MainPage}"
+        ContentTemplate="{DataTemplate views:MainPage}"
         Route="home" />
 
 </Shell>
