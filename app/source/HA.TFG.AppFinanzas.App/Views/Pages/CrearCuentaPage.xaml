@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="clr-namespace:HA.TFG.AppFinanzas.Core.ViewModels;assembly=HA.TFG.AppFinanzas.Core"
+             x:Class="HA.TFG.AppFinanzas.App.Views.Pages.CrearCuentaPage"
+             x:DataType="viewModels:CrearCuentaViewModel"
+             Title="Nueva cuenta"
+             Shell.NavBarIsVisible="False">
+
+    <VerticalStackLayout Padding="40" Spacing="24" VerticalOptions="Center" MaximumWidthRequest="600">
+
+        <Label Text="Crear cuenta"
+               FontSize="32"
+               FontAttributes="Bold"
+               HorizontalOptions="Center" />
+
+        <Label Text="Empecemos por crear una cuenta de gastos."
+               FontSize="Body"
+               TextColor="Gray"
+               HorizontalOptions="Center" />
+
+        <Entry Placeholder="Descripción"
+               Text="{Binding Descripcion}"
+               HorizontalOptions="Fill" />
+
+        <Picker Title="Moneda principal"
+                ItemsSource="{Binding Monedas}"
+                SelectedItem="{Binding MonedaSeleccionada}"
+                ItemDisplayBinding="{Binding Value}"
+                HorizontalOptions="Fill" />
+
+        <Label Text="{Binding Error}"
+               TextColor="OrangeRed"
+               HorizontalOptions="Center"
+               IsVisible="{Binding HasError}" />
+
+        <ActivityIndicator IsRunning="{Binding IsBusy}"
+                           IsVisible="{Binding IsBusy}"
+                           HorizontalOptions="Center" />
+
+        <Button Text="Crear"
+                Command="{Binding CrearCuentaCommand}"
+                IsEnabled="{Binding IsNotBusy}"
+                HorizontalOptions="Fill" />
+
+    </VerticalStackLayout>
+
+</ContentPage>

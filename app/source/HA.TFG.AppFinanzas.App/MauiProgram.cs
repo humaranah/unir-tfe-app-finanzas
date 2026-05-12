@@ -1,5 +1,6 @@
 ﻿using HA.TFG.AppFinanzas.App.Core.ViewModels;
 using HA.TFG.AppFinanzas.App.Extensions;
+using HA.TFG.AppFinanzas.Core.ViewModels;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -32,8 +33,11 @@ public static class MauiProgram
         builder.AddBackend();
 
         builder.Services.AddSingleton<WelcomeViewModel>();
-        builder.Services.AddSingleton<LoginPage>();
-        builder.Services.AddSingleton<MainPage>();
+        builder.Services.AddSingleton<CrearCuentaViewModel>();
+        builder.Services.AddSingleton<Views.LoginPage>();
+        builder.Services.AddSingleton<Views.MainPage>();
+        builder.Services.AddSingleton<Views.SplashLoadingPage>();
+        builder.Services.AddTransient<Views.Pages.CrearCuentaPage>();
         builder.Services.AddSingleton<AppShell>();
         builder.Services.AddSingleton<App>();
 
