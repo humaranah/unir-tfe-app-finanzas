@@ -1,3 +1,4 @@
+using HA.TFG.AppFinanzas.BackEnd.Application.Common.Exceptions;
 using HA.TFG.AppFinanzas.BackEnd.Application.Contracts;
 using HA.TFG.AppFinanzas.BackEnd.Domain.Common;
 using HA.TFG.AppFinanzas.BackEnd.Domain.Models;
@@ -40,8 +41,7 @@ public sealed class EnsureUsuarioCommandHandler(
 
         // Caso 3: usuario nuevo → crear usuario e identidad
         var rolUsuario = await rolRepository.GetByNombreAsync(Roles.Usuario, cancellationToken)
-            ?? throw new InvalidOperationException(
-                $"El rol '{Roles.Usuario}' no existe en la base de datos. Ejecuta el seed de datos.");
+            ?? throw new NotFoundException(nameof(Rol), Roles.Usuario);
 
         var nuevo = new Usuario
         {

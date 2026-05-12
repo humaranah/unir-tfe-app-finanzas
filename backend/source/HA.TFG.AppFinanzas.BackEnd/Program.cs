@@ -49,7 +49,13 @@ try
 
     var app = builder.Build();
 
-    app.UseSerilogRequestLogging();
+    app.UseSerilogRequestLogging(options =>
+    {
+        options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
+        {
+            diagnosticContext.Set("CorrelationId", httpContext.TraceIdentifier);
+        };
+    });
     app.UseGlobalExceptionHandler();
     app.UseHttpsRedirection();
     app.UseAuthentication();

@@ -1,3 +1,4 @@
+using HA.TFG.AppFinanzas.BackEnd.Application.Common.Exceptions;
 using HA.TFG.AppFinanzas.BackEnd.Application.Contracts;
 using HA.TFG.AppFinanzas.BackEnd.Application.Features.Usuarios.Commands.EnsureUsuario;
 using HA.TFG.AppFinanzas.BackEnd.Domain.Common;
@@ -66,7 +67,7 @@ public class EnsureUsuarioCommandHandlerTests
         _rolRepository.GetByNombreAsync(Roles.Usuario, Arg.Any<CancellationToken>()).Returns((Rol?)null);
 
         // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(
+        await Assert.ThrowsAsync<NotFoundException>(
             () => _sut.Handle(command, CancellationToken.None).AsTask());
     }
 
