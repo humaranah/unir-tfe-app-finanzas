@@ -18,7 +18,7 @@ public sealed class MovimientoRepository(AppDbContext context) : IMovimientoRepo
             .Where(t => t.IdCuenta == idCuenta);
 
         if (idCategoria.HasValue)
-            query = query.Where(t => t.IdCategoria == idCategoria.Value);
+            query = query.Where(t => t.IdCuentaCategoria == idCategoria.Value);
 
         if (fechaDesde.HasValue)
             query = query.Where(t => DateOnly.FromDateTime(t.FechaMovimiento) >= fechaDesde.Value);

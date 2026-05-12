@@ -16,7 +16,7 @@ internal class MovimientoConfigurations : IEntityTypeConfiguration<Movimiento>
 
         builder.Property(movimiento => movimiento.IdMovimiento).HasValueGenerator<GuidV7ValueGenerator>();
         builder.Property(movimiento => movimiento.IdCuenta).IsRequired();
-        builder.Property(movimiento => movimiento.IdCategoria).IsRequired();
+        builder.Property(movimiento => movimiento.IdCuentaCategoria).IsRequired();
         builder.Property(movimiento => movimiento.TipoMovimiento)
             .IsRequired()
             .HasConversion(new EnumToStringConverter<TipoMovimiento>())
@@ -44,7 +44,7 @@ internal class MovimientoConfigurations : IEntityTypeConfiguration<Movimiento>
         builder
             .HasOne(movimiento => movimiento.Categoria)
             .WithMany(categoria => categoria.Movimientos)
-            .HasForeignKey(movimiento => movimiento.IdCategoria)
+            .HasForeignKey(movimiento => movimiento.IdCuentaCategoria)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

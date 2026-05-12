@@ -19,7 +19,6 @@ public sealed class UsuariosController(IMediator mediator) : ControllerBase
     [HttpPost("ensure")]
     [Authorize]
     [ProducesResponseType<EnsureUsuarioResult>(StatusCodes.Status200OK)]
-    [ProducesResponseType<EnsureUsuarioResult>(StatusCodes.Status201Created)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Ensure(CancellationToken cancellationToken)
     {
@@ -44,8 +43,6 @@ public sealed class UsuariosController(IMediator mediator) : ControllerBase
 
         var result = await _mediator.Send(command, cancellationToken);
 
-        return result.EsNuevo
-            ? CreatedAtAction(nameof(Ensure), null, result)
-            : Ok(result);
+        return Ok(result);
     }
 }

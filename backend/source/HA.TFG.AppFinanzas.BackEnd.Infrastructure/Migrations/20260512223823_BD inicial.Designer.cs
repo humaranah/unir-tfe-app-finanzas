@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260512201950_BD inicial")]
+    [Migration("20260512223823_BD inicial")]
     partial class BDinicial
     {
         /// <inheritdoc />
@@ -282,14 +282,14 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
                     b.Property<DateTime>("FechaMovimiento")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("IdCategoria")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("IdComprobante")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<Guid>("IdCuenta")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("IdCuentaCategoria")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal>("Importe")
@@ -317,9 +317,9 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
 
                     b.HasKey("IdMovimiento");
 
-                    b.HasIndex("IdCategoria");
-
                     b.HasIndex("IdCuenta");
+
+                    b.HasIndex("IdCuentaCategoria");
 
                     b.ToTable("movimientos", (string)null);
                 });
@@ -450,16 +450,16 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
 
             modelBuilder.Entity("HA.TFG.AppFinanzas.BackEnd.Domain.Models.Movimiento", b =>
                 {
-                    b.HasOne("HA.TFG.AppFinanzas.BackEnd.Domain.Models.CuentaCategoria", "Categoria")
-                        .WithMany("Movimientos")
-                        .HasForeignKey("IdCategoria")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("HA.TFG.AppFinanzas.BackEnd.Domain.Models.Cuenta", "Cuenta")
                         .WithMany()
                         .HasForeignKey("IdCuenta")
                         .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("HA.TFG.AppFinanzas.BackEnd.Domain.Models.CuentaCategoria", "Categoria")
+                        .WithMany("Movimientos")
+                        .HasForeignKey("IdCuentaCategoria")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Categoria");

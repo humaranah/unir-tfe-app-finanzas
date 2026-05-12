@@ -6,7 +6,7 @@ namespace HA.TFG.AppFinanzas.BackEnd.Application.Features.Movimientos.GetMovimie
 [Mapper(RequiredMappingStrategy = RequiredMappingStrategy.None)]
 public static partial class GetMovimientosMapper
 {
-    [MapProperty([nameof(Movimiento.IdCategoria)], nameof(GetMovimientosResultItem.IdCategoria))]
+    [MapProperty([nameof(Movimiento.IdCuentaCategoria)], nameof(GetMovimientosResultItem.IdCategoria))]
     [MapProperty([nameof(Movimiento.Categoria), nameof(CuentaCategoria.Nombre)], nameof(GetMovimientosResultItem.NombreCategoria))]
     public static partial GetMovimientosResultItem ToResultItem(this Movimiento movimiento);
 

@@ -182,7 +182,7 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
                 {
                     IdMovimiento = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IdCuenta = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    IdCategoria = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    IdCuentaCategoria = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     TipoMovimiento = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     Concepto = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     Importe = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
@@ -199,8 +199,8 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_movimientos", x => x.IdMovimiento);
                     table.ForeignKey(
-                        name: "FK_movimientos_cuenta_categorias_IdCategoria",
-                        column: x => x.IdCategoria,
+                        name: "FK_movimientos_cuenta_categorias_IdCuentaCategoria",
+                        column: x => x.IdCuentaCategoria,
                         principalTable: "cuenta_categorias",
                         principalColumn: "IdCuentaCategoria",
                         onDelete: ReferentialAction.Cascade);
@@ -249,14 +249,14 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_movimientos_IdCategoria",
-                table: "movimientos",
-                column: "IdCategoria");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_movimientos_IdCuenta",
                 table: "movimientos",
                 column: "IdCuenta");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_movimientos_IdCuentaCategoria",
+                table: "movimientos",
+                column: "IdCuentaCategoria");
 
             migrationBuilder.CreateIndex(
                 name: "IX_usuario_cuentas_IdCuenta",
