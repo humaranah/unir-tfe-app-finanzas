@@ -4,13 +4,20 @@ namespace HA.TFG.AppFinanzas.Core.Utilities;
 
 public static class MonedasHelper
 {
-    public static IReadOnlyList<KeyValuePair<string, string>> BuildMonedas()
+    private static readonly Lazy<IReadOnlyList<KeyValuePair<string, string>>> _monedas =
+        new(BuildMonedasCore, LazyThreadSafetyMode.ExecutionAndPublication);
+
+    public static IReadOnlyList<KeyValuePair<string, string>> Monedas => _monedas.Value;
+
+    public static KeyValuePair<string, string> DefaultMoneda => GetDefaultMoneda(Monedas);
+
+    private static List<KeyValuePair<string, string>> BuildMonedasCore()
     {
         var isoLocal = GetIsoLocal();
         var textInfo = CultureInfo.CurrentCulture.TextInfo;
         var nombresLocalizados = BuildNombresLocalizados();
 
-        return [.. CultureInfo
+        var monedas = CultureInfo
             .GetCultures(CultureTypes.SpecificCultures)
             .Select(c =>
             {
@@ -35,10 +42,29 @@ public static class MonedasHelper
                 return new KeyValuePair<string, string>(
                     r!.ISOCurrencySymbol,
                     $"{r.ISOCurrencySymbol} – {textInfo.ToTitleCase(nombre.ToLower())}");
-            })];
+            })
+            .ToList();
+
+        if (monedas.Count > 0)
+            return monedas;
+
+        try
+        {
+            var region = new RegionInfo(CultureInfo.CurrentCulture.Name);
+            return
+            [
+                new KeyValuePair<string, string>(
+                    region.ISOCurrencySymbol,
+                    $"{region.ISOCurrencySymbol} – {textInfo.ToTitleCase(region.CurrencyEnglishName.ToLower())}")
+            ];
+        }
+        catch
+        {
+            return [];
+        }
     }
 
-    public static KeyValuePair<string, string> GetDefaultMoneda(IReadOnlyList<KeyValuePair<string, string>> monedas)
+    private static KeyValuePair<string, string> GetDefaultMoneda(IReadOnlyList<KeyValuePair<string, string>> monedas)
     {
         try
         {

@@ -14,7 +14,7 @@ public partial class CrearCuentaViewModel(ICuentasService cuentasService) : Obse
 
     [ObservableProperty]
     public partial KeyValuePair<string, string> MonedaSeleccionada { get; set; }
-        = MonedasHelper.GetDefaultMoneda(MonedasHelper.BuildMonedas());
+        = MonedasHelper.DefaultMoneda;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasError))]
@@ -28,7 +28,7 @@ public partial class CrearCuentaViewModel(ICuentasService cuentasService) : Obse
 
     public bool IsNotBusy => !IsBusy;
 
-    public IReadOnlyList<KeyValuePair<string, string>> Monedas { get; } = MonedasHelper.BuildMonedas();
+    public IReadOnlyList<KeyValuePair<string, string>> Monedas { get; } = MonedasHelper.Monedas;
 
     public event EventHandler? CuentaCreada;
 
