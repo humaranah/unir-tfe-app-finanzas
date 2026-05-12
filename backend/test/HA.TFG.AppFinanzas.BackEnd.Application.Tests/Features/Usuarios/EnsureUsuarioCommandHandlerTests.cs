@@ -56,7 +56,7 @@ public class EnsureUsuarioCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_UsuarioNuevo_LanzaExcepcionSiNoExisteRolUsuario()
+    public async Task Handle_UsuarioNuevo_LanzaInvalidOperationExceptionSiNoExisteRolUsuario()
     {
         // Arrange
         var command = new EnsureUsuarioCommand("auth0|123", "token_abc");
@@ -67,7 +67,7 @@ public class EnsureUsuarioCommandHandlerTests
         _rolRepository.GetByNombreAsync(Roles.Usuario, Arg.Any<CancellationToken>()).Returns((Rol?)null);
 
         // Act & Assert
-        await Assert.ThrowsAsync<NotFoundException>(
+        await Assert.ThrowsAsync<InvalidOperationException>(
             () => _sut.Handle(command, CancellationToken.None).AsTask());
     }
 

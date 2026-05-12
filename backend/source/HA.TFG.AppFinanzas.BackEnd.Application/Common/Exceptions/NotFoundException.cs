@@ -4,5 +4,5 @@ public sealed class NotFoundException(string entityName, object key)
     : Exception($"No se encontró '{entityName}' con clave '{key}'.")
 {
     public string EntityName { get; } = entityName;
-    public object Key { get; } = key;
+    public object SafeKey { get; } = key;
 }

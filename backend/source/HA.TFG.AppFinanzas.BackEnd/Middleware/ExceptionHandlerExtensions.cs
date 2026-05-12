@@ -47,7 +47,7 @@ public static class ExceptionHandlerExtensions
 
     private static (int, ProblemDetails) HandleNotFound(NotFoundException nfe, ILogger logger)
     {
-        logger.LogWarning(nfe, "Entidad no encontrada: {EntityName} con clave '{Key}'", nfe.EntityName, nfe.Key);
+        logger.LogWarning(nfe, "Entidad no encontrada: {EntityName} con clave '{SafeKey}'", nfe.EntityName, nfe.SafeKey);
 
         var problem = new ProblemDetails
         {

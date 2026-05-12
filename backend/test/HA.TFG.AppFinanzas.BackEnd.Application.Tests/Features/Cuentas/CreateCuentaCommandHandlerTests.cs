@@ -59,7 +59,7 @@ public class CreateCuentaCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_UsuarioNoExiste_LanzaInvalidOperationException()
+    public async Task Handle_UsuarioNoExiste_LanzaNotFoundException()
     {
         // Arrange
         _usuarioRepository.GetByEmailAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns((Usuario?)null);

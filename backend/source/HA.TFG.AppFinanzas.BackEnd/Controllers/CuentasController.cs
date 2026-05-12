@@ -41,7 +41,6 @@ public sealed class CuentasController(IMediator mediator) : ControllerBase
     [HttpPost]
     [ProducesResponseType<CreateCuentaResult>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
     public async Task<IActionResult> CreateCuenta([FromBody] CreateCuentaRequest request, CancellationToken cancellationToken)
     {
         var email = User.Identity?.Name ?? string.Empty;

@@ -41,7 +41,8 @@ public sealed class EnsureUsuarioCommandHandler(
 
         // Caso 3: usuario nuevo → crear usuario e identidad
         var rolUsuario = await rolRepository.GetByNombreAsync(Roles.Usuario, cancellationToken)
-            ?? throw new NotFoundException(nameof(Rol), Roles.Usuario);
+            ?? throw new InvalidOperationException(
+                $"El rol '{Roles.Usuario}' no existe en la base de datos.");
 
         var nuevo = new Usuario
         {

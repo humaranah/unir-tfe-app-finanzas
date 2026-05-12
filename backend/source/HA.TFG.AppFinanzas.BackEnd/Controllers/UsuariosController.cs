@@ -18,18 +18,27 @@ public sealed class UsuariosController(IMediator mediator) : ControllerBase
     // directamente desde Auth0 /userinfo (solo si el usuario no existe aún).
     [HttpPost("ensure")]
     [Authorize]
+    [ProducesResponseType<EnsureUsuarioResult>(StatusCodes.Status200OK)]
+    [ProducesResponseType<EnsureUsuarioResult>(StatusCodes.Status201Created)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Ensure(CancellationToken cancellationToken)
     {
         var idAuth0 = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
         if (string.IsNullOrWhiteSpace(idAuth0))
-            return BadRequest("Ha ocurrido un error validando la información del usuario.");
+            return Problem(
+                title: "Error de validación",
+                detail: "Ha ocurrido un error validando la información del usuario.",
+                statusCode: StatusCodes.Status400BadRequest);
 
         var accessToken = Request.Headers.Authorization.ToString();
         if (accessToken.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
             accessToken = accessToken["Bearer ".Length..].Trim();
 
         if (string.IsNullOrWhiteSpace(accessToken))
-            return BadRequest("No se encontró el token de acceso en la solicitud.");
+            return Problem(
+                title: "Error de validación",
+                detail: "No se encontró el token de acceso en la solicitud.",
+                statusCode: StatusCodes.Status400BadRequest);
 
         var command = new EnsureUsuarioCommand(idAuth0, accessToken);
 
