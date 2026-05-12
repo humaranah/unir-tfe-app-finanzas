@@ -25,7 +25,7 @@ public static class ExceptionHandlerExtensions
             problem.Extensions["correlationId"] = correlationId;
 
             context.Response.StatusCode = statusCode;
-            await context.Response.WriteAsJsonAsync(problem);
+            await context.Response.WriteAsJsonAsync(problem, problem.GetType());
         }));
 
         return app;
