@@ -1,4 +1,5 @@
-﻿using HA.TFG.AppFinanzas.BackEnd.Application.Contracts;
+﻿using HA.TFG.AppFinanzas.BackEnd.Application.Common.Exceptions;
+using HA.TFG.AppFinanzas.BackEnd.Application.Contracts;
 using HA.TFG.AppFinanzas.BackEnd.Domain.Models;
 using Mediator;
 
@@ -15,7 +16,7 @@ public class CreateCuentaCommandHandler(
     public async ValueTask<CreateCuentaResult> Handle(CreateCuentaCommand request, CancellationToken cancellationToken)
     {
         var usuario = await _usuarioRepository.GetByEmailAsync(request.Email, cancellationToken)
-            ?? throw new InvalidOperationException($"No se encontró el usuario con email '{request.Email}'.");
+            ?? throw new NotFoundException(nameof(Usuario), request.Email);
 
         var cuenta = new Cuenta
         {

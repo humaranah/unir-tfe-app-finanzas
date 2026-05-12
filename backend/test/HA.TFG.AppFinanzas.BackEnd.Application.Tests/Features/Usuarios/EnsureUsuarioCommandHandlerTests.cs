@@ -1,3 +1,4 @@
+using HA.TFG.AppFinanzas.BackEnd.Application.Common.Exceptions;
 using HA.TFG.AppFinanzas.BackEnd.Application.Contracts;
 using HA.TFG.AppFinanzas.BackEnd.Application.Features.Usuarios.Commands.EnsureUsuario;
 using HA.TFG.AppFinanzas.BackEnd.Domain.Common;
@@ -55,7 +56,7 @@ public class EnsureUsuarioCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_UsuarioNuevo_LanzaExcepcionSiNoExisteRolUsuario()
+    public async Task Handle_UsuarioNuevo_LanzaInvalidOperationExceptionSiNoExisteRolUsuario()
     {
         // Arrange
         var command = new EnsureUsuarioCommand("auth0|123", "token_abc");

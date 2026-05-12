@@ -1,3 +1,4 @@
+using HA.TFG.AppFinanzas.BackEnd.Application.Common.Exceptions;
 using HA.TFG.AppFinanzas.BackEnd.Application.Contracts;
 using HA.TFG.AppFinanzas.BackEnd.Application.Features.Cuentas.CreateCuentaCommand;
 using HA.TFG.AppFinanzas.BackEnd.Domain.Models;
@@ -58,14 +59,14 @@ public class CreateCuentaCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_UsuarioNoExiste_LanzaInvalidOperationException()
+    public async Task Handle_UsuarioNoExiste_LanzaNotFoundException()
     {
         // Arrange
         _usuarioRepository.GetByEmailAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns((Usuario?)null);
         var command = new CreateCuentaCommand { Email = "noexiste@test.com", Moneda = "EUR", Descripcion = "Mi cuenta" };
 
         // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+        await Assert.ThrowsAsync<NotFoundException>(() =>
             _sut.Handle(command, CancellationToken.None).AsTask());
 
         await _cuentaRepository.DidNotReceive().CreateCuentaConCategoriasAsync(Arg.Any<Cuenta>(), Arg.Any<CancellationToken>());

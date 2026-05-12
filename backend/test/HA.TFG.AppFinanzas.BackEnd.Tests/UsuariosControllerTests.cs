@@ -74,7 +74,9 @@ public class UsuariosControllerTests
         var result = await _sut.Ensure(CancellationToken.None);
 
         // Assert
-        Assert.IsType<BadRequestObjectResult>(result);
+        var problem = Assert.IsType<ObjectResult>(result);
+        Assert.Equal(StatusCodes.Status400BadRequest, problem.StatusCode);
+        Assert.IsType<ProblemDetails>(problem.Value);
         await _mediator.DidNotReceive().Send(Arg.Any<EnsureUsuarioCommand>(), Arg.Any<CancellationToken>());
     }
 
