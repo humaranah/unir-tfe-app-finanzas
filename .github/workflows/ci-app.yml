@@ -28,7 +28,7 @@ jobs:
         run: dotnet restore app/HA.TFG.AppFinanzas.App.slnx
 
       - name: Build (Android)
-        run: dotnet build app/source/HA.TFG.AppFinanzas.App/HA.TFG.AppFinanzas.App.csproj -f net10.0-android -c Release --no-restore
+        run: dotnet build app/source/HA.TFG.AppFinanzas.App/HA.TFG.AppFinanzas.App.csproj -f net10.0-android -c Release --no-restore -p:RuntimeIdentifier=
 
       - name: Test
         run: dotnet test app/test/HA.TFG.AppFinanzas.App.UnitTests/HA.TFG.AppFinanzas.App.UnitTests.csproj -f net10.0 -c Release --verbosity normal
