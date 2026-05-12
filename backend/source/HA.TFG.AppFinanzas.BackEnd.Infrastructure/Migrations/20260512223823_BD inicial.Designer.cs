@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260505165152_Add_IAuditable_Cuenta_FechaCreacion")]
-    partial class Add_IAuditable_Cuenta_FechaCreacion
+    [Migration("20260512223823_BD inicial")]
+    partial class BDinicial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,11 +27,9 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
 
             modelBuilder.Entity("HA.TFG.AppFinanzas.BackEnd.Domain.Models.Categoria", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<Guid>("IdCategoria")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Descripcion")
                         .IsRequired()
@@ -46,121 +44,122 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("Slug")
+                    b.Property<string>("TipoMovimiento")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
-                    b.HasKey("Id");
+                    b.HasKey("IdCategoria");
+
+                    b.HasIndex("Nombre")
+                        .IsUnique();
 
                     b.ToTable("categorias", (string)null);
 
                     b.HasData(
                         new
                         {
-                            Id = 1L,
+                            IdCategoria = new Guid("87a094ed-c89e-8cb7-a230-24e661e6b81e"),
                             Descripcion = "Cualquier tipo de ingreso",
                             FechaCreacion = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Nombre = "Ingresos",
-                            Slug = "ingresos"
+                            TipoMovimiento = "Ingreso"
                         },
                         new
                         {
-                            Id = 2L,
+                            IdCategoria = new Guid("5c1b4a03-8a80-94ec-e3fa-ed108fba5af1"),
                             Descripcion = "Alquiler, hipoteca y gastos del hogar",
                             FechaCreacion = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Nombre = "Vivienda",
-                            Slug = "gastos-vivienda"
+                            TipoMovimiento = "Gasto"
                         },
                         new
                         {
-                            Id = 3L,
+                            IdCategoria = new Guid("3ca32666-7234-8ffa-1743-87fe755d1b21"),
                             Descripcion = "Compras en supermercado y alimentación en casa",
                             FechaCreacion = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Nombre = "Supermercado",
-                            Slug = "gastos-supermercado"
+                            TipoMovimiento = "Gasto"
                         },
                         new
                         {
-                            Id = 4L,
+                            IdCategoria = new Guid("05d99d95-5bd2-d9b4-9bc5-282be6c98ce5"),
                             Descripcion = "Restaurantes, bares y comida para llevar",
                             FechaCreacion = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Nombre = "Restaurantes",
-                            Slug = "gastos-restaurantes"
+                            TipoMovimiento = "Gasto"
                         },
                         new
                         {
-                            Id = 5L,
+                            IdCategoria = new Guid("e6a6ad16-fd61-835b-3c45-ac310298f556"),
                             Descripcion = "Combustible, transporte público y vehículo",
                             FechaCreacion = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Nombre = "Transporte",
-                            Slug = "gastos-transporte"
+                            TipoMovimiento = "Gasto"
                         },
                         new
                         {
-                            Id = 6L,
+                            IdCategoria = new Guid("0ecb90bb-f405-92d9-9c49-08adb9e43ac3"),
                             Descripcion = "Médico, farmacia y seguros de salud",
                             FechaCreacion = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Nombre = "Salud",
-                            Slug = "gastos-salud"
+                            TipoMovimiento = "Gasto"
                         },
                         new
                         {
-                            Id = 7L,
+                            IdCategoria = new Guid("104a0f1c-93f3-9160-0052-51d32f85ee7b"),
                             Descripcion = "Cursos, libros y formación",
                             FechaCreacion = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Nombre = "Educación",
-                            Slug = "gastos-educacion"
+                            TipoMovimiento = "Gasto"
                         },
                         new
                         {
-                            Id = 8L,
+                            IdCategoria = new Guid("9a6cf402-04f6-49d4-7cd0-bd0f540040c3"),
                             Descripcion = "Cine, viajes, hobbies y deportes",
                             FechaCreacion = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Nombre = "Ocio y entretenimiento",
-                            Slug = "gastos-ocio"
+                            TipoMovimiento = "Gasto"
                         },
                         new
                         {
-                            Id = 9L,
+                            IdCategoria = new Guid("b40532f5-ec9b-8d31-2180-ccb81fe954cf"),
                             Descripcion = "Prendas de vestir y complementos",
                             FechaCreacion = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Nombre = "Ropa y calzado",
-                            Slug = "gastos-ropa"
+                            TipoMovimiento = "Gasto"
                         },
                         new
                         {
-                            Id = 10L,
+                            IdCategoria = new Guid("ef82c217-d3f9-18c4-a956-b0a414ece3b2"),
                             Descripcion = "Dispositivos, software y suscripciones digitales",
                             FechaCreacion = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Nombre = "Tecnología",
-                            Slug = "gastos-tecnologia"
+                            TipoMovimiento = "Gasto"
                         },
                         new
                         {
-                            Id = 11L,
+                            IdCategoria = new Guid("a44f7452-de22-2136-9cda-9d446f5f86eb"),
                             Descripcion = "Electricidad, agua, gas e internet",
                             FechaCreacion = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Nombre = "Servicios",
-                            Slug = "gastos-servicios"
+                            TipoMovimiento = "Gasto"
                         },
                         new
                         {
-                            Id = 12L,
+                            IdCategoria = new Guid("c73ebca7-2bf5-fd6e-e041-642b86a9aa02"),
                             Descripcion = "Gastos no clasificados",
                             FechaCreacion = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Nombre = "Otros gastos",
-                            Slug = "gastos-otros"
+                            TipoMovimiento = "Gasto"
                         });
                 });
 
             modelBuilder.Entity("HA.TFG.AppFinanzas.BackEnd.Domain.Models.Cuenta", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<Guid>("IdCuenta")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Descripcion")
                         .IsRequired()
@@ -176,23 +175,21 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
                     b.Property<DateTime?>("FechaModificacion")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Nombre")
+                    b.Property<string>("Moneda")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
-                    b.HasKey("Id");
+                    b.HasKey("IdCuenta");
 
                     b.ToTable("cuentas", (string)null);
                 });
 
             modelBuilder.Entity("HA.TFG.AppFinanzas.BackEnd.Domain.Models.CuentaCategoria", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<Guid>("IdCuentaCategoria")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Descripcion")
                         .IsRequired()
@@ -202,41 +199,136 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
                     b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("FechaEliminacion")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime?>("FechaModificacion")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("IdCuenta")
-                        .HasColumnType("bigint");
+                    b.Property<Guid?>("IdCategoria")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<long?>("IdOrigen")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("IdCuenta")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("Slug")
+                    b.Property<string>("TipoMovimiento")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
-                    b.HasKey("Id");
+                    b.HasKey("IdCuentaCategoria");
 
-                    b.HasIndex("IdCuenta");
+                    b.HasIndex("IdCategoria");
 
-                    b.HasIndex("IdOrigen");
+                    b.HasIndex("IdCuenta", "Nombre")
+                        .IsUnique();
 
                     b.ToTable("cuenta_categorias", (string)null);
                 });
 
+            modelBuilder.Entity("HA.TFG.AppFinanzas.BackEnd.Domain.Models.Identidad", b =>
+                {
+                    b.Property<Guid>("IdIdentidad")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("IdAuth0")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<Guid>("IdUsuario")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Proveedor")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("IdIdentidad");
+
+                    b.HasIndex("IdAuth0")
+                        .IsUnique();
+
+                    b.HasIndex("IdUsuario");
+
+                    b.ToTable("usuario_identidades", (string)null);
+                });
+
+            modelBuilder.Entity("HA.TFG.AppFinanzas.BackEnd.Domain.Models.Movimiento", b =>
+                {
+                    b.Property<Guid>("IdMovimiento")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Concepto")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("FechaEliminacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("FechaModificacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("FechaMovimiento")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("IdComprobante")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<Guid>("IdCuenta")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("IdCuentaCategoria")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Importe")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Moneda")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("nvarchar(3)");
+
+                    b.Property<string>("Nota")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<decimal?>("TipoCambio")
+                        .HasPrecision(18, 6)
+                        .HasColumnType("decimal(18,6)");
+
+                    b.Property<string>("TipoMovimiento")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("IdMovimiento");
+
+                    b.HasIndex("IdCuenta");
+
+                    b.HasIndex("IdCuentaCategoria");
+
+                    b.ToTable("movimientos", (string)null);
+                });
+
             modelBuilder.Entity("HA.TFG.AppFinanzas.BackEnd.Domain.Models.Rol", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<Guid>("IdRol")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Descripcion")
                         .IsRequired()
@@ -254,78 +346,16 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.HasKey("Id");
+                    b.HasKey("IdRol");
 
                     b.ToTable("roles", (string)null);
                 });
 
-            modelBuilder.Entity("HA.TFG.AppFinanzas.BackEnd.Domain.Models.Transaccion", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("Descripcion")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<DateTime>("Fecha")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("FechaCreacion")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("FechaModificacion")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long>("IdCategoria")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("IdCuenta")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Moneda")
-                        .IsRequired()
-                        .HasMaxLength(3)
-                        .HasColumnType("nvarchar(3)");
-
-                    b.Property<string>("MonedaLocal")
-                        .IsRequired()
-                        .HasMaxLength(3)
-                        .HasColumnType("nvarchar(3)");
-
-                    b.Property<decimal>("Monto")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("Notas")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<decimal>("TipoCambio")
-                        .HasPrecision(18, 6)
-                        .HasColumnType("decimal(18,6)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IdCategoria");
-
-                    b.HasIndex("IdCuenta");
-
-                    b.ToTable("transacciones", (string)null);
-                });
-
             modelBuilder.Entity("HA.TFG.AppFinanzas.BackEnd.Domain.Models.Usuario", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<Guid>("IdUsuario")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -348,20 +378,12 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
                         .HasMaxLength(2048)
                         .HasColumnType("nvarchar(2048)");
 
-                    b.Property<string>("Metadata")
-                        .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
-
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTimeOffset?>("UltimaActualizacion")
-                        .HasColumnType("datetimeoffset");
-
-                    b.HasKey("Id");
+                    b.HasKey("IdUsuario");
 
                     b.HasIndex("Email")
                         .IsUnique();
@@ -371,11 +393,11 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
 
             modelBuilder.Entity("HA.TFG.AppFinanzas.BackEnd.Domain.Models.UsuarioCuenta", b =>
                 {
-                    b.Property<long>("IdUsuario")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("IdUsuario")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<long>("IdCuenta")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("IdCuenta")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("IdUsuario", "IdCuenta");
 
@@ -384,43 +406,13 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
                     b.ToTable("usuario_cuentas", (string)null);
                 });
 
-            modelBuilder.Entity("HA.TFG.AppFinanzas.BackEnd.Domain.Models.UsuarioIdentidad", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("IdAuth0")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<long>("IdUsuario")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Proveedor")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IdAuth0")
-                        .IsUnique();
-
-                    b.HasIndex("IdUsuario");
-
-                    b.ToTable("usuario_identidades", (string)null);
-                });
-
             modelBuilder.Entity("HA.TFG.AppFinanzas.BackEnd.Domain.Models.UsuarioRol", b =>
                 {
-                    b.Property<long>("IdUsuario")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("IdUsuario")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<long>("IdRol")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("IdRol")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("IdUsuario", "IdRol");
 
@@ -431,34 +423,43 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
 
             modelBuilder.Entity("HA.TFG.AppFinanzas.BackEnd.Domain.Models.CuentaCategoria", b =>
                 {
+                    b.HasOne("HA.TFG.AppFinanzas.BackEnd.Domain.Models.Categoria", "Origen")
+                        .WithMany()
+                        .HasForeignKey("IdCategoria")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("HA.TFG.AppFinanzas.BackEnd.Domain.Models.Cuenta", "Cuenta")
                         .WithMany("Categorias")
                         .HasForeignKey("IdCuenta")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("HA.TFG.AppFinanzas.BackEnd.Domain.Models.Categoria", "Origen")
-                        .WithMany()
-                        .HasForeignKey("IdOrigen")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.Navigation("Cuenta");
 
                     b.Navigation("Origen");
                 });
 
-            modelBuilder.Entity("HA.TFG.AppFinanzas.BackEnd.Domain.Models.Transaccion", b =>
+            modelBuilder.Entity("HA.TFG.AppFinanzas.BackEnd.Domain.Models.Identidad", b =>
                 {
-                    b.HasOne("HA.TFG.AppFinanzas.BackEnd.Domain.Models.CuentaCategoria", "Categoria")
-                        .WithMany("Transacciones")
-                        .HasForeignKey("IdCategoria")
+                    b.HasOne("HA.TFG.AppFinanzas.BackEnd.Domain.Models.Usuario", null)
+                        .WithMany("Identidades")
+                        .HasForeignKey("IdUsuario")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
 
+            modelBuilder.Entity("HA.TFG.AppFinanzas.BackEnd.Domain.Models.Movimiento", b =>
+                {
                     b.HasOne("HA.TFG.AppFinanzas.BackEnd.Domain.Models.Cuenta", "Cuenta")
                         .WithMany()
                         .HasForeignKey("IdCuenta")
                         .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("HA.TFG.AppFinanzas.BackEnd.Domain.Models.CuentaCategoria", "Categoria")
+                        .WithMany("Movimientos")
+                        .HasForeignKey("IdCuentaCategoria")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Categoria");
@@ -476,15 +477,6 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
 
                     b.HasOne("HA.TFG.AppFinanzas.BackEnd.Domain.Models.Usuario", null)
                         .WithMany()
-                        .HasForeignKey("IdUsuario")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("HA.TFG.AppFinanzas.BackEnd.Domain.Models.UsuarioIdentidad", b =>
-                {
-                    b.HasOne("HA.TFG.AppFinanzas.BackEnd.Domain.Models.Usuario", null)
-                        .WithMany("Identidades")
                         .HasForeignKey("IdUsuario")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -512,7 +504,7 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
 
             modelBuilder.Entity("HA.TFG.AppFinanzas.BackEnd.Domain.Models.CuentaCategoria", b =>
                 {
-                    b.Navigation("Transacciones");
+                    b.Navigation("Movimientos");
                 });
 
             modelBuilder.Entity("HA.TFG.AppFinanzas.BackEnd.Domain.Models.Usuario", b =>

@@ -2,10 +2,10 @@
 
 namespace HA.TFG.AppFinanzas.BackEnd.Controllers.Requests;
 
-public record GetTransaccionesRequestFilters
+public record GetMovimientosRequestFilters
 {
     [FromQuery(Name = "idCategoria")]
-    public long? IdCategoria { get; init; }
+    public Guid? IdCategoria { get; init; }
 
     [FromQuery(Name = "fechaDesde")]
     public DateOnly? FechaDesde { get; init; }

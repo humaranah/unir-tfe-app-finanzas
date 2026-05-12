@@ -1,21 +1,24 @@
 using HA.TFG.AppFinanzas.BackEnd.Domain.Common;
 using HA.TFG.AppFinanzas.BackEnd.Domain.Models;
+using HA.TFG.AppFinanzas.BackEnd.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Persistence;
 
 public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
     public DbSet<Usuario> Usuarios { get; set; }
-    public DbSet<UsuarioIdentidad> UsuarioIdentidades { get; set; }
+    public DbSet<Identidad> UsuarioIdentidades { get; set; }
     public DbSet<Rol> Roles { get; set; }
     public DbSet<UsuarioRol> UsuariosRoles { get; set; }
     public DbSet<Categoria> Categorias { get; set; }
     public DbSet<CuentaCategoria> CuentaCategorias { get; set; }
     public DbSet<Cuenta> Cuentas { get; set; }
     public DbSet<UsuarioCuenta> UsuariosCuentas { get; set; }
-    public DbSet<Transaccion> Transacciones { get; set; }
+    public DbSet<Movimiento> Movimientos { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -42,21 +45,46 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
 
     private static void SeedDatosIniciales(ModelBuilder modelBuilder)
     {
-        var fecha = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        var seedDate = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+        var categorias = new[]
+        {
+            (TipoMovimiento.Ingreso, "Ingresos",              "Cualquier tipo de ingreso"),
+            (TipoMovimiento.Gasto,   "Vivienda",              "Alquiler, hipoteca y gastos del hogar"),
+            (TipoMovimiento.Gasto,   "Supermercado",          "Compras en supermercado y alimentación en casa"),
+            (TipoMovimiento.Gasto,   "Restaurantes",          "Restaurantes, bares y comida para llevar"),
+            (TipoMovimiento.Gasto,   "Transporte",            "Combustible, transporte público y vehículo"),
+            (TipoMovimiento.Gasto,   "Salud",                 "Médico, farmacia y seguros de salud"),
+            (TipoMovimiento.Gasto,   "Educación",             "Cursos, libros y formación"),
+            (TipoMovimiento.Gasto,   "Ocio y entretenimiento", "Cine, viajes, hobbies y deportes"),
+            (TipoMovimiento.Gasto,   "Ropa y calzado",        "Prendas de vestir y complementos"),
+            (TipoMovimiento.Gasto,   "Tecnología",            "Dispositivos, software y suscripciones digitales"),
+            (TipoMovimiento.Gasto,   "Servicios",             "Electricidad, agua, gas e internet"),
+            (TipoMovimiento.Gasto,   "Otros gastos",          "Gastos no clasificados"),
+        };
 
         modelBuilder.Entity<Categoria>().HasData(
-            new Categoria { Id = 1, Slug = "ingresos", Nombre = "Ingresos", Descripcion = "Cualquier tipo de ingreso", FechaCreacion = fecha },
-            new Categoria { Id = 2, Slug = "gastos-vivienda", Nombre = "Vivienda", Descripcion = "Alquiler, hipoteca y gastos del hogar", FechaCreacion = fecha },
-            new Categoria { Id = 3, Slug = "gastos-supermercado", Nombre = "Supermercado", Descripcion = "Compras en supermercado y alimentación en casa", FechaCreacion = fecha },
-            new Categoria { Id = 4, Slug = "gastos-restaurantes", Nombre = "Restaurantes", Descripcion = "Restaurantes, bares y comida para llevar", FechaCreacion = fecha },
-            new Categoria { Id = 5, Slug = "gastos-transporte", Nombre = "Transporte", Descripcion = "Combustible, transporte público y vehículo", FechaCreacion = fecha },
-            new Categoria { Id = 6, Slug = "gastos-salud", Nombre = "Salud", Descripcion = "Médico, farmacia y seguros de salud", FechaCreacion = fecha },
-            new Categoria { Id = 7, Slug = "gastos-educacion", Nombre = "Educación", Descripcion = "Cursos, libros y formación", FechaCreacion = fecha },
-            new Categoria { Id = 8, Slug = "gastos-ocio", Nombre = "Ocio y entretenimiento", Descripcion = "Cine, viajes, hobbies y deportes", FechaCreacion = fecha },
-            new Categoria { Id = 9, Slug = "gastos-ropa", Nombre = "Ropa y calzado", Descripcion = "Prendas de vestir y complementos", FechaCreacion = fecha },
-            new Categoria { Id = 10, Slug = "gastos-tecnologia", Nombre = "Tecnología", Descripcion = "Dispositivos, software y suscripciones digitales", FechaCreacion = fecha },
-            new Categoria { Id = 11, Slug = "gastos-servicios", Nombre = "Servicios", Descripcion = "Electricidad, agua, gas e internet", FechaCreacion = fecha },
-            new Categoria { Id = 12, Slug = "gastos-otros", Nombre = "Otros gastos", Descripcion = "Gastos no clasificados", FechaCreacion = fecha }
+            categorias.Select(c => new Categoria
+            {
+                IdCategoria = GuidFromNombre(c.Item2),
+                TipoMovimiento = c.Item1,
+                Nombre = c.Item2,
+                Descripcion = c.Item3,
+                FechaCreacion = seedDate
+            })
         );
+    }
+
+    /// <summary>
+    /// Genera un GUID determinista a partir de un nombre usando SHA-256,
+    /// de modo que el mismo nombre produce siempre el mismo GUID.
+    /// </summary>
+    private static Guid GuidFromNombre(string nombre)
+    {
+        var hash = SHA256.HashData(Encoding.UTF8.GetBytes(nombre));
+        // Usar los primeros 16 bytes del hash como base del GUID
+        Span<byte> bytes = stackalloc byte[16];
+        hash.AsSpan(0, 16).CopyTo(bytes);
+        return new Guid(bytes);
     }
 }

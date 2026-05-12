@@ -16,7 +16,7 @@ public class EnsureUsuarioCommandHandlerTests
 
     private static readonly Rol RolUsuario = new()
     {
-        Id = 1,
+        IdRol = Guid.Parse("00000000-0000-7000-8000-000000000001"),
         Nombre = Roles.Usuario,
         FechaCreacion = DateTime.UtcNow
     };
@@ -39,8 +39,8 @@ public class EnsureUsuarioCommandHandlerTests
         _auth0UserInfoService.GetUserInfoAsync(command.AccessToken, Arg.Any<CancellationToken>()).Returns(DefaultUserInfo);
         _usuarioRepository.GetByEmailAsync(DefaultUserInfo.Email, Arg.Any<CancellationToken>()).Returns((Usuario?)null);
         _rolRepository.GetByNombreAsync(Roles.Usuario, Arg.Any<CancellationToken>()).Returns(RolUsuario);
-        _usuarioRepository.CreateAsync(Arg.Any<Usuario>(), Arg.Any<UsuarioIdentidad>(), Arg.Any<CancellationToken>()).Returns(call =>
-            call.Arg<Usuario>() with { Id = 10 });
+        _usuarioRepository.CreateAsync(Arg.Any<Usuario>(), Arg.Any<Identidad>(), Arg.Any<CancellationToken>()).Returns(call =>
+            call.Arg<Usuario>() with { IdUsuario = Guid.Parse("00000000-0000-7000-8000-000000000010") });
 
         // Act
         var result = await _sut.Handle(command, CancellationToken.None);
@@ -51,7 +51,7 @@ public class EnsureUsuarioCommandHandlerTests
         Assert.Equal(DefaultUserInfo.Nombre, result.Nombre);
         await _usuarioRepository.Received(1).CreateAsync(
             Arg.Is<Usuario>(u => u.Roles.Any(r => r.Nombre == Roles.Usuario)),
-            Arg.Is<UsuarioIdentidad>(i => i.IdAuth0 == command.IdAuth0 && i.Proveedor == "auth0"),
+            Arg.Is<Identidad>(i => i.IdAuth0 == command.IdAuth0 && i.Proveedor == "auth0"),
             CancellationToken.None);
     }
 
@@ -78,7 +78,7 @@ public class EnsureUsuarioCommandHandlerTests
         var command = new EnsureUsuarioCommand("microsoft|456", "token_abc");
         var usuarioExistente = new Usuario
         {
-            Id = 5,
+            IdUsuario = Guid.Parse("00000000-0000-7000-8000-000000000005"),
             Email = DefaultUserInfo.Email,
             Nombre = DefaultUserInfo.Nombre,
             FechaCreacion = DateTime.UtcNow
@@ -93,13 +93,12 @@ public class EnsureUsuarioCommandHandlerTests
 
         // Assert
         Assert.False(result.EsNuevo);
-        Assert.Equal(usuarioExistente.Id, result.Id);
         await _usuarioRepository.Received(1).AddIdentidadAsync(
-            usuarioExistente.Id,
-            Arg.Is<UsuarioIdentidad>(i => i.IdAuth0 == command.IdAuth0 && i.Proveedor == "microsoft"),
+            usuarioExistente.IdUsuario,
+            Arg.Is<Identidad>(i => i.IdAuth0 == command.IdAuth0 && i.Proveedor == "microsoft"),
             CancellationToken.None);
         await _usuarioRepository.DidNotReceive().CreateAsync(
-            Arg.Any<Usuario>(), Arg.Any<UsuarioIdentidad>(), Arg.Any<CancellationToken>());
+            Arg.Any<Usuario>(), Arg.Any<Identidad>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -109,7 +108,7 @@ public class EnsureUsuarioCommandHandlerTests
         var command = new EnsureUsuarioCommand("auth0|456", "token_abc");
         var usuarioExistente = new Usuario
         {
-            Id = 5,
+            IdUsuario = Guid.Parse("00000000-0000-7000-8000-000000000005"),
             Email = "existente@test.com",
             Nombre = "Existente",
             FechaCreacion = DateTime.UtcNow
@@ -122,7 +121,6 @@ public class EnsureUsuarioCommandHandlerTests
 
         // Assert
         Assert.False(result.EsNuevo);
-        Assert.Equal(usuarioExistente.Id, result.Id);
         await _auth0UserInfoService.DidNotReceive().GetUserInfoAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
         await _usuarioRepository.DidNotReceive().UpdateAsync(Arg.Any<Usuario>(), CancellationToken.None);
     }

@@ -2,17 +2,17 @@
 using Mediator;
 using Microsoft.Extensions.Logging;
 
-namespace HA.TFG.AppFinanzas.BackEnd.Application.Features.Transacciones.GetTransaccionesQuery;
+namespace HA.TFG.AppFinanzas.BackEnd.Application.Features.Movimientos.GetMovimientosQuery;
 
-public class GetTransaccionesQueryHandler(
+public class GetMovimientosQueryHandler(
     IUsuarioRepository usuarioRepository,
     ICuentaRepository cuentaRepository,
-    ITransaccionRepository transaccionRepository,
-    ILogger<GetTransaccionesQueryHandler> logger)
-    : IRequestHandler<GetTransaccionesQuery, IReadOnlyList<GetTransaccionesResultItem>>
+    IMovimientoRepository movimientoRepository,
+    ILogger<GetMovimientosQueryHandler> logger)
+    : IRequestHandler<GetMovimientosQuery, IReadOnlyList<GetMovimientosResultItem>>
 {
-    public async ValueTask<IReadOnlyList<GetTransaccionesResultItem>> Handle(
-        GetTransaccionesQuery request,
+    public async ValueTask<IReadOnlyList<GetMovimientosResultItem>> Handle(
+        GetMovimientosQuery request,
         CancellationToken cancellationToken)
     {
         var usuario = await usuarioRepository.GetByEmailAsync(request.EmailUsuario, cancellationToken);
@@ -22,18 +22,18 @@ public class GetTransaccionesQueryHandler(
             return [];
         }
 
-        var cuenta = await cuentaRepository.GetCuentaByIdAsync(usuario.Id, request.IdCuenta, cancellationToken);
+        var cuenta = await cuentaRepository.GetCuentaByIdAsync(usuario.IdUsuario, request.IdCuenta, cancellationToken);
         if (cuenta is null)
         {
             logger.LogWarning("Cuenta {IdCuenta} no encontrada para usuario {Email}", request.IdCuenta, request.EmailUsuario);
             return [];
         }
 
-        var transacciones = await transaccionRepository.GetTransaccionesAsync(
+        var movimientos = await movimientoRepository.GetMovimientosAsync(
             request.IdCuenta, request.IdCategoria, request.FechaDesde, request.FechaHasta, cancellationToken);
 
-        logger.LogInformation("Recuperadas {Count} transacciones para cuenta {IdCuenta}", transacciones.Count, request.IdCuenta);
+        logger.LogInformation("Recuperados {Count} movimientos para cuenta {IdCuenta}", movimientos.Count, request.IdCuenta);
 
-        return [.. transacciones.Select(t => t.ToResultItem())];
+        return [.. movimientos.Select(t => t.ToResultItem())];
     }
 }

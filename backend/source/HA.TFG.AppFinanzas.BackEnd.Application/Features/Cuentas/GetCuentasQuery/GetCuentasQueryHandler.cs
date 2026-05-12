@@ -28,7 +28,7 @@ public class GetCuentasQueryHandler(
             return [];
         }
 
-        var cuentas = await _cuentaRepository.GetCuentasByUsuarioIdAsync(usuario.Id, cancellationToken)
+        var cuentas = await _cuentaRepository.GetCuentasByUsuarioIdAsync(usuario.IdUsuario, cancellationToken)
             .ConfigureAwait(false);
 
         var resultItems = cuentas

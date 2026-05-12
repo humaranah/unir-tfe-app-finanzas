@@ -19,12 +19,12 @@ public class UsuarioRepositoryTests : AppDbContextTestBase
         // Arrange
         var usuario = new Usuario
         {
-            Id = 1,
+            IdUsuario = Guid.NewGuid(),
             Email = "test@test.com",
             Nombre = "Test",
             FechaCreacion = DateTime.UtcNow
         };
-        var identidad = new UsuarioIdentidad { Id = 1, IdAuth0 = "auth0|123", Proveedor = "auth0", IdUsuario = 1 };
+        var identidad = new Identidad { IdIdentidad = Guid.NewGuid(), IdAuth0 = "auth0|123", Proveedor = "auth0", IdUsuario = usuario.IdUsuario };
         Context.Usuarios.Add(usuario);
         Context.UsuarioIdentidades.Add(identidad);
         await Context.SaveChangesAsync(CancellationToken.None);
@@ -53,13 +53,13 @@ public class UsuarioRepositoryTests : AppDbContextTestBase
         // Arrange — soft delete activo
         var usuario = new Usuario
         {
-            Id = 2,
+            IdUsuario = Guid.NewGuid(),
             Email = "eliminado@test.com",
             Nombre = "Eliminado",
             FechaCreacion = DateTime.UtcNow,
             FechaEliminacion = DateTime.UtcNow
         };
-        var identidad = new UsuarioIdentidad { Id = 2, IdAuth0 = "auth0|eliminado", IdUsuario = 2 };
+        var identidad = new Identidad { IdIdentidad = Guid.NewGuid(), IdAuth0 = "auth0|eliminado", IdUsuario = usuario.IdUsuario };
         Context.Usuarios.Add(usuario);
         Context.UsuarioIdentidades.Add(identidad);
         await Context.SaveChangesAsync(CancellationToken.None);
@@ -75,16 +75,16 @@ public class UsuarioRepositoryTests : AppDbContextTestBase
     public async Task ObtenerPorIdAuth0Async_IncludeRoles_DevuelveUsuarioConRoles()
     {
         // Arrange
-        var rol = new Rol { Id = 1, Nombre = "usuario", FechaCreacion = DateTime.UtcNow };
+        var rol = new Rol { IdRol = Guid.NewGuid(), Nombre = "usuario", FechaCreacion = DateTime.UtcNow };
         var usuario = new Usuario
         {
-            Id = 3,
+            IdUsuario = Guid.NewGuid(),
             Email = "conroles@test.com",
             Nombre = "Con Roles",
             FechaCreacion = DateTime.UtcNow,
             Roles = [rol]
         };
-        var identidad = new UsuarioIdentidad { Id = 3, IdAuth0 = "auth0|conroles", IdUsuario = 3 };
+        var identidad = new Identidad { IdIdentidad = Guid.NewGuid(), IdAuth0 = "auth0|conroles", IdUsuario = usuario.IdUsuario };
         Context.Usuarios.Add(usuario);
         Context.UsuarioIdentidades.Add(identidad);
         await Context.SaveChangesAsync(CancellationToken.None);
@@ -104,22 +104,22 @@ public class UsuarioRepositoryTests : AppDbContextTestBase
         // Arrange
         var usuario = new Usuario
         {
-            Id = 10,
+            IdUsuario = Guid.NewGuid(),
             Email = "nuevo@test.com",
             Nombre = "Nuevo",
             FechaCreacion = DateTime.UtcNow
         };
-        var identidad = new UsuarioIdentidad { IdAuth0 = "auth0|nuevo", Proveedor = "auth0" };
+        var identidad = new Identidad { IdAuth0 = "auth0|nuevo", Proveedor = "auth0" };
 
         // Act
         var result = await _sut.CreateAsync(usuario, identidad, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.NotNull(result);
-        var enBD = await Context.Usuarios.FindAsync([result.Id], TestContext.Current.CancellationToken);
+        var enBD = await Context.Usuarios.FindAsync([result.IdUsuario], TestContext.Current.CancellationToken);
         Assert.NotNull(enBD);
         Assert.Equal(usuario.Email, enBD.Email);
-        var identidadEnBD = Context.UsuarioIdentidades.FirstOrDefault(i => i.IdUsuario == result.Id);
+        var identidadEnBD = Context.UsuarioIdentidades.FirstOrDefault(i => i.IdUsuario == result.IdUsuario);
         Assert.NotNull(identidadEnBD);
         Assert.Equal("auth0|nuevo", identidadEnBD.IdAuth0);
     }
@@ -130,7 +130,7 @@ public class UsuarioRepositoryTests : AppDbContextTestBase
         // Arrange
         var usuario = new Usuario
         {
-            Id = 20,
+            IdUsuario = Guid.NewGuid(),
             Email = "viejo@test.com",
             Nombre = "Viejo",
             FechaCreacion = DateTime.UtcNow
@@ -151,7 +151,7 @@ public class UsuarioRepositoryTests : AppDbContextTestBase
         // Assert
         Assert.Equal("nuevo@test.com", result.Email);
         Assert.Equal("Nuevo", result.Nombre);
-        var enBD = await Context.Usuarios.FindAsync([usuario.Id], TestContext.Current.CancellationToken);
+        var enBD = await Context.Usuarios.FindAsync([usuario.IdUsuario], TestContext.Current.CancellationToken);
         Assert.Equal("nuevo@test.com", enBD!.Email);
     }
 }

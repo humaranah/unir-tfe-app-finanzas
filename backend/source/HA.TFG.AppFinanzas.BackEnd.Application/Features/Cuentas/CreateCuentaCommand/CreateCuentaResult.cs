@@ -2,7 +2,7 @@
 
 public record CreateCuentaResult
 {
-    public long IdCuenta { get; init; }
+    public Guid IdCuenta { get; init; }
     public string Moneda { get; init; } = string.Empty;
     public string Descripcion { get; init; } = string.Empty;
 }

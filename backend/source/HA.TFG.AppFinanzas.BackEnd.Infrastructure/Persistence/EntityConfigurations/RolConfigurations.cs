@@ -1,4 +1,5 @@
 using HA.TFG.AppFinanzas.BackEnd.Domain.Models;
+using HA.TFG.AppFinanzas.BackEnd.Infrastructure.Persistence.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -9,8 +10,9 @@ internal class RolConfigurations : IEntityTypeConfiguration<Rol>
     public void Configure(EntityTypeBuilder<Rol> builder)
     {
         builder.ToTable("roles");
-        builder.HasKey(rol => rol.Id);
+        builder.HasKey(rol => rol.IdRol);
 
+        builder.Property(rol => rol.IdRol).HasValueGenerator<GuidV7ValueGenerator>();
         builder.Property(rol => rol.Nombre).IsRequired().HasMaxLength(100);
         builder.Property(rol => rol.Descripcion).HasMaxLength(500);
         builder.Property(rol => rol.FechaCreacion).IsRequired();

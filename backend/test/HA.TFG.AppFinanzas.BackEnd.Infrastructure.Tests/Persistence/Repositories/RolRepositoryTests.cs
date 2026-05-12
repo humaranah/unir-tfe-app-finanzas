@@ -17,7 +17,7 @@ public class RolRepositoryTests : AppDbContextTestBase
     public async Task ObtenerPorNombreAsync_RolExistente_DevuelveRol()
     {
         // Arrange
-        var rol = new Rol { Id = 1, Nombre = "usuario", Descripcion = "Rol base", FechaCreacion = DateTime.UtcNow };
+        var rol = new Rol { IdRol = Guid.NewGuid(), Nombre = "usuario", Descripcion = "Rol base", FechaCreacion = DateTime.UtcNow };
         Context.Roles.Add(rol);
         await Context.SaveChangesAsync(CancellationToken.None);
 
@@ -45,7 +45,7 @@ public class RolRepositoryTests : AppDbContextTestBase
         // Arrange — soft delete activo
         var rol = new Rol
         {
-            Id = 2,
+            IdRol = Guid.NewGuid(),
             Nombre = "eliminado",
             FechaCreacion = DateTime.UtcNow,
             FechaEliminacion = DateTime.UtcNow
@@ -64,7 +64,7 @@ public class RolRepositoryTests : AppDbContextTestBase
     public async Task ObtenerPorNombreAsync_NombreDistinto_NoDevuelveRol()
     {
         // Arrange
-        var rol = new Rol { Id = 3, Nombre = "usuario", FechaCreacion = DateTime.UtcNow };
+        var rol = new Rol { IdRol = Guid.NewGuid(), Nombre = "usuario", FechaCreacion = DateTime.UtcNow };
         Context.Roles.Add(rol);
         await Context.SaveChangesAsync(CancellationToken.None);
 

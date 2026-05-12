@@ -2,11 +2,11 @@
 
 namespace HA.TFG.AppFinanzas.BackEnd.Application.Contracts;
 
-public interface ITransaccionRepository
+public interface IMovimientoRepository
 {
-    Task<IReadOnlyList<Transaccion>> GetTransaccionesAsync(
-        long idCuenta,
-        long? idCategoria,
+    Task<IReadOnlyList<Movimiento>> GetMovimientosAsync(
+        Guid idCuenta,
+        Guid? idCategoria,
         DateOnly? fechaDesde,
         DateOnly? fechaHasta,
         CancellationToken cancellationToken);

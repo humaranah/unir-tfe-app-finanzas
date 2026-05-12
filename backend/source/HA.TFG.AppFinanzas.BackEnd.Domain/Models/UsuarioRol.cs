@@ -2,6 +2,6 @@
 
 public record UsuarioRol
 {
-    public long IdUsuario { get; init; }
-    public long IdRol { get; init; }
+    public Guid IdUsuario { get; init; }
+    public Guid IdRol { get; init; }
 }

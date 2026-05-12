@@ -1,6 +1,9 @@
 ﻿using HA.TFG.AppFinanzas.BackEnd.Domain.Models;
+using HA.TFG.AppFinanzas.BackEnd.Domain.ValueObjects;
+using HA.TFG.AppFinanzas.BackEnd.Infrastructure.Persistence.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Persistence.EntityConfigurations;
 
@@ -9,25 +12,34 @@ internal class CuentaCategoriaConfigurations : IEntityTypeConfiguration<CuentaCa
     public void Configure(EntityTypeBuilder<CuentaCategoria> builder)
     {
         builder.ToTable("cuenta_categorias");
-        builder.HasKey(categoria => categoria.Id);
+        builder.HasKey(cc => cc.IdCuentaCategoria);
 
-        builder.Property(categoria => categoria.IdCuenta).IsRequired();
-        builder.Property(categoria => categoria.Slug).IsRequired().HasMaxLength(100);
-        builder.Property(categoria => categoria.Nombre).IsRequired().HasMaxLength(100);
-        builder.Property(categoria => categoria.Descripcion).HasMaxLength(500);
-        builder.Property(categoria => categoria.FechaCreacion).IsRequired();
+        builder.Property(cc => cc.IdCuentaCategoria).HasValueGenerator<GuidV7ValueGenerator>();
+        builder.Property(cc => cc.IdCuenta).IsRequired();
+        builder.Property(cc => cc.TipoMovimiento)
+            .IsRequired()
+            .HasConversion(new EnumToStringConverter<TipoMovimiento>())
+            .HasMaxLength(20);
+        builder.Property(cc => cc.Nombre).IsRequired().HasMaxLength(100);
+        builder.Property(cc => cc.Descripcion).HasMaxLength(500);
+        builder.Property(cc => cc.FechaCreacion).IsRequired();
+        builder.Property(cc => cc.FechaModificacion).IsRequired(false);
+        builder.Property(cc => cc.FechaEliminacion).IsRequired(false);
+
+        builder.HasIndex(cc => new { cc.IdCuenta, cc.Nombre }).IsUnique();
+
         // Relación: CuentaCategoria -> Cuenta (muchos a uno)
         builder
-            .HasOne(categoria => categoria.Cuenta)
+            .HasOne(cc => cc.Cuenta)
             .WithMany(cuenta => cuenta.Categorias)
-            .HasForeignKey(categoria => categoria.IdCuenta)
+            .HasForeignKey(cc => cc.IdCuenta)
             .OnDelete(DeleteBehavior.Cascade);
 
         // Relación: CuentaCategoria -> Categoria (muchos a uno, opcional)
         builder
-            .HasOne(categoria => categoria.Origen)
+            .HasOne(cc => cc.Origen)
             .WithMany()
-            .HasForeignKey(categoria => categoria.IdOrigen)
+            .HasForeignKey(cc => cc.IdCategoria)
             .OnDelete(DeleteBehavior.SetNull);
     }
 }

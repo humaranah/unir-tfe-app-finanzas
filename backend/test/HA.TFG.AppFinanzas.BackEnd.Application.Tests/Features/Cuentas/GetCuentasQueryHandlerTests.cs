@@ -21,23 +21,25 @@ public class GetCuentasQueryHandlerTests
     public async Task Handle_UsuarioExistente_DevuelveSusCuentas()
     {
         // Arrange
-        var usuario = new Usuario { Id = 1, Email = "test@test.com", Nombre = "Test" };
+        var usuario = new Usuario { IdUsuario = Guid.Parse("00000000-0000-7000-8000-000000000001"), Email = "test@test.com", Nombre = "Test" };
+        var idA = Guid.Parse("00000000-0000-7000-8000-000000000010");
+        var idB = Guid.Parse("00000000-0000-7000-8000-000000000011");
         var cuentas = new List<Cuenta>
         {
-            new() { Id = 10, Moneda = "EUR", Descripcion = "Desc A" },
-            new() { Id = 11, Moneda = "EUR", Descripcion = "Desc B" }
+            new() { IdCuenta = idA, Moneda = "EUR", Descripcion = "Desc A" },
+            new() { IdCuenta = idB, Moneda = "EUR", Descripcion = "Desc B" }
         };
 
         _usuarioRepository.GetByEmailAsync(usuario.Email, Arg.Any<CancellationToken>()).Returns(usuario);
-        _cuentaRepository.GetCuentasByUsuarioIdAsync(usuario.Id, Arg.Any<CancellationToken>()).Returns(cuentas);
+        _cuentaRepository.GetCuentasByUsuarioIdAsync(usuario.IdUsuario, Arg.Any<CancellationToken>()).Returns(cuentas);
 
         // Act
         var result = await _sut.Handle(new GetCuentasQuery(usuario.Email), CancellationToken.None);
 
         // Assert
         Assert.Equal(2, result.Count);
-        Assert.Contains(result, r => r.Id == 10 && r.Descripcion == "Desc A");
-        Assert.Contains(result, r => r.Id == 11 && r.Descripcion == "Desc B");
+        Assert.Contains(result, r => r.Id == idA && r.Descripcion == "Desc A");
+        Assert.Contains(result, r => r.Id == idB && r.Descripcion == "Desc B");
     }
 
     [Fact]
@@ -51,17 +53,17 @@ public class GetCuentasQueryHandlerTests
 
         // Assert
         Assert.Empty(result);
-        await _cuentaRepository.DidNotReceive().GetCuentasByUsuarioIdAsync(Arg.Any<long>(), Arg.Any<CancellationToken>());
+        await _cuentaRepository.DidNotReceive().GetCuentasByUsuarioIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
     public async Task Handle_UsuarioSinCuentas_DevuelveLista_Vacia()
     {
         // Arrange
-        var usuario = new Usuario { Id = 1, Email = "test@test.com", Nombre = "Test" };
+        var usuario = new Usuario { IdUsuario = Guid.Parse("00000000-0000-7000-8000-000000000001"), Email = "test@test.com", Nombre = "Test" };
 
         _usuarioRepository.GetByEmailAsync(usuario.Email, Arg.Any<CancellationToken>()).Returns(usuario);
-        _cuentaRepository.GetCuentasByUsuarioIdAsync(usuario.Id, Arg.Any<CancellationToken>()).Returns([]);
+        _cuentaRepository.GetCuentasByUsuarioIdAsync(usuario.IdUsuario, Arg.Any<CancellationToken>()).Returns([]);
 
         // Act
         var result = await _sut.Handle(new GetCuentasQuery(usuario.Email), CancellationToken.None);
