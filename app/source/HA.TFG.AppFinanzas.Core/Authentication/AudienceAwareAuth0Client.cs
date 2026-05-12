@@ -3,9 +3,9 @@ using Duende.IdentityModel.OidcClient;
 using Duende.IdentityModel.OidcClient.Browser;
 using Duende.IdentityModel.OidcClient.Results;
 
-namespace HA.TFG.AppFinanzas.App.Authentication;
+namespace HA.TFG.AppFinanzas.Core.Authentication;
 
-internal sealed class AudienceAwareAuth0Client(IAuth0Client innerClient, string audience) : IAuth0Client
+public sealed class AudienceAwareAuth0Client(IAuth0Client innerClient, string audience) : IAuth0Client
 {
     private readonly IAuth0Client _innerClient = innerClient;
     private readonly string _audience = audience;

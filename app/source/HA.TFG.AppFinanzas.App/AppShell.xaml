@@ -5,6 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:HA.TFG.AppFinanzas.App"
     xmlns:views="clr-namespace:HA.TFG.AppFinanzas.App.Views"
+    xmlns:pages="clr-namespace:HA.TFG.AppFinanzas.App.Views.Pages"
     Title="App Finanzas">
 
     <!-- Página inicial: solo visible mientras se comprueba la sesión -->
@@ -12,12 +13,21 @@
         Title=""
         ContentTemplate="{DataTemplate views:SplashLoadingPage}"
         Route="splash"
+        Shell.FlyoutItemIsVisible="False"
         Shell.NavBarIsVisible="False" />
 
     <ShellContent
         Title="Iniciar sesión"
         ContentTemplate="{DataTemplate views:LoginPage}"
         Route="login"
+        Shell.FlyoutItemIsVisible="False"
+        Shell.NavBarIsVisible="False" />
+
+    <ShellContent
+        Title="Nueva cuenta"
+        ContentTemplate="{DataTemplate pages:CrearCuentaPage}"
+        Route="crear-cuenta"
+        Shell.FlyoutItemIsVisible="False"
         Shell.NavBarIsVisible="False" />
 
     <ShellContent
