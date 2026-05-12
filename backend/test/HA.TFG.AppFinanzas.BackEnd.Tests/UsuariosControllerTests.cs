@@ -33,7 +33,7 @@ public class UsuariosControllerTests
     }
 
     [Fact]
-    public async Task Ensure_UsuarioNuevo_DevuelveCreated()
+    public async Task Ensure_UsuarioNuevo_DevuelveOk()
     {
         // Arrange
         SetUser("auth0|123");
@@ -44,8 +44,8 @@ public class UsuariosControllerTests
         var result = await _sut.Ensure(CancellationToken.None);
 
         // Assert
-        var created = Assert.IsType<CreatedAtActionResult>(result);
-        Assert.Equal(commandResult, created.Value);
+        var ok = Assert.IsType<OkObjectResult>(result);
+        Assert.Equal(commandResult, ok.Value);
     }
 
     [Fact]
