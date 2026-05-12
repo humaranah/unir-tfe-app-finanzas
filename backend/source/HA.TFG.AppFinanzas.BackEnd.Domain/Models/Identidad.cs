@@ -1,9 +1,9 @@
 namespace HA.TFG.AppFinanzas.BackEnd.Domain.Models;
 
-public record UsuarioIdentidad
+public record Identidad
 {
-    public long Id { get; init; }
+    public Guid IdIdentidad { get; init; }
+    public Guid IdUsuario { get; init; }
     public string IdAuth0 { get; init; } = string.Empty;
     public string? Proveedor { get; init; }
-    public long IdUsuario { get; init; }
 }

@@ -31,7 +31,7 @@ public static class DependencyInjection
         services.AddScoped<IRolRepository, RolRepository>();
         services.AddScoped<ICuentaRepository, CuentaRepository>();
         services.AddScoped<ICategoriaRepository, CategoriaRepository>();
-        services.AddScoped<ITransaccionRepository, TransaccionRepository>();
+        services.AddScoped<IMovimientoRepository, MovimientoRepository>();
 
         services.AddOptions<Auth0Config>()
             .Bind(configuration.GetSection(Auth0Config.SectionName))

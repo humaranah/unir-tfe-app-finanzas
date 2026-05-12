@@ -20,7 +20,7 @@ public sealed class UsuarioRepository(AppDbContext context) : IUsuarioRepository
             .Include(u => u.Roles)
             .FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
 
-    public async Task<Usuario> CreateAsync(Usuario usuario, UsuarioIdentidad identidad, CancellationToken cancellationToken)
+    public async Task<Usuario> CreateAsync(Usuario usuario, Identidad identidad, CancellationToken cancellationToken)
     {
         var usuarioConIdentidad = usuario with { Identidades = [identidad] };
         context.Usuarios.Add(usuarioConIdentidad);
@@ -28,7 +28,7 @@ public sealed class UsuarioRepository(AppDbContext context) : IUsuarioRepository
         return usuarioConIdentidad;
     }
 
-    public async Task AddIdentidadAsync(long idUsuario, UsuarioIdentidad identidad, CancellationToken cancellationToken)
+    public async Task AddIdentidadAsync(Guid idUsuario, Identidad identidad, CancellationToken cancellationToken)
     {
         var identidadConId = identidad with { IdUsuario = idUsuario };
         context.UsuarioIdentidades.Add(identidadConId);
@@ -40,7 +40,7 @@ public sealed class UsuarioRepository(AppDbContext context) : IUsuarioRepository
         var entry = context.Entry(usuario);
         if (entry.State == EntityState.Detached)
         {
-            var tracked = await context.Usuarios.FindAsync([usuario.Id], cancellationToken);
+            var tracked = await context.Usuarios.FindAsync([usuario.IdUsuario], cancellationToken);
             if (tracked is not null)
                 context.Entry(tracked).CurrentValues.SetValues(usuario);
         }

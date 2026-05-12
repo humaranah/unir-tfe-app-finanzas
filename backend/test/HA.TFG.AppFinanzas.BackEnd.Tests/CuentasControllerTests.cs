@@ -41,7 +41,7 @@ public class CuentasControllerTests
         SetUser("test@test.com");
         var cuentas = new List<GetCuentasResultItem>
         {
-            new() { Id = 1, Descripcion = "Desc A" }
+            new() { Id = Guid.NewGuid(), Descripcion = "Desc A" }
         };
         _mediator.Send(Arg.Any<GetCuentasQuery>(), Arg.Any<CancellationToken>()).Returns(cuentas);
 
@@ -76,7 +76,7 @@ public class CuentasControllerTests
         // Arrange
         SetUser("test@test.com");
         var request = new CreateCuentaRequest { Moneda = "EUR", Descripcion = "Mi cuenta" };
-        var createResult = new CreateCuentaResult { IdCuenta = 1, Moneda = "EUR", Descripcion = "Mi cuenta" };
+        var createResult = new CreateCuentaResult { IdCuenta = Guid.NewGuid(), Moneda = "EUR", Descripcion = "Mi cuenta" };
         _mediator.Send(Arg.Any<CreateCuentaCommand>(), Arg.Any<CancellationToken>()).Returns(createResult);
 
         // Act

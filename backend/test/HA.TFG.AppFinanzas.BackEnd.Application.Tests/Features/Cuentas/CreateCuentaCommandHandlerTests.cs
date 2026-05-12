@@ -22,8 +22,8 @@ public class CreateCuentaCommandHandlerTests
     public async Task Handle_UsuarioExistente_CreaCuentaYDevuelveResult()
     {
         // Arrange
-        var usuario = new Usuario { Id = 1, Email = "test@test.com", Nombre = "Test" };
-        var cuentaCreada = new Cuenta { Id = 10, Moneda = "EUR", Descripcion = "Mi cuenta" };
+        var usuario = new Usuario { IdUsuario = Guid.Parse("00000000-0000-7000-8000-000000000001"), Email = "test@test.com", Nombre = "Test" };
+        var cuentaCreada = new Cuenta { IdCuenta = Guid.Parse("00000000-0000-7000-8000-000000000010"), Moneda = "EUR", Descripcion = "Mi cuenta" };
         var command = new CreateCuentaCommand { Email = usuario.Email, Moneda = "EUR", Descripcion = "Mi cuenta" };
 
         _usuarioRepository.GetByEmailAsync(usuario.Email, Arg.Any<CancellationToken>()).Returns(usuario);
@@ -33,7 +33,7 @@ public class CreateCuentaCommandHandlerTests
         var result = await _sut.Handle(command, CancellationToken.None);
 
         // Assert
-        Assert.Equal(10, result.IdCuenta);
+        Assert.Equal(cuentaCreada.IdCuenta, result.IdCuenta);
         Assert.Equal("EUR", result.Moneda);
         Assert.Equal("Mi cuenta", result.Descripcion);
     }
@@ -42,7 +42,7 @@ public class CreateCuentaCommandHandlerTests
     public async Task Handle_UsuarioExistente_LlamaCuentaRepositoryConUsuarioAsociado()
     {
         // Arrange
-        var usuario = new Usuario { Id = 1, Email = "test@test.com", Nombre = "Test" };
+        var usuario = new Usuario { IdUsuario = Guid.Parse("00000000-0000-7000-8000-000000000001"), Email = "test@test.com", Nombre = "Test" };
         var command = new CreateCuentaCommand { Email = usuario.Email, Moneda = "USD", Descripcion = "Mi cuenta" };
 
         _usuarioRepository.GetByEmailAsync(usuario.Email, Arg.Any<CancellationToken>()).Returns(usuario);

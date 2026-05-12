@@ -8,21 +8,21 @@ public class CuentaRepository(AppDbContext context) : ICuentaRepository
 {
     private readonly AppDbContext _context = context;
 
-    public async Task<IReadOnlyList<Cuenta>> GetCuentasByUsuarioIdAsync(long idUsuario, CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<Cuenta>> GetCuentasByUsuarioIdAsync(Guid idUsuario, CancellationToken cancellationToken)
     {
         var cuentas = await _context.Usuarios
-            .Where(u => u.Id == idUsuario)
+            .Where(u => u.IdUsuario == idUsuario)
             .SelectMany(u => u.Cuentas)
             .ToListAsync(cancellationToken);
 
         return cuentas ?? [];
     }
 
-    public Task<Cuenta?> GetCuentaByIdAsync(long idUsuario, long idCuenta, CancellationToken cancellationToken) =>
+    public Task<Cuenta?> GetCuentaByIdAsync(Guid idUsuario, Guid idCuenta, CancellationToken cancellationToken) =>
         _context.Usuarios
-            .Where(u => u.Id == idUsuario)
+            .Where(u => u.IdUsuario == idUsuario)
             .SelectMany(u => u.Cuentas)
-            .FirstOrDefaultAsync(c => c.Id == idCuenta, cancellationToken);
+            .FirstOrDefaultAsync(c => c.IdCuenta == idCuenta, cancellationToken);
 
     public async Task<Cuenta> CreateCuentaConCategoriasAsync(Cuenta cuenta, CancellationToken cancellationToken)
     {
@@ -33,8 +33,8 @@ public class CuentaRepository(AppDbContext context) : ICuentaRepository
             FechaCreacion = DateTime.UtcNow,
             Categorias = [.. categorias.Select(c => new CuentaCategoria
             {
-                IdOrigen = c.Id,
-                Slug = c.Slug,
+                IdCategoria = c.IdCategoria,
+                TipoMovimiento = c.TipoMovimiento,
                 Nombre = c.Nombre,
                 Descripcion = c.Descripcion,
                 FechaCreacion = DateTime.UtcNow

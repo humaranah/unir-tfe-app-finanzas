@@ -2,6 +2,6 @@
 
 public record UsuarioCuenta
 {
-    public long IdUsuario { get; init; }
-    public long IdCuenta { get; init; }
+    public Guid IdUsuario { get; init; }
+    public Guid IdCuenta { get; init; }
 }

@@ -18,7 +18,7 @@ public sealed class RolesClaimsTransformation(AppDbContext context) : IClaimsTra
         var roles = await context.UsuarioIdentidades
             .Where(i => i.IdAuth0 == idAuth0)
             .SelectMany(i => context.Usuarios
-                .Where(u => u.Id == i.IdUsuario)
+                .Where(u => u.IdUsuario == i.IdUsuario)
                 .SelectMany(u => u.Roles))
             .Select(r => r.Nombre)
             .ToListAsync();

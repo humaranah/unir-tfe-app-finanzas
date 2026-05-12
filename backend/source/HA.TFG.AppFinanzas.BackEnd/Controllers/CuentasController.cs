@@ -1,6 +1,6 @@
 ﻿using HA.TFG.AppFinanzas.BackEnd.Application.Features.Cuentas.CreateCuentaCommand;
 using HA.TFG.AppFinanzas.BackEnd.Application.Features.Cuentas.GetCuentasQuery;
-using HA.TFG.AppFinanzas.BackEnd.Application.Features.Transacciones.GetTransaccionesQuery;
+using HA.TFG.AppFinanzas.BackEnd.Application.Features.Movimientos.GetMovimientosQuery;
 using HA.TFG.AppFinanzas.BackEnd.Controllers.Mappers;
 using HA.TFG.AppFinanzas.BackEnd.Controllers.Requests;
 using HA.TFG.AppFinanzas.BackEnd.Domain.Common;
@@ -25,11 +25,11 @@ public sealed class CuentasController(IMediator mediator) : ControllerBase
         return Ok(result);
     }
 
-    [HttpGet("{idCuenta:long}/transacciones")]
-    [ProducesResponseType<IReadOnlyList<GetTransaccionesResultItem>>(StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetTransacciones(
-        [FromRoute] long idCuenta,
-        [FromQuery] GetTransaccionesRequestFilters filters,
+    [HttpGet("{idCuenta:guid}/movimientos")]
+    [ProducesResponseType<IReadOnlyList<GetMovimientosResultItem>>(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetMovimientos(
+        [FromRoute] Guid idCuenta,
+        [FromQuery] GetMovimientosRequestFilters filters,
         CancellationToken cancellationToken)
     {
         var email = User.Identity?.Name ?? string.Empty;

@@ -45,7 +45,7 @@ public sealed class UsuariosController(IMediator mediator) : ControllerBase
         var result = await _mediator.Send(command, cancellationToken);
 
         return result.EsNuevo
-            ? CreatedAtAction(nameof(Ensure), new { id = result.Id }, result)
+            ? CreatedAtAction(nameof(Ensure), null, result)
             : Ok(result);
     }
 }

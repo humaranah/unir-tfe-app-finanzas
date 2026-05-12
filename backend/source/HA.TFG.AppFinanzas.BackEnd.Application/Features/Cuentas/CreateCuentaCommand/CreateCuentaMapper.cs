@@ -6,6 +6,6 @@ namespace HA.TFG.AppFinanzas.BackEnd.Application.Features.Cuentas.CreateCuentaCo
 [Mapper(RequiredMappingStrategy = RequiredMappingStrategy.None)]
 public static partial class CreateCuentaMapper
 {
-    [MapProperty(nameof(Cuenta.Id), nameof(CreateCuentaResult.IdCuenta))]
+    [MapProperty(nameof(Cuenta.IdCuenta), nameof(CreateCuentaResult.IdCuenta))]
     public static partial CreateCuentaResult ToResult(this Cuenta cuenta);
 }

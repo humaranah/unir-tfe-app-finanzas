@@ -1,4 +1,3 @@
-using HA.TFG.AppFinanzas.BackEnd.Application.Common.Exceptions;
 using HA.TFG.AppFinanzas.BackEnd.Application.Contracts;
 using HA.TFG.AppFinanzas.BackEnd.Domain.Common;
 using HA.TFG.AppFinanzas.BackEnd.Domain.Models;
@@ -17,7 +16,7 @@ public sealed class EnsureUsuarioCommandHandler(
         CancellationToken cancellationToken)
     {
         var proveedor = ExtractProveedorFromSub(command.IdAuth0);
-        var identidad = new UsuarioIdentidad
+        var identidad = new Identidad
         {
             IdAuth0 = command.IdAuth0,
             Proveedor = proveedor
@@ -35,7 +34,7 @@ public sealed class EnsureUsuarioCommandHandler(
         var usuarioPorEmail = await usuarioRepository.GetByEmailAsync(userInfo.Email, cancellationToken);
         if (usuarioPorEmail is not null)
         {
-            await usuarioRepository.AddIdentidadAsync(usuarioPorEmail.Id, identidad, cancellationToken);
+            await usuarioRepository.AddIdentidadAsync(usuarioPorEmail.IdUsuario, identidad, cancellationToken);
             return ToResult(usuarioPorEmail, EsNuevo: false);
         }
 
@@ -50,7 +49,6 @@ public sealed class EnsureUsuarioCommandHandler(
             Nombre = userInfo.Nombre,
             FotoPerfil = userInfo.FotoPerfil,
             EmailVerificado = userInfo.EmailVerificado,
-            UltimaActualizacion = userInfo.UltimaActualizacion,
             FechaCreacion = DateTime.UtcNow,
             Roles = [rolUsuario]
         };
@@ -61,8 +59,10 @@ public sealed class EnsureUsuarioCommandHandler(
     }
 
     private static EnsureUsuarioResult ToResult(Usuario u, bool EsNuevo) =>
-        new(u.Id, u.Email, u.Nombre,
-            u.FotoPerfil, u.EmailVerificado, u.UltimaActualizacion,
+        new(u.Email,
+            u.Nombre,
+            u.FotoPerfil,
+            u.EmailVerificado,
             EsNuevo);
 
     private static string? ExtractProveedorFromSub(string sub)

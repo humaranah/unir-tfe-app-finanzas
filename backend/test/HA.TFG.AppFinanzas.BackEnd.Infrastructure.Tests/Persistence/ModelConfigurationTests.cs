@@ -13,7 +13,7 @@ public class ModelConfigurationTests : AppDbContextTestBase
         Assert.NotNull(Context.Cuentas);
         Assert.NotNull(Context.Categorias);
         Assert.NotNull(Context.CuentaCategorias);
-        Assert.NotNull(Context.Transacciones);
+        Assert.NotNull(Context.Movimientos);
         Assert.NotNull(Context.UsuariosRoles);
         Assert.NotNull(Context.UsuariosCuentas);
     }

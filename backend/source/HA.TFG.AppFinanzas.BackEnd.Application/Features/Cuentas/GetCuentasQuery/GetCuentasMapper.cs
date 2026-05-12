@@ -6,6 +6,7 @@ namespace HA.TFG.AppFinanzas.BackEnd.Application.Features.Cuentas.GetCuentasQuer
 [Mapper(RequiredMappingStrategy = RequiredMappingStrategy.None)]
 public static partial class GetCuentasMapper
 {
+    [MapProperty(nameof(Cuenta.IdCuenta), nameof(GetCuentasResultItem.Id))]
     public static partial GetCuentasResultItem ToResultItem(this Cuenta cuenta);
 }
 

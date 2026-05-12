@@ -11,7 +11,7 @@ public class SoftDeleteTests : AppDbContextTestBase
     {
         var usuario = new Usuario
         {
-            Id = 1,
+            IdUsuario = Guid.NewGuid(),
             Email = "test@test.com",
             Nombre = "Test",
             FechaCreacion = DateTime.UtcNow,
@@ -31,7 +31,7 @@ public class SoftDeleteTests : AppDbContextTestBase
     {
         var usuario = new Usuario
         {
-            Id = 2,
+            IdUsuario = Guid.NewGuid(),
             Email = "activo@test.com",
             Nombre = "Activo",
             FechaCreacion = DateTime.UtcNow,
@@ -51,7 +51,7 @@ public class SoftDeleteTests : AppDbContextTestBase
     {
         var usuario = new Usuario
         {
-            Id = 3,
+            IdUsuario = Guid.NewGuid(),
             Email = "eliminado@test.com",
             Nombre = "Eliminado",
             FechaCreacion = DateTime.UtcNow,
@@ -71,7 +71,7 @@ public class SoftDeleteTests : AppDbContextTestBase
     {
         var cuenta = new Cuenta
         {
-            Id = 1,
+            IdCuenta = Guid.NewGuid(),
             Moneda = "EUR",
             Descripcion = "Cuenta test",
             FechaEliminacion = DateTime.UtcNow
@@ -90,7 +90,7 @@ public class SoftDeleteTests : AppDbContextTestBase
     {
         var rol = new Rol
         {
-            Id = 1,
+            IdRol = Guid.NewGuid(),
             Nombre = "Admin",
             FechaCreacion = DateTime.UtcNow,
             FechaEliminacion = DateTime.UtcNow

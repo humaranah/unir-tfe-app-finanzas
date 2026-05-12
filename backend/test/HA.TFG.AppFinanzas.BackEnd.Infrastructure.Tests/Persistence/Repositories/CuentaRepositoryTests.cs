@@ -17,11 +17,11 @@ public class CuentaRepositoryTests : AppDbContextTestBase
     public async Task GetCuentasByUsuarioIdAsync_UsuarioConCuentas_DevuelveCuentas()
     {
         // Arrange
-        var cuenta1 = new Cuenta { Id = 1, Moneda = "EUR", Descripcion = "Desc 1" };
-        var cuenta2 = new Cuenta { Id = 2, Moneda = "EUR", Descripcion = "Desc 2" };
+        var cuenta1 = new Cuenta { IdCuenta = Guid.NewGuid(), Moneda = "EUR", Descripcion = "Desc 1" };
+        var cuenta2 = new Cuenta { IdCuenta = Guid.NewGuid(), Moneda = "EUR", Descripcion = "Desc 2" };
         var usuario = new Usuario
         {
-            Id = 1,
+            IdUsuario = Guid.NewGuid(),
             Email = "test@test.com",
             Nombre = "Test",
             FechaCreacion = DateTime.UtcNow,
@@ -31,7 +31,7 @@ public class CuentaRepositoryTests : AppDbContextTestBase
         await Context.SaveChangesAsync(CancellationToken.None);
 
         // Act
-        var result = await _sut.GetCuentasByUsuarioIdAsync(1, TestContext.Current.CancellationToken);
+        var result = await _sut.GetCuentasByUsuarioIdAsync(usuario.IdUsuario, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.NotNull(result);
@@ -46,7 +46,7 @@ public class CuentaRepositoryTests : AppDbContextTestBase
         // Arrange
         var usuario = new Usuario
         {
-            Id = 2,
+            IdUsuario = Guid.NewGuid(),
             Email = "sincuentas@test.com",
             Nombre = "Sin Cuentas",
             FechaCreacion = DateTime.UtcNow
@@ -55,7 +55,7 @@ public class CuentaRepositoryTests : AppDbContextTestBase
         await Context.SaveChangesAsync(CancellationToken.None);
 
         // Act
-        var result = await _sut.GetCuentasByUsuarioIdAsync(2, TestContext.Current.CancellationToken);
+        var result = await _sut.GetCuentasByUsuarioIdAsync(usuario.IdUsuario, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.NotNull(result);
@@ -66,7 +66,7 @@ public class CuentaRepositoryTests : AppDbContextTestBase
     public async Task GetCuentasByUsuarioIdAsync_UsuarioNoExistente_DevuelveListaVacia()
     {
         // Act
-        var result = await _sut.GetCuentasByUsuarioIdAsync(999, TestContext.Current.CancellationToken);
+        var result = await _sut.GetCuentasByUsuarioIdAsync(Guid.NewGuid(), TestContext.Current.CancellationToken);
 
         // Assert
         Assert.NotNull(result);
@@ -77,11 +77,11 @@ public class CuentaRepositoryTests : AppDbContextTestBase
     public async Task GetCuentasByUsuarioIdAsync_SoloDevuelveCuentasDelUsuarioSolicitado()
     {
         // Arrange
-        var cuentaU1 = new Cuenta { Id = 3, Moneda = "EUR", Descripcion = "Desc Usuario 1" };
-        var cuentaU2 = new Cuenta { Id = 4, Moneda = "EUR", Descripcion = "Desc Usuario 2" };
+        var cuentaU1 = new Cuenta { IdCuenta = Guid.NewGuid(), Moneda = "EUR", Descripcion = "Desc Usuario 1" };
+        var cuentaU2 = new Cuenta { IdCuenta = Guid.NewGuid(), Moneda = "EUR", Descripcion = "Desc Usuario 2" };
         var usuario1 = new Usuario
         {
-            Id = 3,
+            IdUsuario = Guid.NewGuid(),
             Email = "usuario1@test.com",
             Nombre = "Usuario 1",
             FechaCreacion = DateTime.UtcNow,
@@ -89,7 +89,7 @@ public class CuentaRepositoryTests : AppDbContextTestBase
         };
         var usuario2 = new Usuario
         {
-            Id = 4,
+            IdUsuario = Guid.NewGuid(),
             Email = "usuario2@test.com",
             Nombre = "Usuario 2",
             FechaCreacion = DateTime.UtcNow,
@@ -99,7 +99,7 @@ public class CuentaRepositoryTests : AppDbContextTestBase
         await Context.SaveChangesAsync(CancellationToken.None);
 
         // Act
-        var result = await _sut.GetCuentasByUsuarioIdAsync(3, TestContext.Current.CancellationToken);
+        var result = await _sut.GetCuentasByUsuarioIdAsync(usuario1.IdUsuario, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Single(result);

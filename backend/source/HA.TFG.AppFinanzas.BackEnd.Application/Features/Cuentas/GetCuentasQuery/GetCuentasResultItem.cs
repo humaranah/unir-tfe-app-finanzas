@@ -2,7 +2,7 @@
 
 public record GetCuentasResultItem
 {
-    public long Id { get; init; }
+    public Guid Id { get; init; }
     public string Moneda { get; init; } = string.Empty;
     public string Descripcion { get; init; } = string.Empty;
 }

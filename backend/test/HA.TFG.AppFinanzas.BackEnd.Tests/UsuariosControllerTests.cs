@@ -37,7 +37,7 @@ public class UsuariosControllerTests
     {
         // Arrange
         SetUser("auth0|123");
-        var commandResult = new EnsureUsuarioResult(1, "test@test.com", "Test User", null, true, null, EsNuevo: true);
+        var commandResult = new EnsureUsuarioResult("test@test.com", "Test User", null, true, EsNuevo: true);
         _mediator.Send(Arg.Any<EnsureUsuarioCommand>(), Arg.Any<CancellationToken>()).Returns(commandResult);
 
         // Act
@@ -53,7 +53,7 @@ public class UsuariosControllerTests
     {
         // Arrange
         SetUser("auth0|456");
-        var commandResult = new EnsureUsuarioResult(5, "existente@test.com", "Existente", null, true, null, EsNuevo: false);
+        var commandResult = new EnsureUsuarioResult("existente@test.com", "Existente", null, true, EsNuevo: false);
         _mediator.Send(Arg.Any<EnsureUsuarioCommand>(), Arg.Any<CancellationToken>()).Returns(commandResult);
 
         // Act
@@ -88,7 +88,7 @@ public class UsuariosControllerTests
         const string token = "mi_token_jwt";
         SetUser(idAuth0, token);
 
-        var commandResult = new EnsureUsuarioResult(1, "test@test.com", "Test User", null, true, null, EsNuevo: true);
+        var commandResult = new EnsureUsuarioResult("test@test.com", "Test User", null, true, EsNuevo: true);
         _mediator.Send(Arg.Any<EnsureUsuarioCommand>(), Arg.Any<CancellationToken>()).Returns(commandResult);
 
         // Act
