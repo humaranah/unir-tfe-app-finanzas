@@ -1,5 +1,5 @@
 ﻿using HA.TFG.AppFinanzas.BackEnd.Domain.Models;
-using HA.TFG.AppFinanzas.BackEnd.Infrastructure.Persistence;
+using HA.TFG.AppFinanzas.BackEnd.Infrastructure.Persistence.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

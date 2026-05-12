@@ -1,5 +1,6 @@
 ﻿using HA.TFG.AppFinanzas.BackEnd.Domain.Models;
 using HA.TFG.AppFinanzas.BackEnd.Domain.ValueObjects;
+using HA.TFG.AppFinanzas.BackEnd.Infrastructure.Persistence.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
