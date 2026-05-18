@@ -54,9 +54,10 @@ public class MovimientosViewModelTests
     [Fact]
     public void Constructor_FechaIsCurrentMonth()
     {
+        var now = DateTime.Now;
         var sut = CreateSut();
-        Assert.Equal(DateTime.Now.Year, sut.Fecha.Year);
-        Assert.Equal(DateTime.Now.Month, sut.Fecha.Month);
+        Assert.Equal(now.Year, sut.Fecha.Year);
+        Assert.Equal(now.Month, sut.Fecha.Month);
     }
 
     // ── SinMovimientos ────────────────────────────────────────────────────────
@@ -76,6 +77,79 @@ public class MovimientosViewModelTests
         await sut.CargarMovimientosAsync();
 
         Assert.False(sut.SinMovimientos);
+    }
+
+    [Fact]
+    public async Task SinMovimientos_WhenHasError_IsFalse()
+    {
+        _cuentasService.GetDefaultCuentaAsync().Throws(new HttpRequestException("fallo"));
+
+        var sut = CreateSut();
+        await sut.CargarMovimientosAsync();
+
+        Assert.False(sut.SinMovimientos);
+    }
+
+    // ── HasMovimientos ────────────────────────────────────────────────────────
+
+    [Fact]
+    public async Task HasMovimientos_WhenMovimientosLoaded_IsTrue()
+    {
+        ConfigurarCuenta();
+        _movimientosService.GetMovimientosAsync(IdCuenta, Arg.Any<GetMovimientosFilters?>())
+            .Returns([CrearMovimiento(DateOnly.FromDateTime(DateTime.Now))]);
+
+        var sut = CreateSut();
+        await sut.CargarMovimientosAsync();
+
+        Assert.True(sut.HasMovimientos);
+    }
+
+    [Fact]
+    public async Task HasMovimientos_WhenHasError_IsFalse()
+    {
+        _cuentasService.GetDefaultCuentaAsync().Throws(new HttpRequestException("fallo"));
+
+        var sut = CreateSut();
+        await sut.CargarMovimientosAsync();
+
+        Assert.False(sut.HasMovimientos);
+    }
+
+    // ── HasError ──────────────────────────────────────────────────────────────
+
+    [Fact]
+    public void HasError_InitiallyIsFalse()
+        => Assert.False(CreateSut().HasError);
+
+    [Fact]
+    public async Task HasError_WhenServiceThrows_IsTrue()
+    {
+        _cuentasService.GetDefaultCuentaAsync().Throws(new HttpRequestException("fallo"));
+
+        var sut = CreateSut();
+        await sut.CargarMovimientosAsync();
+
+        Assert.True(sut.HasError);
+    }
+
+    [Fact]
+    public async Task HasError_IsClearedOnNextSuccessfulLoad()
+    {
+        _cuentasService.GetDefaultCuentaAsync().Throws(new HttpRequestException("fallo"));
+
+        var sut = CreateSut();
+        await sut.CargarMovimientosAsync();
+
+        Assert.True(sut.HasError);
+
+        _cuentasService.GetDefaultCuentaAsync(Arg.Any<CancellationToken>())
+            .Returns((IdCuenta, (string?)"Mi cuenta"));
+        _movimientosService.GetMovimientosAsync(IdCuenta, Arg.Any<GetMovimientosFilters?>()).Returns([]);
+
+        await sut.CargarMovimientosAsync();
+
+        Assert.False(sut.HasError);
     }
 
     // ── CargarMovimientosAsync ────────────────────────────────────────────────
