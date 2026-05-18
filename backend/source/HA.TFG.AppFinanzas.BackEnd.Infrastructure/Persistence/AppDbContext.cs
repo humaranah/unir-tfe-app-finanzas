@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Security.Cryptography;
 using System.Text;
+using RoleNames = HA.TFG.AppFinanzas.BackEnd.Domain.Common.Roles;
 
 namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Persistence;
 
@@ -72,6 +73,16 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
                 Descripcion = c.Item3,
                 FechaCreacion = seedDate
             })
+        );
+
+        modelBuilder.Entity<Rol>().HasData(
+            new Rol
+            {
+                IdRol = GuidFromNombre(RoleNames.Usuario),
+                Nombre = RoleNames.Usuario,
+                Descripcion = "Usuario estándar de la aplicación",
+                FechaCreacion = seedDate
+            }
         );
     }
 
