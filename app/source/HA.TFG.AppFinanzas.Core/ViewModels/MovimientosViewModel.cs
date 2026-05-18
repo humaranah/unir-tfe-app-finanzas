@@ -23,6 +23,7 @@ public partial class MovimientosViewModel(
     [NotifyPropertyChangedFor(nameof(IsAnteriorEnabled))]
     [NotifyPropertyChangedFor(nameof(IsSiguienteEnabled))]
     [NotifyPropertyChangedFor(nameof(SinMovimientos))]
+    [NotifyPropertyChangedFor(nameof(HasMovimientos))]
     public partial bool IsBusy { get; set; }
 
     [ObservableProperty]

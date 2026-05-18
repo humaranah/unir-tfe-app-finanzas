@@ -1,5 +1,6 @@
 using Auth0.OidcClient;
 using HA.TFG.AppFinanzas.Core.Models;
+using System.Buffers.Text;
 using System.Text;
 using System.Text.Json;
 
@@ -33,6 +34,10 @@ public class UsuarioService(
 
         try
         {
+            var backendAvailable = await backendHealthService.IsAvailableAsync(cancellationToken);
+            if (!backendAvailable)
+                return info;
+
             await usuarioEnsureService.EnsureUsuarioAsync(cancellationToken);
         }
         catch
@@ -87,8 +92,14 @@ public class UsuarioService(
 
     public async Task LogoutAsync(CancellationToken cancellationToken = default)
     {
-        await auth0Client.LogoutAsync(cancellationToken: cancellationToken);
-        await sessionStore.ClearAsync();
+        try
+        {
+            await auth0Client.LogoutAsync(cancellationToken: cancellationToken);
+        }
+        finally
+        {
+            await sessionStore.ClearAsync();
+        }
     }
 
     private static UsuarioInfo? ParseIdentityToken(string? idToken)
@@ -103,8 +114,7 @@ public class UsuarioService(
                 return null;
 
             var payload = parts[1];
-            payload = payload.PadRight(payload.Length + (4 - payload.Length % 4) % 4, '=');
-            var json = Encoding.UTF8.GetString(Convert.FromBase64String(payload));
+            var json = Encoding.UTF8.GetString(Base64Url.DecodeFromChars(payload));
 
             using var doc = JsonDocument.Parse(json);
             var root = doc.RootElement;

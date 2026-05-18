@@ -58,7 +58,16 @@
                         <StackLayout>
                             <Label Text="{Binding Concepto}" FontSize="16" FontAttributes="Bold" />
                             <Label Text="{Binding FechaMovimiento, StringFormat='Fecha: {0:dd/MM/yyyy}'}" FontSize="14" TextColor="Gray" />
-                            <Label Text="{Binding Importe, StringFormat='Monto: {0:C}'}" FontSize="14" TextColor="Green" />
+                            <Label FontSize="14" TextColor="Green">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="Monto: " />
+                                        <Span Text="{Binding Importe, StringFormat='{0:N2}'}" />
+                                        <Span Text=" " />
+                                        <Span Text="{Binding Moneda}" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
                         </StackLayout>
                     </Border>
                 </DataTemplate>

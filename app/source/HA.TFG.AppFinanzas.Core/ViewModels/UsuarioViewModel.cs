@@ -36,6 +36,8 @@ public partial class UsuarioViewModel(IUsuarioService usuarioService) : Observab
         var info = await usuarioService.TryRestoreSessionAsync(cancellationToken);
         if (info is not null)
             SetSession(info);
+        else
+            ClearSession();
     }
 
     [RelayCommand]
@@ -66,10 +68,14 @@ public partial class UsuarioViewModel(IUsuarioService usuarioService) : Observab
     [RelayCommand]
     public async Task LogoutAsync(CancellationToken cancellationToken = default)
     {
-        await usuarioService.LogoutAsync(cancellationToken);
-        IsAuthenticated = false;
-        Name = string.Empty;
-        Email = string.Empty;
+        try
+        {
+            await usuarioService.LogoutAsync(cancellationToken);
+        }
+        finally
+        {
+            ClearSession();
+        }
     }
 
     private void SetSession(UsuarioInfo info)
@@ -77,5 +83,12 @@ public partial class UsuarioViewModel(IUsuarioService usuarioService) : Observab
         Name = info.Nombre;
         Email = info.Email;
         IsAuthenticated = true;
+    }
+
+    private void ClearSession()
+    {
+        IsAuthenticated = false;
+        Name = string.Empty;
+        Email = string.Empty;
     }
 }

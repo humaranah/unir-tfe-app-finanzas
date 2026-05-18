@@ -7,7 +7,7 @@
              Title="App Finanzas"
              Shell.NavBarIsVisible="False">
 
-    <VerticalStackLayout Padding="40" Spacing="24" VerticalOptions="Center">
+    <VerticalStackLayout Padding="40" Spacing="24" VerticalOptions="Center" MaximumWidthRequest="800">
 
         <Label Text="App Finanzas"
                FontSize="32"

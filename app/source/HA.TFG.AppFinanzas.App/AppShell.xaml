@@ -22,21 +22,24 @@
         ContentTemplate="{DataTemplate views:SplashLoadingPage}"
         Route="splash"
         Shell.FlyoutItemIsVisible="False"
-        Shell.NavBarIsVisible="False" />
+        Shell.NavBarIsVisible="False"
+        Shell.FlyoutBehavior="Disabled" />
 
     <ShellContent
         Title="Iniciar sesión"
         ContentTemplate="{DataTemplate views:LoginPage}"
         Route="login"
         Shell.FlyoutItemIsVisible="False"
-        Shell.NavBarIsVisible="False" />
+        Shell.NavBarIsVisible="False"
+        Shell.FlyoutBehavior="Disabled" />
 
     <ShellContent
         Title="Nueva cuenta"
         ContentTemplate="{DataTemplate pages:CrearCuentaPage}"
         Route="crear-cuenta"
         Shell.FlyoutItemIsVisible="False"
-        Shell.NavBarIsVisible="False" />
+        Shell.NavBarIsVisible="False"
+        Shell.FlyoutBehavior="Disabled" />
 
     <ShellContent
         Title="Movimientos"
