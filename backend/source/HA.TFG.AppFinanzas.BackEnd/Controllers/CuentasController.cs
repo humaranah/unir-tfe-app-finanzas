@@ -1,5 +1,6 @@
 ﻿using HA.TFG.AppFinanzas.BackEnd.Application.Features.Cuentas.CreateCuentaCommand;
 using HA.TFG.AppFinanzas.BackEnd.Application.Features.Cuentas.GetCuentasQuery;
+using HA.TFG.AppFinanzas.BackEnd.Application.Features.Movimientos.CreateMovimientoCommand;
 using HA.TFG.AppFinanzas.BackEnd.Application.Features.Movimientos.GetMovimientosQuery;
 using HA.TFG.AppFinanzas.BackEnd.Controllers.Mappers;
 using HA.TFG.AppFinanzas.BackEnd.Controllers.Requests;
@@ -47,5 +48,33 @@ public sealed class CuentasController(IMediator mediator) : ControllerBase
         var command = request.ToCommand(email);
         var result = await _mediator.Send(command, cancellationToken);
         return Ok(result);
+    }
+
+    [HttpPost("{idCuenta:guid}/movimientos")]
+    [ProducesResponseType<CreateMovimientoResult>(StatusCodes.Status201Created)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> CreateMovimiento(
+        [FromRoute] Guid idCuenta,
+        [FromBody] CreateMovimientoRequest request,
+        CancellationToken cancellationToken)
+    {
+        var email = User.Identity?.Name ?? string.Empty;
+        var command = new CreateMovimientoCommand
+        {
+            Email = email,
+            IdCuenta = idCuenta,
+            IdCuentaCategoria = request.IdCuentaCategoria,
+            TipoMovimiento = request.TipoMovimiento,
+            Concepto = request.Concepto,
+            Importe = request.Importe,
+            Moneda = request.Moneda,
+            TipoCambio = request.TipoCambio,
+            IdComprobante = request.IdComprobante,
+            Nota = request.Nota,
+            FechaMovimiento = request.FechaMovimiento
+        };
+        var result = await _mediator.Send(command, cancellationToken);
+        return CreatedAtAction(nameof(GetMovimientos), new { idCuenta }, result);
     }
 }

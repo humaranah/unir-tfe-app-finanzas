@@ -10,4 +10,6 @@ public interface IMovimientoRepository
         DateOnly? fechaDesde,
         DateOnly? fechaHasta,
         CancellationToken cancellationToken);
+
+    Task<Movimiento> AddMovimientoAsync(Movimiento movimiento, CancellationToken cancellationToken);
 }

@@ -5,4 +5,5 @@ public record GetCuentasResultItem
     public Guid Id { get; init; }
     public string Moneda { get; init; } = string.Empty;
     public string Descripcion { get; init; } = string.Empty;
+    public DateTime FechaCreacion { get; init; }
 }

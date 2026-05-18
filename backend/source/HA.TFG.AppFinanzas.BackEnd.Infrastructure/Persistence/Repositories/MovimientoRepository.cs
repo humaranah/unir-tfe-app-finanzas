@@ -30,4 +30,11 @@ public sealed class MovimientoRepository(AppDbContext context) : IMovimientoRepo
             .OrderByDescending(t => t.FechaMovimiento)
             .ToListAsync(cancellationToken);
     }
+
+    public async Task<Movimiento> AddMovimientoAsync(Movimiento movimiento, CancellationToken cancellationToken)
+    {
+        context.Movimientos.Add(movimiento);
+        await context.SaveChangesAsync(cancellationToken);
+        return movimiento;
+    }
 }
