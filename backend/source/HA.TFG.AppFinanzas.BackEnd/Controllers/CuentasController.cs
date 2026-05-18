@@ -56,24 +56,22 @@ public sealed class CuentasController(IMediator mediator) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> CreateMovimiento(
         [FromRoute] Guid idCuenta,
-        [FromBody] CreateMovimientoRequest request,
+        [FromForm] CreateMovimientoRequest request,
         CancellationToken cancellationToken)
     {
         var email = User.Identity?.Name ?? string.Empty;
-        var command = new CreateMovimientoCommand
+        var command = request.ToCommand(email, idCuenta);
+
+        if (request.Comprobante is { Length: > 0 } archivo)
         {
-            Email = email,
-            IdCuenta = idCuenta,
-            IdCuentaCategoria = request.IdCuentaCategoria,
-            TipoMovimiento = request.TipoMovimiento,
-            Concepto = request.Concepto,
-            Importe = request.Importe,
-            Moneda = request.Moneda,
-            TipoCambio = request.TipoCambio,
-            IdComprobante = request.IdComprobante,
-            Nota = request.Nota,
-            FechaMovimiento = request.FechaMovimiento
-        };
+            command = command with
+            {
+                ComprobanteStream = archivo.OpenReadStream(),
+                ComprobanteFileName = archivo.FileName,
+                ComprobanteContentType = archivo.ContentType
+            };
+        }
+
         var result = await _mediator.Send(command, cancellationToken);
         return CreatedAtAction(nameof(GetMovimientos), new { idCuenta }, result);
     }

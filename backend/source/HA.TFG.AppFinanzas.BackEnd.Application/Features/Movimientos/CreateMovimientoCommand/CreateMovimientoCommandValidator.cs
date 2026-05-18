@@ -34,9 +34,9 @@ public class CreateMovimientoCommandValidator : AbstractValidator<CreateMovimien
             .GreaterThan(0).When(x => x.TipoCambio.HasValue)
             .WithMessage("El tipo de cambio debe ser mayor que cero.");
 
-        RuleFor(x => x.IdComprobante)
-            .MaximumLength(100).When(x => x.IdComprobante is not null)
-            .WithMessage("El identificador de comprobante no puede superar los 100 caracteres.");
+        RuleFor(x => x.ComprobanteFileName)
+            .MaximumLength(100).When(x => x.ComprobanteFileName is not null)
+            .WithMessage("El nombre del comprobante no puede superar los 100 caracteres.");
 
         RuleFor(x => x.Nota)
             .MaximumLength(1000).WithMessage("La nota no puede superar los 1000 caracteres.");

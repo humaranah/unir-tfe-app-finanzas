@@ -1,5 +1,7 @@
+using Azure.Storage.Blobs;
 using HA.TFG.AppFinanzas.BackEnd.Application.Contracts;
 using HA.TFG.AppFinanzas.BackEnd.Infrastructure.ExternalServices.Auth0;
+using HA.TFG.AppFinanzas.BackEnd.Infrastructure.ExternalServices.Storage;
 using HA.TFG.AppFinanzas.BackEnd.Infrastructure.Persistence;
 using HA.TFG.AppFinanzas.BackEnd.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -37,6 +39,29 @@ public static class DependencyInjection
             .Bind(configuration.GetSection(Auth0Config.SectionName))
             .ValidateDataAnnotations()
             .ValidateOnStart();
+
+        services.AddOptions<ComprobanteStorageConfig>()
+            .Bind(configuration.GetSection(ComprobanteStorageConfig.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        var storageConfig = configuration
+            .GetSection(ComprobanteStorageConfig.SectionName)
+            .Get<ComprobanteStorageConfig>() ?? new ComprobanteStorageConfig();
+
+        if (storageConfig.Provider.Equals("Azure", StringComparison.OrdinalIgnoreCase))
+        {
+            if (string.IsNullOrWhiteSpace(storageConfig.AzureConnectionString))
+                throw new InvalidOperationException(
+                    "ComprobanteStorage:AzureConnectionString es obligatorio cuando Provider = \"Azure\".");
+
+            services.AddSingleton(_ => new BlobServiceClient(storageConfig.AzureConnectionString));
+            services.AddScoped<IComprobanteStorageService, AzureBlobComprobanteStorageService>();
+        }
+        else
+        {
+            services.AddScoped<IComprobanteStorageService, LocalComprobanteStorageService>();
+        }
 
         services.AddHttpClient<IAuth0UserInfoService, Auth0UserInfoService>((sp, client) =>
         {

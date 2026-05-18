@@ -2,13 +2,16 @@ using HA.TFG.AppFinanzas.BackEnd.Application.Common.Exceptions;
 using HA.TFG.AppFinanzas.BackEnd.Application.Contracts;
 using HA.TFG.AppFinanzas.BackEnd.Domain.Models;
 using Mediator;
+using Microsoft.Extensions.Logging;
 
 namespace HA.TFG.AppFinanzas.BackEnd.Application.Features.Movimientos.CreateMovimientoCommand;
 
 public class CreateMovimientoCommandHandler(
     IUsuarioRepository usuarioRepository,
     ICuentaRepository cuentaRepository,
-    IMovimientoRepository movimientoRepository)
+    IMovimientoRepository movimientoRepository,
+    IComprobanteStorageService comprobanteStorage,
+    ILogger<CreateMovimientoCommandHandler> logger)
     : IRequestHandler<CreateMovimientoCommand, CreateMovimientoResult>
 {
     public async ValueTask<CreateMovimientoResult> Handle(CreateMovimientoCommand request, CancellationToken cancellationToken)
@@ -19,36 +22,45 @@ public class CreateMovimientoCommandHandler(
         var cuenta = await cuentaRepository.GetCuentaByIdAsync(usuario.IdUsuario, request.IdCuenta, cancellationToken)
             ?? throw new NotFoundException(nameof(Cuenta), request.IdCuenta.ToString());
 
-        var movimiento = new Movimiento
+        // Subir comprobante antes de persistir en BD
+        string? idComprobante = null;
+        if (request.ComprobanteStream is not null
+            && !string.IsNullOrWhiteSpace(request.ComprobanteFileName)
+            && !string.IsNullOrWhiteSpace(request.ComprobanteContentType))
         {
-            IdCuenta = cuenta.IdCuenta,
-            IdCuentaCategoria = request.IdCuentaCategoria,
-            TipoMovimiento = request.TipoMovimiento,
-            Concepto = request.Concepto,
-            Importe = request.Importe,
-            Moneda = request.Moneda,
-            TipoCambio = request.TipoCambio,
-            IdComprobante = request.IdComprobante,
-            Nota = request.Nota,
-            FechaMovimiento = request.FechaMovimiento,
-            FechaCreacion = DateTime.UtcNow
-        };
+            idComprobante = await comprobanteStorage.UploadComprobanteAsync(
+                cuenta.IdCuenta,
+                request.ComprobanteFileName,
+                request.ComprobanteContentType,
+                request.ComprobanteStream,
+                cancellationToken);
+        }
 
-        var resultado = await movimientoRepository.AddMovimientoAsync(movimiento, cancellationToken);
-
-        return new CreateMovimientoResult
+        try
         {
-            IdMovimiento = resultado.IdMovimiento,
-            IdCuenta = resultado.IdCuenta,
-            IdCuentaCategoria = resultado.IdCuentaCategoria,
-            TipoMovimiento = resultado.TipoMovimiento,
-            Concepto = resultado.Concepto,
-            Importe = resultado.Importe,
-            Moneda = resultado.Moneda,
-            TipoCambio = resultado.TipoCambio,
-            IdComprobante = resultado.IdComprobante,
-            Nota = resultado.Nota,
-            FechaMovimiento = resultado.FechaMovimiento
-        };
+            var movimiento = request.ToMovimiento() with
+            {
+                IdCuenta = cuenta.IdCuenta,
+                IdComprobante = idComprobante,
+                FechaCreacion = DateTime.UtcNow
+            };
+
+            var resultado = await movimientoRepository.AddMovimientoAsync(movimiento, cancellationToken);
+
+            return resultado.ToResult();
+        }
+        catch (Exception ex)
+        {
+            // Rollback: eliminar el archivo subido si la BD falla
+            if (idComprobante is not null)
+            {
+                logger.LogWarning(ex,
+                    "Error al persistir el movimiento. Eliminando comprobante huérfano: {IdComprobante}", idComprobante);
+
+                await comprobanteStorage.DeleteComprobanteAsync(idComprobante, CancellationToken.None);
+            }
+
+            throw;
+        }
     }
 }
