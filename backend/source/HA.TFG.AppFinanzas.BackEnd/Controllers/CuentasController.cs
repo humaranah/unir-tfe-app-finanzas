@@ -1,4 +1,5 @@
 ﻿using HA.TFG.AppFinanzas.BackEnd.Application.Features.Cuentas.CreateCuentaCommand;
+using HA.TFG.AppFinanzas.BackEnd.Application.Features.Cuentas.GetCuentaCategoriasQuery;
 using HA.TFG.AppFinanzas.BackEnd.Application.Features.Cuentas.GetCuentasQuery;
 using HA.TFG.AppFinanzas.BackEnd.Application.Features.Movimientos.CreateMovimientoCommand;
 using HA.TFG.AppFinanzas.BackEnd.Application.Features.Movimientos.GetMovimientosQuery;
@@ -36,6 +37,18 @@ public sealed class CuentasController(IMediator mediator) : ControllerBase
         var email = User.Identity?.Name ?? string.Empty;
         var query = filters.ToQuery(idCuenta, email);
         var result = await _mediator.Send(query, cancellationToken);
+        return Ok(result);
+    }
+
+    [HttpGet("{idCuenta:guid}/categorias")]
+    [ProducesResponseType<IReadOnlyList<GetCuentaCategoriasResultItem>>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetCategoriasCuenta(
+        [FromRoute] Guid idCuenta,
+        CancellationToken cancellationToken)
+    {
+        var email = User.Identity?.Name ?? string.Empty;
+        var result = await _mediator.Send(new GetCuentaCategoriasQuery(email, idCuenta), cancellationToken);
         return Ok(result);
     }
 

@@ -24,6 +24,23 @@ public class CuentaRepository(AppDbContext context) : ICuentaRepository
             .SelectMany(u => u.Cuentas)
             .FirstOrDefaultAsync(c => c.IdCuenta == idCuenta, cancellationToken);
 
+    public async Task<IReadOnlyList<CuentaCategoria>> GetCategoriasByCuentaAsync(Guid idUsuario, Guid idCuenta, CancellationToken cancellationToken)
+    {
+        var existe = await _context.Usuarios
+            .Where(u => u.IdUsuario == idUsuario)
+            .SelectMany(u => u.Cuentas)
+            .AnyAsync(c => c.IdCuenta == idCuenta, cancellationToken);
+
+        if (!existe)
+            return [];
+
+        return await _context.CuentaCategorias
+            .Where(cc => cc.IdCuenta == idCuenta)
+            .OrderBy(cc => cc.TipoMovimiento)
+            .ThenBy(cc => cc.Nombre)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<Cuenta> CreateCuentaConCategoriasAsync(Cuenta cuenta, CancellationToken cancellationToken)
     {
         var categorias = await _context.Categorias.ToListAsync(cancellationToken);

@@ -6,6 +6,7 @@ using HA.TFG.AppFinanzas.BackEnd.Middleware;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using System.Text.Json.Serialization;
 
 Log.Logger = new LoggerConfiguration()
     .Enrich.FromLogContext()
@@ -43,7 +44,9 @@ try
         options.ServiceLifetime = ServiceLifetime.Scoped;
     });
     builder.Services.AddAuth0(builder.Environment);
-    builder.Services.AddControllers();
+    builder.Services.AddControllers()
+        .AddJsonOptions(options =>
+            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
     builder.Services.AddOpenApiWithAuth0();
     builder.Services.AddHealthChecks();
 
