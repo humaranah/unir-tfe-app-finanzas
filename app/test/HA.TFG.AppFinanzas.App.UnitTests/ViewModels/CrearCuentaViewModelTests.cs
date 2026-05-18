@@ -79,7 +79,7 @@ public class CrearCuentaViewModelTests
 
         await sut.CrearCuentaCommand.ExecuteAsync(null);
 
-        await _cuentasService.Received(1).CrearCuentaAsync(
+        await _cuentasService.Received(1).CreateCuentaAsync(
             "Cuenta de vacaciones",
             "USD",
             Arg.Any<CancellationToken>());
@@ -127,7 +127,7 @@ public class CrearCuentaViewModelTests
     public async Task CrearCuentaAsync_WhenServiceThrows_SetsError()
     {
         _cuentasService
-            .CrearCuentaAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .CreateCuentaAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .ThrowsAsync(new HttpRequestException("Error al crear cuenta. Status=500."));
 
         var sut = CreateSut();
@@ -142,7 +142,7 @@ public class CrearCuentaViewModelTests
     public async Task CrearCuentaAsync_WhenServiceThrows_DoesNotRaiseCuentaCreadaEvent()
     {
         _cuentasService
-            .CrearCuentaAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .CreateCuentaAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .ThrowsAsync(new HttpRequestException("Error al crear cuenta. Status=500."));
 
         var eventRaised = false;
@@ -158,7 +158,7 @@ public class CrearCuentaViewModelTests
     public async Task CrearCuentaAsync_WhenServiceThrows_IsBusyIsFalseAfterCompletion()
     {
         _cuentasService
-            .CrearCuentaAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .CreateCuentaAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .ThrowsAsync(new HttpRequestException("Error al crear cuenta. Status=500."));
 
         var sut = CreateSut();
@@ -173,7 +173,7 @@ public class CrearCuentaViewModelTests
     public async Task CrearCuentaAsync_WhenCalledAfterError_ClearsErrorBeforeAttempt()
     {
         _cuentasService
-            .CrearCuentaAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .CreateCuentaAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .ThrowsAsync(new HttpRequestException("fallo"));
 
         var sut = CreateSut();
@@ -183,7 +183,7 @@ public class CrearCuentaViewModelTests
 
         // Segunda llamada, ahora el servicio tiene éxito
         _cuentasService
-            .CrearCuentaAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .CreateCuentaAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(Task.CompletedTask);
 
         await sut.CrearCuentaCommand.ExecuteAsync(null);

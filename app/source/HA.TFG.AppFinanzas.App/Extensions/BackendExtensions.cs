@@ -1,6 +1,7 @@
 using HA.TFG.AppFinanzas.App.Http;
 using HA.TFG.AppFinanzas.Core.Authentication;
 using HA.TFG.AppFinanzas.Core.Cuentas;
+using HA.TFG.AppFinanzas.Core.Movimientos;
 
 namespace HA.TFG.AppFinanzas.App.Extensions;
 
@@ -16,6 +17,7 @@ internal static class BackendExtensions
         builder.Services.AddSingleton<IUsuarioEnsureService, UsuariosApiClient>();
         builder.Services.AddSingleton<IBackendHealthService, BackendHealthClient>();
         builder.Services.AddSingleton<ICuentasService, CuentasApiClient>();
+        builder.Services.AddSingleton<IMovimientosService, MovimientosApiClient>();
         builder.Services.AddTransient<AuthHeaderHandler>();
 
         builder.Services.AddHttpClient("Backend", client =>

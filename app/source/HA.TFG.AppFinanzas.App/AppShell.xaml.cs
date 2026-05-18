@@ -1,21 +1,27 @@
-﻿using HA.TFG.AppFinanzas.App.Core.ViewModels;
-using HA.TFG.AppFinanzas.Core.Cuentas;
+﻿using HA.TFG.AppFinanzas.Core.Cuentas;
 using HA.TFG.AppFinanzas.Core.ViewModels;
 
 namespace HA.TFG.AppFinanzas.App
 {
     public partial class AppShell : Shell
     {
-        private readonly WelcomeViewModel _welcomeViewModel;
+        private readonly UsuarioViewModel _usuarioViewModel;
         private readonly ICuentasService _cuentasService;
 
-        public AppShell(WelcomeViewModel welcomeViewModel, ICuentasService cuentasService, CrearCuentaViewModel crearCuentaViewModel)
+        public AppShell(UsuarioViewModel usuarioViewModel, ICuentasService cuentasService, CrearCuentaViewModel crearCuentaViewModel)
         {
             InitializeComponent();
-            _welcomeViewModel = welcomeViewModel;
+            _usuarioViewModel = usuarioViewModel;
             _cuentasService = cuentasService;
-            _welcomeViewModel.LoginSucceeded += OnLoginSucceeded;
+            _usuarioViewModel.LoginSucceeded += OnLoginSucceeded;
             crearCuentaViewModel.CuentaCreada += OnCuentaCreada;
+            BtnCerrarSesion.Clicked += async (_, _) => await LogoutAndReturnToLoginAsync();
+        }
+
+        protected override void OnSizeAllocated(double width, double height)
+        {
+            base.OnSizeAllocated(width, height);
+            FlyoutBehavior = width > 1200 ? FlyoutBehavior.Locked : FlyoutBehavior.Flyout;
         }
 
         protected override async void OnHandlerChanged()
@@ -24,6 +30,12 @@ namespace HA.TFG.AppFinanzas.App
             if (Handler is null)
                 return;
 
+            if (Window is not null)
+            {
+                Window.SizeChanged += (_, _) => ActualizarFlyout(Window.Width);
+                ActualizarFlyout(Window.Width);
+            }
+
             await EvaluateSessionAsync();
         }
 
@@ -31,9 +43,9 @@ namespace HA.TFG.AppFinanzas.App
         {
             try
             {
-                await _welcomeViewModel.TryRestoreSessionAsync();
+                await _usuarioViewModel.TryRestoreSessionAsync();
 
-                if (!_welcomeViewModel.IsAuthenticated)
+                if (!_usuarioViewModel.IsAuthenticated)
                 {
                     await GoToAsync("//login");
                     return;
@@ -59,13 +71,13 @@ namespace HA.TFG.AppFinanzas.App
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Post-login navigation failed: {ex}");
-                await MainThread.InvokeOnMainThreadAsync(() => GoToAsync("//home"));
+                await MainThread.InvokeOnMainThreadAsync(() => GoToAsync("//movimientos"));
             }
         }
 
         private async void OnCuentaCreada(object? sender, EventArgs e)
         {
-            await MainThread.InvokeOnMainThreadAsync(() => GoToAsync("//home"));
+            await MainThread.InvokeOnMainThreadAsync(() => GoToAsync("//movimientos"));
         }
 
         private async Task<string> ResolverDestinoAsync(CancellationToken cancellationToken = default)
@@ -73,19 +85,24 @@ namespace HA.TFG.AppFinanzas.App
             try
             {
                 var tieneCuentas = await _cuentasService.TieneCuentasAsync(cancellationToken);
-                return tieneCuentas ? "//home" : "//crear-cuenta";
+                return tieneCuentas ? "//movimientos" : "//crear-cuenta";
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error al consultar cuentas: {ex}");
-                return "//home";
+                return "//movimientos";
             }
         }
 
         public async Task LogoutAndReturnToLoginAsync()
         {
-            await _welcomeViewModel.LogoutCommand.ExecuteAsync(null);
+            await _usuarioViewModel.LogoutCommand.ExecuteAsync(null);
             await GoToAsync("//login");
+        }
+
+        private void ActualizarFlyout(double width)
+        {
+            FlyoutBehavior = width > 1200 ? FlyoutBehavior.Locked : FlyoutBehavior.Flyout;
         }
     }
 }

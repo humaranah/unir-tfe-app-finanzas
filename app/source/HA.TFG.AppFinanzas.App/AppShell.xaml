@@ -8,6 +8,14 @@
     xmlns:pages="clr-namespace:HA.TFG.AppFinanzas.App.Views.Pages"
     Title="App Finanzas">
 
+    <Shell.FlyoutFooter>
+        <Button Text="Cerrar sesión"
+                x:Name="BtnCerrarSesion"
+                Style="{DynamicResource OutlinedButton}"
+                Margin="16"
+                HorizontalOptions="Fill" />
+    </Shell.FlyoutFooter>
+
     <!-- Página inicial: solo visible mientras se comprueba la sesión -->
     <ShellContent
         Title=""
@@ -31,8 +39,8 @@
         Shell.NavBarIsVisible="False" />
 
     <ShellContent
-        Title="Inicio"
-        ContentTemplate="{DataTemplate views:MainPage}"
-        Route="home" />
+        Title="Movimientos"
+        ContentTemplate="{DataTemplate pages:MovimientosPage}"
+        Route="movimientos" />
 
 </Shell>
