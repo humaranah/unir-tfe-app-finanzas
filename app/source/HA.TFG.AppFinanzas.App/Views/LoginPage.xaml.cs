@@ -1,10 +1,10 @@
-using HA.TFG.AppFinanzas.App.Core.ViewModels;
+using HA.TFG.AppFinanzas.Core.ViewModels;
 
 namespace HA.TFG.AppFinanzas.App.Views;
 
 public partial class LoginPage : ContentPage
 {
-    public LoginPage(WelcomeViewModel viewModel)
+    public LoginPage(UsuarioViewModel viewModel)
     {
         InitializeComponent();
         BindingContext = viewModel;

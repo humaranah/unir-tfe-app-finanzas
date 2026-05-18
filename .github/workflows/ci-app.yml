@@ -32,4 +32,3 @@ jobs:
 
       - name: Test
         run: dotnet test app/test/HA.TFG.AppFinanzas.App.UnitTests/HA.TFG.AppFinanzas.App.UnitTests.csproj -f net10.0 -c Release --verbosity normal
-

@@ -39,7 +39,7 @@ public partial class CrearCuentaViewModel(ICuentasService cuentasService) : Obse
         IsBusy = true;
         try
         {
-            await _cuentasService.CrearCuentaAsync(Descripcion, MonedaSeleccionada.Key, cancellationToken);
+            await _cuentasService.CreateCuentaAsync(Descripcion, MonedaSeleccionada.Key, cancellationToken);
             CuentaCreada?.Invoke(this, EventArgs.Empty);
         }
         catch (Exception ex)
