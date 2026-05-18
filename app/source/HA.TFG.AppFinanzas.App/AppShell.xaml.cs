@@ -84,7 +84,7 @@ namespace HA.TFG.AppFinanzas.App
         {
             try
             {
-                var tieneCuentas = await _cuentasService.TieneCuentasAsync(cancellationToken);
+                var tieneCuentas = await _cuentasService.HaveCuentasAsync(cancellationToken);
                 return tieneCuentas ? "//movimientos" : "//crear-cuenta";
             }
             catch (Exception ex)

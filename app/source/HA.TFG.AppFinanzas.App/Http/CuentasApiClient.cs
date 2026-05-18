@@ -8,22 +8,16 @@ internal sealed class CuentasApiClient(IHttpClientFactory httpClientFactory) : I
     private record CreateCuentaRequest(string Moneda, string Descripcion);
     private record CuentaResponse(Guid Id, string Moneda, string Descripcion);
 
-    public async Task<bool> TieneCuentasAsync(CancellationToken cancellationToken = default)
+    public async Task<bool> HaveCuentasAsync(CancellationToken cancellationToken = default)
     {
         var cuentas = await GetCuentasAsync(cancellationToken);
         return cuentas.Count > 0;
     }
 
-    public async Task<Guid?> GetDefaultCuentaIdAsync(CancellationToken cancellationToken = default)
+    public async Task<(Guid? Id, string? Descripcion)> GetDefaultCuentaAsync(CancellationToken cancellationToken = default)
     {
         var cuentas = await GetCuentasAsync(cancellationToken);
-        return cuentas.Count > 0 ? cuentas[0].Id : null;
-    }
-
-    public async Task<string?> GetDefaultCuentaDescripcionAsync(CancellationToken cancellationToken = default)
-    {
-        var cuentas = await GetCuentasAsync(cancellationToken);
-        return cuentas.Count > 0 ? cuentas[0].Descripcion : null;
+        return cuentas.Count > 0 ? (cuentas[0].Id, cuentas[0].Descripcion) : (null, null);
     }
 
     private async Task<List<CuentaResponse>> GetCuentasAsync(CancellationToken cancellationToken)

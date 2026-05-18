@@ -70,8 +70,8 @@ public partial class MovimientosViewModel(
 
         try
         {
-            var idCuenta = await cuentasService.GetDefaultCuentaIdAsync(cancellationToken);
-            NombreCuenta = await cuentasService.GetDefaultCuentaDescripcionAsync(cancellationToken) ?? string.Empty;
+            var (idCuenta, descripcion) = await cuentasService.GetDefaultCuentaAsync(cancellationToken);
+            NombreCuenta = descripcion ?? string.Empty;
 
             if (idCuenta is null)
             {
