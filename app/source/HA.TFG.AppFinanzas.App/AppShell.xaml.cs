@@ -1,5 +1,6 @@
 ﻿using HA.TFG.AppFinanzas.Core.Cuentas;
 using HA.TFG.AppFinanzas.Core.ViewModels;
+using System.Diagnostics;
 
 namespace HA.TFG.AppFinanzas.App
 {
@@ -7,6 +8,7 @@ namespace HA.TFG.AppFinanzas.App
     {
         private readonly UsuarioViewModel _usuarioViewModel;
         private readonly ICuentasService _cuentasService;
+        private Window? _subscribedWindow;
 
         public AppShell(UsuarioViewModel usuarioViewModel, ICuentasService cuentasService, CrearCuentaViewModel crearCuentaViewModel)
         {
@@ -30,10 +32,12 @@ namespace HA.TFG.AppFinanzas.App
             if (Handler is null)
                 return;
 
-            if (Window is not null)
+            _subscribedWindow?.SizeChanged -= OnWindowSizeChanged;
+            _subscribedWindow = Window;
+            if (_subscribedWindow is not null)
             {
-                Window.SizeChanged += (_, _) => ActualizarFlyout(Window.Width);
-                ActualizarFlyout(Window.Width);
+                _subscribedWindow.SizeChanged += OnWindowSizeChanged;
+                ActualizarFlyout(_subscribedWindow.Width);
             }
 
             await EvaluateSessionAsync();
@@ -56,7 +60,7 @@ namespace HA.TFG.AppFinanzas.App
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Session restore failed: {ex}");
+                Debug.WriteLine($"Session restore failed: {ex}");
                 await GoToAsync("//login");
             }
         }
@@ -70,7 +74,7 @@ namespace HA.TFG.AppFinanzas.App
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Post-login navigation failed: {ex}");
+                Debug.WriteLine($"Post-login navigation failed: {ex}");
                 await MainThread.InvokeOnMainThreadAsync(() => GoToAsync("//movimientos"));
             }
         }
@@ -84,12 +88,12 @@ namespace HA.TFG.AppFinanzas.App
         {
             try
             {
-                var tieneCuentas = await _cuentasService.HaveCuentasAsync(cancellationToken);
-                return tieneCuentas ? "//movimientos" : "//crear-cuenta";
+                var hasCuentas = await _cuentasService.HasCuentasAsync(cancellationToken);
+                return hasCuentas ? "//movimientos" : "//crear-cuenta";
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error al consultar cuentas: {ex}");
+                Debug.WriteLine($"Error al consultar cuentas: {ex}");
                 return "//movimientos";
             }
         }
@@ -99,6 +103,9 @@ namespace HA.TFG.AppFinanzas.App
             await _usuarioViewModel.LogoutCommand.ExecuteAsync(null);
             await GoToAsync("//login");
         }
+
+        private void OnWindowSizeChanged(object? sender, EventArgs e) =>
+            ActualizarFlyout(_subscribedWindow!.Width);
 
         private void ActualizarFlyout(double width)
         {

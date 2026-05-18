@@ -1,3 +1,4 @@
+using HA.TFG.AppFinanzas.Core.Models.Enums;
 using HA.TFG.AppFinanzas.Core.Movimientos;
 using System.Net.Http.Json;
 
@@ -10,7 +11,7 @@ internal sealed class MovimientosApiClient(IHttpClientFactory httpClientFactory)
         Guid IdCuenta,
         Guid? IdCategoria,
         string? NombreCategoria,
-        string TipoMovimiento,
+        TipoMovimiento TipoMovimiento,
         string Concepto,
         decimal Importe,
         string Moneda,

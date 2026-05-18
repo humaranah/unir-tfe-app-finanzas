@@ -8,7 +8,7 @@ internal sealed class CuentasApiClient(IHttpClientFactory httpClientFactory) : I
     private record CreateCuentaRequest(string Moneda, string Descripcion);
     private record CuentaResponse(Guid Id, string Moneda, string Descripcion);
 
-    public async Task<bool> HaveCuentasAsync(CancellationToken cancellationToken = default)
+    public async Task<bool> HasCuentasAsync(CancellationToken cancellationToken = default)
     {
         var cuentas = await GetCuentasAsync(cancellationToken);
         return cuentas.Count > 0;

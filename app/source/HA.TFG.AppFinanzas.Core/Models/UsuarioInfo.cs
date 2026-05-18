@@ -1,4 +1,4 @@
-namespace HA.TFG.AppFinanzas.Core.Authentication;
+namespace HA.TFG.AppFinanzas.Core.Models;
 
 /// <summary>
 /// Información del usuario obtenida del proveedor de identidad (Auth0/OIDC).

@@ -15,6 +15,7 @@ public partial class MovimientosViewModel(
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(SinMovimientos))]
+    [NotifyPropertyChangedFor(nameof(HasMovimientos))]
     public partial ObservableCollection<MovimientosPorFecha> Movimientos { get; set; } = [];
 
     [ObservableProperty]
@@ -26,6 +27,8 @@ public partial class MovimientosViewModel(
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasError))]
+    [NotifyPropertyChangedFor(nameof(SinMovimientos))]
+    [NotifyPropertyChangedFor(nameof(HasMovimientos))]
     public partial string Error { get; set; } = string.Empty;
 
     [ObservableProperty]
@@ -41,12 +44,13 @@ public partial class MovimientosViewModel(
     public string MesSiguiente => Fecha.AddMonths(1).ToString("MMMM");
 
     public bool IsAnteriorEnabled => !IsBusy;
-    public bool IsSiguienteEnabled => !IsBusy && Fecha.Year < DateTime.Now.Year
-        || (Fecha.Year == DateTime.Now.Year && Fecha.Month < DateTime.Now.Month);
+    public bool IsSiguienteEnabled => !IsBusy && (Fecha.Year < DateTime.Now.Year
+        || (Fecha.Year == DateTime.Now.Year && Fecha.Month < DateTime.Now.Month));
 
     public bool HasError => !string.IsNullOrEmpty(Error);
     public bool IsNotBusy => !IsBusy;
-    public bool SinMovimientos => !IsBusy && Movimientos.Count == 0;
+    public bool SinMovimientos => !IsBusy && !HasError && Movimientos.Count == 0;
+    public bool HasMovimientos => !IsBusy && !HasError && Movimientos.Count > 0;
 
     [RelayCommand]
     private async Task AnteriorAsync()
@@ -97,6 +101,7 @@ public partial class MovimientosViewModel(
         }
         catch (Exception ex)
         {
+            Movimientos = [];
             Error = ex.Message;
         }
         finally

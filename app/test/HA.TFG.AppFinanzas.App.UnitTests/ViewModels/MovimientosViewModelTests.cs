@@ -1,4 +1,5 @@
 using HA.TFG.AppFinanzas.Core.Cuentas;
+using HA.TFG.AppFinanzas.Core.Models.Enums;
 using HA.TFG.AppFinanzas.Core.Movimientos;
 using HA.TFG.AppFinanzas.Core.ViewModels;
 using NSubstitute;
@@ -28,7 +29,7 @@ public class MovimientosViewModelTests
         Concepto = "Test",
         Importe = importe,
         Moneda = "EUR",
-        TipoMovimiento = "Gasto",
+        TipoMovimiento = TipoMovimiento.Gasto,
         FechaMovimiento = fecha
     };
 

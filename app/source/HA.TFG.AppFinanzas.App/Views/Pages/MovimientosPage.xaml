@@ -42,7 +42,7 @@
         <CollectionView Grid.Row="1"
                         ItemsSource="{Binding Movimientos}"
                         IsGrouped="True"
-                        IsVisible="{Binding SinMovimientos, Converter={StaticResource InvertedBoolConverter}}"
+                        IsVisible="{Binding HasMovimientos}"
                         Margin="20">
             <CollectionView.GroupHeaderTemplate>
                 <DataTemplate x:DataType="model:MovimientosPorFecha">
@@ -64,6 +64,22 @@
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
+
+        <VerticalStackLayout Grid.Row="1"
+                             IsVisible="{Binding HasError}"
+                             HorizontalOptions="Center"
+                             VerticalOptions="Center"
+                             Spacing="12">
+            <Label Text="Algo salió mal"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center" />
+            <Label Text="No pudimos obtener tus movimientos. Comprueba tu conexión e intenta de nuevo."
+                   FontSize="14"
+                   TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}"
+                   HorizontalOptions="Center"
+                   HorizontalTextAlignment="Center" />
+        </VerticalStackLayout>
 
         <VerticalStackLayout Grid.Row="1"
                              IsVisible="{Binding SinMovimientos}"
