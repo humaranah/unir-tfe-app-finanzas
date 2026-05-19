@@ -34,6 +34,19 @@ internal sealed class AzureBlobComprobanteStorageService(
         return idComprobante;
     }
 
+    public async Task<ComprobanteFile> GetComprobanteAsync(Guid idCuenta, string idComprobante, CancellationToken cancellationToken)
+    {
+        var blobName = $"{idCuenta}/{idComprobante}";
+        var containerClient = blobServiceClient.GetBlobContainerClient(ContainerName);
+        var blobClient = containerClient.GetBlobClient(blobName);
+
+        var properties = await blobClient.GetPropertiesAsync(cancellationToken: cancellationToken);
+        var contentType = properties.Value.ContentType ?? "application/octet-stream";
+        var stream = await blobClient.OpenReadAsync(cancellationToken: cancellationToken);
+
+        return new ComprobanteFile(stream, contentType, idComprobante);
+    }
+
     public async Task DeleteComprobanteAsync(Guid idCuenta, string idComprobante, CancellationToken cancellationToken)
     {
         var blobName = $"{idCuenta}/{idComprobante}";
