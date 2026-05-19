@@ -1,3 +1,4 @@
+using Azure;
 using HA.TFG.AppFinanzas.BackEnd.Application.Common.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
@@ -18,6 +19,8 @@ public static class ExceptionHandlerExtensions
             {
                 ValidationException ve => HandleValidation(ve, logger),
                 NotFoundException nfe => HandleNotFound(nfe, logger),
+                FileNotFoundException fnfe => HandleFileNotFound(fnfe, logger),
+                RequestFailedException rfe => HandleRequestFailed(rfe, logger),
                 ExternalServiceException ese => HandleExternalService(ese, logger),
                 _ => HandleUnexpected(exception, logger)
             };
@@ -60,6 +63,48 @@ public static class ExceptionHandlerExtensions
         };
 
         return (StatusCodes.Status404NotFound, problem);
+    }
+
+    private static (int, ProblemDetails) HandleFileNotFound(FileNotFoundException ex, ILogger logger)
+    {
+        logger.LogWarning(ex, "Fichero no encontrado: {FileName}", ex.FileName);
+
+        var problem = new ProblemDetails
+        {
+            Title = "Recurso no encontrado",
+            Detail = ex.Message,
+            Status = StatusCodes.Status404NotFound
+        };
+
+        return (StatusCodes.Status404NotFound, problem);
+    }
+
+    private static (int, ProblemDetails) HandleRequestFailed(RequestFailedException ex, ILogger logger)
+    {
+        if (ex.Status == StatusCodes.Status404NotFound)
+        {
+            logger.LogWarning(ex, "Comprobante no encontrado en Azure Blob: {ErrorCode}", ex.ErrorCode);
+
+            var notFoundProblem = new ProblemDetails
+            {
+                Title = "Recurso no encontrado",
+                Detail = ex.Message,
+                Status = StatusCodes.Status404NotFound
+            };
+
+            return (StatusCodes.Status404NotFound, notFoundProblem);
+        }
+
+        logger.LogError(ex, "Error en Azure Blob Storage [{Status}]: {ErrorCode}", ex.Status, ex.ErrorCode);
+
+        var problem = new ProblemDetails
+        {
+            Title = "Error en servicio externo",
+            Detail = ex.Message,
+            Status = StatusCodes.Status502BadGateway
+        };
+
+        return (StatusCodes.Status502BadGateway, problem);
     }
 
     private static (int, ProblemDetails) HandleExternalService(ExternalServiceException ex, ILogger logger)

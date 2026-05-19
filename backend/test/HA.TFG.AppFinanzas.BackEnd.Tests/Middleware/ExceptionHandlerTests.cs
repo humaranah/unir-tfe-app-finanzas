@@ -1,3 +1,4 @@
+using Azure;
 using FluentValidation.Results;
 using HA.TFG.AppFinanzas.BackEnd.Application.Common.Exceptions;
 using HA.TFG.AppFinanzas.BackEnd.Middleware;
@@ -78,6 +79,48 @@ public class ExceptionHandlerTests : IDisposable
     public async Task ExternalServiceException_Devuelve502_ConDetalle()
     {
         using var client = BuildClient(new ExternalServiceException("Auth0", "No se pudo conectar con Auth0."));
+
+        using var response = await client.GetAsync("/test", CancellationToken.None);
+        using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync(CancellationToken.None));
+
+        Assert.Equal(HttpStatusCode.BadGateway, response.StatusCode);
+        Assert.Equal(502, json.RootElement.GetProperty("status").GetInt32());
+        Assert.Equal("Error en servicio externo", json.RootElement.GetProperty("title").GetString());
+        Assert.True(json.RootElement.TryGetProperty("correlationId", out _));
+    }
+
+    [Fact]
+    public async Task FileNotFoundException_Devuelve404_ConDetalle()
+    {
+        using var client = BuildClient(new FileNotFoundException("Comprobante no encontrado en la ruta local.", "comprobante.pdf"));
+
+        using var response = await client.GetAsync("/test", CancellationToken.None);
+        using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync(CancellationToken.None));
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        Assert.Equal(404, json.RootElement.GetProperty("status").GetInt32());
+        Assert.Equal("Recurso no encontrado", json.RootElement.GetProperty("title").GetString());
+        Assert.True(json.RootElement.TryGetProperty("correlationId", out _));
+    }
+
+    [Fact]
+    public async Task RequestFailedException_404_Devuelve404_ConDetalle()
+    {
+        using var client = BuildClient(new RequestFailedException(404, "The specified blob does not exist.", "BlobNotFound", null));
+
+        using var response = await client.GetAsync("/test", CancellationToken.None);
+        using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync(CancellationToken.None));
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        Assert.Equal(404, json.RootElement.GetProperty("status").GetInt32());
+        Assert.Equal("Recurso no encontrado", json.RootElement.GetProperty("title").GetString());
+        Assert.True(json.RootElement.TryGetProperty("correlationId", out _));
+    }
+
+    [Fact]
+    public async Task RequestFailedException_OtroError_Devuelve502_ConDetalle()
+    {
+        using var client = BuildClient(new RequestFailedException(503, "The Azure Blob service is unavailable.", "ServerBusy", null));
 
         using var response = await client.GetAsync("/test", CancellationToken.None);
         using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync(CancellationToken.None));

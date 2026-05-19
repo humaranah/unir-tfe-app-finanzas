@@ -40,9 +40,9 @@ internal sealed class AzureBlobComprobanteStorageService(
         var containerClient = blobServiceClient.GetBlobContainerClient(ContainerName);
         var blobClient = containerClient.GetBlobClient(blobName);
 
-        var response = await blobClient.DownloadContentAsync(cancellationToken);
-        var contentType = response.Value.Details.ContentType ?? "application/octet-stream";
-        var stream = response.Value.Content.ToStream();
+        var properties = await blobClient.GetPropertiesAsync(cancellationToken: cancellationToken);
+        var contentType = properties.Value.ContentType ?? "application/octet-stream";
+        var stream = await blobClient.OpenReadAsync(cancellationToken: cancellationToken);
 
         return new ComprobanteFile(stream, contentType, idComprobante);
     }
