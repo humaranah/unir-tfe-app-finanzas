@@ -8,6 +8,10 @@ internal sealed class LocalComprobanteStorageService(
     IOptions<ComprobanteStorageConfig> options,
     ILogger<LocalComprobanteStorageService> logger) : IComprobanteStorageService
 {
+    private string BasePath => string.IsNullOrWhiteSpace(options.Value.LocalBasePath)
+        ? Path.Combine(Path.GetTempPath(), "comprobantes")
+        : options.Value.LocalBasePath;
+
     public async Task<string> UploadComprobanteAsync(
         Guid idCuenta,
         string fileName,
@@ -15,10 +19,7 @@ internal sealed class LocalComprobanteStorageService(
         Stream stream,
         CancellationToken cancellationToken)
     {
-        var basePath = string.IsNullOrWhiteSpace(options.Value.LocalBasePath)
-            ? Path.Combine(Path.GetTempPath(), "comprobantes")
-            : options.Value.LocalBasePath;
-        var carpetaCuenta = Path.Combine(basePath, idCuenta.ToString());
+        var carpetaCuenta = Path.Combine(BasePath, idCuenta.ToString());
         Directory.CreateDirectory(carpetaCuenta);
 
         var extension = Path.GetExtension(fileName);
@@ -35,8 +36,7 @@ internal sealed class LocalComprobanteStorageService(
 
     public Task DeleteComprobanteAsync(Guid idCuenta, string idComprobante, CancellationToken cancellationToken)
     {
-        var basePath = options.Value.LocalBasePath ?? Path.Combine(Path.GetTempPath(), "comprobantes");
-        var rutaCompleta = Path.Combine(basePath, idCuenta.ToString(), idComprobante);
+        var rutaCompleta = Path.Combine(BasePath, idCuenta.ToString(), idComprobante);
 
         if (File.Exists(rutaCompleta))
             File.Delete(rutaCompleta);
