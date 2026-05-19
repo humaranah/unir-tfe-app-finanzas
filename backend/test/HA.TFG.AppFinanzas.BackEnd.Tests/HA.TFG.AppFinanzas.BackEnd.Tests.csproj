@@ -21,7 +21,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\source\HA.TFG.AppFinanzas.BackEnd\HA.TFG.AppFinanzas.BackEnd.csproj" />
+		<ProjectReference Include="..\..\source\HA.TFG.AppFinanzas.BackEnd\HA.TFG.AppFinanzas.BackEnd.csproj" />
+		<ProjectReference Include="..\..\source\HA.TFG.AppFinanzas.BackEnd.Infrastructure\HA.TFG.AppFinanzas.BackEnd.Infrastructure.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
