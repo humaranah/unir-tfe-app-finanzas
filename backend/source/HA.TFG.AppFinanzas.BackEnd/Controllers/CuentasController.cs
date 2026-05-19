@@ -85,7 +85,17 @@ public sealed class CuentasController(IMediator mediator) : ControllerBase
             };
         }
 
-        var result = await _mediator.Send(command, cancellationToken);
-        return CreatedAtAction(nameof(GetMovimientos), new { idCuenta }, result);
+        try
+        {
+            var result = await _mediator.Send(command, cancellationToken);
+            return CreatedAtAction(nameof(GetMovimientos), new { idCuenta }, result);
+        }
+        finally
+        {
+            if (command.ComprobanteStream != null)
+            {
+                await command.ComprobanteStream.DisposeAsync();
+            }
+        }
     }
 }
