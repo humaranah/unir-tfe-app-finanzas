@@ -26,4 +26,12 @@ public class NullComprobanteStorageServiceTests
         // Act & Assert (no debe lanzar)
         await _sut.DeleteComprobanteAsync(Guid.NewGuid(), "algun-id.jpg", CancellationToken.None);
     }
+
+    [Fact]
+    public async Task GetComprobanteAsync_LanzaInvalidOperationException()
+    {
+        // Act & Assert
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            _sut.GetComprobanteAsync(Guid.NewGuid(), "algun-id.pdf", CancellationToken.None));
+    }
 }
