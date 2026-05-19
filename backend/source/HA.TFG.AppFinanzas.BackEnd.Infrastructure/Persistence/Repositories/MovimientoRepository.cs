@@ -37,4 +37,10 @@ public sealed class MovimientoRepository(AppDbContext context) : IMovimientoRepo
         await context.SaveChangesAsync(cancellationToken);
         return movimiento;
     }
+
+    public Task<Movimiento?> GetMovimientoByIdAsync(Guid idCuenta, Guid idMovimiento, CancellationToken cancellationToken) =>
+        context.Movimientos
+            .Include(m => m.Categoria)
+            .Where(m => m.IdCuenta == idCuenta && m.IdMovimiento == idMovimiento)
+            .FirstOrDefaultAsync(cancellationToken);
 }

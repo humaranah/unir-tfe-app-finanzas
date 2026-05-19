@@ -12,4 +12,5 @@ public interface IMovimientoRepository
         CancellationToken cancellationToken);
 
     Task<Movimiento> AddMovimientoAsync(Movimiento movimiento, CancellationToken cancellationToken);
+    Task<Movimiento?> GetMovimientoByIdAsync(Guid idCuenta, Guid idMovimiento, CancellationToken cancellationToken);
 }

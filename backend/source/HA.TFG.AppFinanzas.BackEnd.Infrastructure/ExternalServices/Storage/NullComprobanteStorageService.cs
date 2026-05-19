@@ -12,6 +12,9 @@ internal sealed class NullComprobanteStorageService : IComprobanteStorageService
         Guid idCuenta, string fileName, string contentType, Stream stream, CancellationToken cancellationToken)
         => Task.FromResult(string.Empty);
 
+    public Task<ComprobanteFile> GetComprobanteAsync(Guid idCuenta, string idComprobante, CancellationToken cancellationToken)
+        => throw new InvalidOperationException("El almacenamiento de comprobantes no está configurado.");
+
     public Task DeleteComprobanteAsync(Guid idCuenta, string idComprobante, CancellationToken cancellationToken)
         => Task.CompletedTask;
 }
