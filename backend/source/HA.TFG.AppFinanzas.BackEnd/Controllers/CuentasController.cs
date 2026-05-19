@@ -1,5 +1,7 @@
 ﻿using HA.TFG.AppFinanzas.BackEnd.Application.Features.Cuentas.CreateCuentaCommand;
+using HA.TFG.AppFinanzas.BackEnd.Application.Features.Cuentas.GetCuentaCategoriasQuery;
 using HA.TFG.AppFinanzas.BackEnd.Application.Features.Cuentas.GetCuentasQuery;
+using HA.TFG.AppFinanzas.BackEnd.Application.Features.Movimientos.CreateMovimientoCommand;
 using HA.TFG.AppFinanzas.BackEnd.Application.Features.Movimientos.GetMovimientosQuery;
 using HA.TFG.AppFinanzas.BackEnd.Controllers.Mappers;
 using HA.TFG.AppFinanzas.BackEnd.Controllers.Requests;
@@ -38,6 +40,18 @@ public sealed class CuentasController(IMediator mediator) : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("{idCuenta:guid}/categorias")]
+    [ProducesResponseType<IReadOnlyList<GetCuentaCategoriasResultItem>>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetCategoriasCuenta(
+        [FromRoute] Guid idCuenta,
+        CancellationToken cancellationToken)
+    {
+        var email = User.Identity?.Name ?? string.Empty;
+        var result = await _mediator.Send(new GetCuentaCategoriasQuery(email, idCuenta), cancellationToken);
+        return Ok(result);
+    }
+
     [HttpPost]
     [ProducesResponseType<CreateCuentaResult>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
@@ -47,5 +61,41 @@ public sealed class CuentasController(IMediator mediator) : ControllerBase
         var command = request.ToCommand(email);
         var result = await _mediator.Send(command, cancellationToken);
         return Ok(result);
+    }
+
+    [HttpPost("{idCuenta:guid}/movimientos")]
+    [ProducesResponseType<CreateMovimientoResult>(StatusCodes.Status201Created)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> CreateMovimiento(
+        [FromRoute] Guid idCuenta,
+        [FromForm] CreateMovimientoRequest request,
+        CancellationToken cancellationToken)
+    {
+        var email = User.Identity?.Name ?? string.Empty;
+        var command = request.ToCommand(email, idCuenta);
+
+        if (request.Comprobante is { Length: > 0 } archivo)
+        {
+            command = command with
+            {
+                ComprobanteStream = archivo.OpenReadStream(),
+                ComprobanteFileName = archivo.FileName,
+                ComprobanteContentType = archivo.ContentType
+            };
+        }
+
+        try
+        {
+            var result = await _mediator.Send(command, cancellationToken);
+            return CreatedAtAction(nameof(GetMovimientos), new { idCuenta }, result);
+        }
+        finally
+        {
+            if (command.ComprobanteStream != null)
+            {
+                await command.ComprobanteStream.DisposeAsync();
+            }
+        }
     }
 }

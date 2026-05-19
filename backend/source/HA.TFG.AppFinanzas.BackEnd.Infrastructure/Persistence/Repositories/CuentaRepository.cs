@@ -1,4 +1,5 @@
-﻿using HA.TFG.AppFinanzas.BackEnd.Application.Contracts;
+﻿using HA.TFG.AppFinanzas.BackEnd.Application.Common.Exceptions;
+using HA.TFG.AppFinanzas.BackEnd.Application.Contracts;
 using HA.TFG.AppFinanzas.BackEnd.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,6 +24,23 @@ public class CuentaRepository(AppDbContext context) : ICuentaRepository
             .Where(u => u.IdUsuario == idUsuario)
             .SelectMany(u => u.Cuentas)
             .FirstOrDefaultAsync(c => c.IdCuenta == idCuenta, cancellationToken);
+
+    public async Task<IReadOnlyList<CuentaCategoria>> GetCategoriasByCuentaAsync(Guid idUsuario, Guid idCuenta, CancellationToken cancellationToken)
+    {
+        var existe = await _context.Usuarios
+            .Where(u => u.IdUsuario == idUsuario)
+            .SelectMany(u => u.Cuentas)
+            .AnyAsync(c => c.IdCuenta == idCuenta, cancellationToken);
+
+        if (!existe)
+            throw new NotFoundException(nameof(Cuenta), idCuenta);
+
+        return await _context.CuentaCategorias
+            .Where(cc => cc.IdCuenta == idCuenta)
+            .OrderBy(cc => cc.TipoMovimiento)
+            .ThenBy(cc => cc.Nombre)
+            .ToListAsync(cancellationToken);
+    }
 
     public async Task<Cuenta> CreateCuentaConCategoriasAsync(Cuenta cuenta, CancellationToken cancellationToken)
     {
