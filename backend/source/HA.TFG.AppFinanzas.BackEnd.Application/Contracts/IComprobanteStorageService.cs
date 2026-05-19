@@ -21,5 +21,5 @@ public interface IComprobanteStorageService
     /// <summary>
     /// Elimina un comprobante previamente subido. Usado para rollback si falla la BD.
     /// </summary>
-    Task DeleteComprobanteAsync(string idComprobante, CancellationToken cancellationToken);
+    Task DeleteComprobanteAsync(Guid idCuenta, string idComprobante, CancellationToken cancellationToken);
 }

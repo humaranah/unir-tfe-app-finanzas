@@ -15,27 +15,28 @@ internal sealed class LocalComprobanteStorageService(
         Stream stream,
         CancellationToken cancellationToken)
     {
-        var basePath = options.Value.LocalBasePath ?? Path.Combine(Path.GetTempPath(), "comprobantes");
+        var basePath = string.IsNullOrWhiteSpace(options.Value.LocalBasePath)
+            ? Path.Combine(Path.GetTempPath(), "comprobantes")
+            : options.Value.LocalBasePath;
         var carpetaCuenta = Path.Combine(basePath, idCuenta.ToString());
         Directory.CreateDirectory(carpetaCuenta);
 
         var extension = Path.GetExtension(fileName);
-        var archivoNombre = $"{Guid.NewGuid()}{extension}";
-        var rutaCompleta = Path.Combine(carpetaCuenta, archivoNombre);
+        var idComprobante = $"{Guid.NewGuid()}{extension}";
+        var rutaCompleta = Path.Combine(carpetaCuenta, idComprobante);
 
         await using var fileStream = File.Create(rutaCompleta);
         await stream.CopyToAsync(fileStream, cancellationToken);
 
-        var idComprobante = Path.Combine(idCuenta.ToString(), archivoNombre);
         logger.LogInformation("Comprobante guardado localmente: {RutaCompleta}", rutaCompleta);
 
         return idComprobante;
     }
 
-    public Task DeleteComprobanteAsync(string idComprobante, CancellationToken cancellationToken)
+    public Task DeleteComprobanteAsync(Guid idCuenta, string idComprobante, CancellationToken cancellationToken)
     {
         var basePath = options.Value.LocalBasePath ?? Path.Combine(Path.GetTempPath(), "comprobantes");
-        var rutaCompleta = Path.Combine(basePath, idComprobante);
+        var rutaCompleta = Path.Combine(basePath, idCuenta.ToString(), idComprobante);
 
         if (File.Exists(rutaCompleta))
             File.Delete(rutaCompleta);

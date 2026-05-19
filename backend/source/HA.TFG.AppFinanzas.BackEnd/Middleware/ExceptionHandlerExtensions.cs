@@ -31,12 +31,12 @@ public static class ExceptionHandlerExtensions
         return app;
     }
 
-    private static (int, ProblemDetails) HandleValidation(ValidationException ve, ILogger logger)
+    private static (int, ProblemDetails) HandleValidation(ValidationException ex, ILogger logger)
     {
-        logger.LogWarning(ve, "Error de validación: {Message}", ve.Message);
+        logger.LogWarning(ex, "Error de validación: {Message}", ex.Message);
 
         var problem = new ValidationProblemDetails(
-            ve.Errors.ToDictionary(e => e.Key, e => e.Value))
+            ex.Errors.ToDictionary(e => e.Key, e => e.Value))
         {
             Title = "Error de validación",
             Status = StatusCodes.Status400BadRequest
@@ -45,28 +45,31 @@ public static class ExceptionHandlerExtensions
         return (StatusCodes.Status400BadRequest, problem);
     }
 
-    private static (int, ProblemDetails) HandleNotFound(NotFoundException nfe, ILogger logger)
+    private static (int, ProblemDetails) HandleNotFound(NotFoundException ex, ILogger logger)
     {
-        logger.LogWarning(nfe, "Entidad no encontrada: {EntityName} con clave '{SafeKey}'", nfe.EntityName, nfe.SafeKey);
+        if (ex.SafeKey != null)
+            logger.LogWarning(ex, "Entidad no encontrada: {EntityName} con clave '{SafeKey}'", ex.EntityName, ex.SafeKey);
+        else
+            logger.LogWarning(ex, "Entidad no encontrada: {EntityName}", ex.EntityName);
 
         var problem = new ProblemDetails
         {
             Title = "Recurso no encontrado",
-            Detail = nfe.Message,
+            Detail = ex.Message,
             Status = StatusCodes.Status404NotFound
         };
 
         return (StatusCodes.Status404NotFound, problem);
     }
 
-    private static (int, ProblemDetails) HandleExternalService(ExternalServiceException ese, ILogger logger)
+    private static (int, ProblemDetails) HandleExternalService(ExternalServiceException ex, ILogger logger)
     {
-        logger.LogError(ese, "Error en servicio externo '{ServiceName}': {Message}", ese.ServiceName, ese.Message);
+        logger.LogError(ex, "Error en servicio externo '{ServiceName}': {Message}", ex.ServiceName, ex.Message);
 
         var problem = new ProblemDetails
         {
             Title = "Error en servicio externo",
-            Detail = ese.Message,
+            Detail = ex.Message,
             Status = StatusCodes.Status502BadGateway
         };
 

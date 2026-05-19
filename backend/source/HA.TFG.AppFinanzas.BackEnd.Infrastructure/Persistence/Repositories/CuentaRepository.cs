@@ -1,4 +1,5 @@
-﻿using HA.TFG.AppFinanzas.BackEnd.Application.Contracts;
+﻿using HA.TFG.AppFinanzas.BackEnd.Application.Common.Exceptions;
+using HA.TFG.AppFinanzas.BackEnd.Application.Contracts;
 using HA.TFG.AppFinanzas.BackEnd.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,7 +33,7 @@ public class CuentaRepository(AppDbContext context) : ICuentaRepository
             .AnyAsync(c => c.IdCuenta == idCuenta, cancellationToken);
 
         if (!existe)
-            return [];
+            throw new NotFoundException(nameof(Cuenta), idCuenta);
 
         return await _context.CuentaCategorias
             .Where(cc => cc.IdCuenta == idCuenta)

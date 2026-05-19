@@ -57,7 +57,7 @@ public class CreateMovimientoCommandHandler(
                 logger.LogWarning(ex,
                     "Error al persistir el movimiento. Eliminando comprobante huérfano: {IdComprobante}", idComprobante);
 
-                await comprobanteStorage.DeleteComprobanteAsync(idComprobante, CancellationToken.None);
+                await comprobanteStorage.DeleteComprobanteAsync(cuenta.IdCuenta, idComprobante, CancellationToken.None);
             }
 
             throw;

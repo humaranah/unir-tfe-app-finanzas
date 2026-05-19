@@ -22,7 +22,8 @@ internal sealed class AzureBlobComprobanteStorageService(
         await containerClient.CreateIfNotExistsAsync(PublicAccessType.None, cancellationToken: cancellationToken);
 
         var extension = Path.GetExtension(fileName);
-        var blobName = $"{idCuenta}/{Guid.NewGuid()}{extension}";
+        var idComprobante = $"{Guid.NewGuid()}{extension}";
+        var blobName = $"{idCuenta}/{idComprobante}";
 
         var blobClient = containerClient.GetBlobClient(blobName);
 
@@ -30,15 +31,16 @@ internal sealed class AzureBlobComprobanteStorageService(
 
         logger.LogInformation("Comprobante subido a Azure Blob: {BlobName}", blobName);
 
-        return blobName;
+        return idComprobante;
     }
 
-    public async Task DeleteComprobanteAsync(string idComprobante, CancellationToken cancellationToken)
+    public async Task DeleteComprobanteAsync(Guid idCuenta, string idComprobante, CancellationToken cancellationToken)
     {
+        var blobName = $"{idCuenta}/{idComprobante}";
         var containerClient = blobServiceClient.GetBlobContainerClient(ContainerName);
-        var blobClient = containerClient.GetBlobClient(idComprobante);
+        var blobClient = containerClient.GetBlobClient(blobName);
         await blobClient.DeleteIfExistsAsync(cancellationToken: cancellationToken);
 
-        logger.LogInformation("Comprobante eliminado de Azure Blob: {BlobName}", idComprobante);
+        logger.LogInformation("Comprobante eliminado de Azure Blob: {BlobName}", blobName);
     }
 }
