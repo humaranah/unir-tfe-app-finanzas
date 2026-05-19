@@ -19,6 +19,11 @@ public interface IComprobanteStorageService
         CancellationToken cancellationToken);
 
     /// <summary>
+    /// Descarga un comprobante y devuelve su stream, content-type y nombre de archivo.
+    /// </summary>
+    Task<ComprobanteFile> GetComprobanteAsync(Guid idCuenta, string idComprobante, CancellationToken cancellationToken);
+
+    /// <summary>
     /// Elimina un comprobante previamente subido. Usado para rollback si falla la BD.
     /// </summary>
     Task DeleteComprobanteAsync(Guid idCuenta, string idComprobante, CancellationToken cancellationToken);

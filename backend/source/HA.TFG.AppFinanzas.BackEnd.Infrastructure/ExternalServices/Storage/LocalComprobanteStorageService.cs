@@ -34,6 +34,27 @@ internal sealed class LocalComprobanteStorageService(
         return idComprobante;
     }
 
+    public Task<ComprobanteFile> GetComprobanteAsync(Guid idCuenta, string idComprobante, CancellationToken cancellationToken)
+    {
+        var rutaCompleta = Path.Combine(BasePath, idCuenta.ToString(), idComprobante);
+
+        if (!File.Exists(rutaCompleta))
+            throw new FileNotFoundException($"Comprobante no encontrado en la ruta local.", rutaCompleta);
+
+        var contentType = Path.GetExtension(idComprobante).ToLowerInvariant() switch
+        {
+            ".pdf" => "application/pdf",
+            ".png" => "image/png",
+            ".jpg" or ".jpeg" => "image/jpeg",
+            ".gif" => "image/gif",
+            ".webp" => "image/webp",
+            _ => "application/octet-stream"
+        };
+
+        var stream = File.OpenRead(rutaCompleta);
+        return Task.FromResult(new ComprobanteFile(stream, contentType, idComprobante));
+    }
+
     public Task DeleteComprobanteAsync(Guid idCuenta, string idComprobante, CancellationToken cancellationToken)
     {
         var rutaCompleta = Path.Combine(BasePath, idCuenta.ToString(), idComprobante);
