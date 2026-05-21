@@ -97,10 +97,11 @@ public partial class MovimientoViewModel(
     }
 
     [RelayCommand(CanExecute = nameof(PuedeCrear))]
-    private async Task CrearMovimientoAsync(CancellationToken cancellationToken)    {
+    private async Task CrearMovimientoAsync(CancellationToken cancellationToken)
+    {
         if (!decimal.TryParse(ImporteTexto, out var importe) || importe <= 0)
         {
-            Error = "El importe debe ser un numero mayor que cero.";
+            Error = "El importe debe ser un número mayor que cero.";
             return;
         }
 
@@ -122,7 +123,7 @@ public partial class MovimientoViewModel(
         }
         catch (Exception ex)
         {
-            Error = "No se pudo registrar el movimiento. Intentalo de nuevo.";
+            Error = "No se pudo registrar el movimiento. Inténtalo de nuevo.";
             System.Diagnostics.Debug.WriteLine($"Error al crear movimiento: {ex}");
         }
         finally

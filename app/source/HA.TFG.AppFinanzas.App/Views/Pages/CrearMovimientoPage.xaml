@@ -75,7 +75,6 @@
             <Button Text="Cancelar"
                     Command="{Binding CancelarCommand}"
                     Style="{DynamicResource OutlinedButton}"
-                    IsEnabled="{Binding IsNotBusy}"
                     HorizontalOptions="Fill" />
 
         </VerticalStackLayout>

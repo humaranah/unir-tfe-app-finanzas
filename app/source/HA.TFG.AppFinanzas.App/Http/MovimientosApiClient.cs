@@ -1,6 +1,6 @@
+using HA.TFG.AppFinanzas.App.Http.Mappers;
 using HA.TFG.AppFinanzas.Core.Models.Enums;
 using HA.TFG.AppFinanzas.Core.Movimientos;
-using HA.TFG.AppFinanzas.App.Http.Mappers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -61,18 +61,19 @@ internal sealed class MovimientosApiClient(IHttpClientFactory httpClientFactory)
     {
         var client = httpClientFactory.CreateClient("Backend");
 
-        var body = new
+        using var content = new MultipartFormDataContent
         {
-            Concepto = concepto,
-            Importe = importe,
-            Moneda = moneda,
-            TipoMovimiento = tipo.ToString(),
-            FechaMovimiento = fecha.ToString("yyyy-MM-dd"),
-            IdCategoria = idCategoria
+            { new StringContent(concepto), "Concepto" },
+            { new StringContent(importe.ToString(System.Globalization.CultureInfo.InvariantCulture)), "Importe" },
+            { new StringContent(moneda), "Moneda" },
+            { new StringContent(tipo.ToString()), "TipoMovimiento" },
+            { new StringContent(fecha.ToDateTime(TimeOnly.MinValue).ToString("yyyy-MM-ddTHH:mm:ss")), "FechaMovimiento" }
         };
+        if (idCategoria.HasValue)
+            content.Add(new StringContent(idCategoria.Value.ToString()), "IdCuentaCategoria");
 
-        using var response = await client.PostAsJsonAsync(
-            $"api/cuentas/{idCuenta}/movimientos", body, JsonOptions, cancellationToken);
+        using var response = await client.PostAsync(
+            $"api/cuentas/{idCuenta}/movimientos", content, cancellationToken);
 
         if (!response.IsSuccessStatusCode)
         {
