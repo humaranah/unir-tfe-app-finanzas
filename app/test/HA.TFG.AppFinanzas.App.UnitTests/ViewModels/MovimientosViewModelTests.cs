@@ -1,6 +1,7 @@
 using HA.TFG.AppFinanzas.Core.Cuentas;
 using HA.TFG.AppFinanzas.Core.Models.Enums;
 using HA.TFG.AppFinanzas.Core.Movimientos;
+using HA.TFG.AppFinanzas.Core.Navigation;
 using HA.TFG.AppFinanzas.Core.ViewModels;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
@@ -11,10 +12,11 @@ public class MovimientosViewModelTests
 {
     private readonly ICuentasService _cuentasService = Substitute.For<ICuentasService>();
     private readonly IMovimientosService _movimientosService = Substitute.For<IMovimientosService>();
+    private readonly INavigationService _navigationService = Substitute.For<INavigationService>();
 
     private static readonly Guid IdCuenta = Guid.NewGuid();
 
-    private MovimientosViewModel CreateSut() => new(_cuentasService, _movimientosService);
+    private MovimientosViewModel CreateSut() => new(_cuentasService, _movimientosService, _navigationService);
 
     private void ConfigurarCuenta(string descripcion = "Mi cuenta")
         => _cuentasService.GetDefaultCuentaAsync().Returns((IdCuenta, (string?)descripcion));

@@ -4,5 +4,6 @@ public interface ICuentasService
 {
     Task<bool> HasCuentasAsync(CancellationToken cancellationToken = default);
     Task<(Guid? Id, string? Descripcion)> GetDefaultCuentaAsync(CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<CategoriaItem>> GetCategoriasAsync(Guid idCuenta, CancellationToken cancellationToken = default);
     Task CreateCuentaAsync(string descripcion, string moneda, CancellationToken cancellationToken = default);
 }

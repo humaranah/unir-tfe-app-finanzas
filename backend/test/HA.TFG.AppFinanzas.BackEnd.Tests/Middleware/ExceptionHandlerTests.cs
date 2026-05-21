@@ -12,7 +12,7 @@ using System.Text.Json;
 
 namespace HA.TFG.AppFinanzas.BackEnd.Tests.Middleware;
 
-public class ExceptionHandlerTests : IDisposable
+public sealed class ExceptionHandlerTests : IDisposable
 {
     private IHost? _host;
 

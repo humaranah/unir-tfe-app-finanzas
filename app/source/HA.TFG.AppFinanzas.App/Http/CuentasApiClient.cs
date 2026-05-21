@@ -1,12 +1,21 @@
 using HA.TFG.AppFinanzas.Core.Cuentas;
+using HA.TFG.AppFinanzas.Core.Models.Enums;
 using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace HA.TFG.AppFinanzas.App.Http;
 
 internal sealed class CuentasApiClient(IHttpClientFactory httpClientFactory) : ICuentasService
 {
+    private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)
+    {
+        Converters = { new JsonStringEnumConverter() }
+    };
+
     private record CreateCuentaRequest(string Moneda, string Descripcion);
     private record CuentaResponse(Guid Id, string Moneda, string Descripcion);
+    private record CategoriaResponse(Guid IdCuentaCategoria, string Nombre, TipoMovimiento TipoMovimiento);
 
     public async Task<bool> HasCuentasAsync(CancellationToken cancellationToken = default)
     {
@@ -51,5 +60,28 @@ internal sealed class CuentasApiClient(IHttpClientFactory httpClientFactory) : I
         var body = await response.Content.ReadAsStringAsync(cancellationToken);
         throw new HttpRequestException(
             $"Error al crear cuenta. Status={(int)response.StatusCode}. Body={body}");
+    }
+
+    public async Task<IReadOnlyList<CategoriaItem>> GetCategoriasAsync(Guid idCuenta, CancellationToken cancellationToken = default)
+    {
+        var client = httpClientFactory.CreateClient("Backend");
+
+        using var response = await client.GetAsync($"api/cuentas/{idCuenta}/categorias", cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var body = await response.Content.ReadAsStringAsync(cancellationToken);
+            throw new HttpRequestException(
+                $"Error al obtener categorias. Status={(int)response.StatusCode}. Body={body}");
+        }
+
+        var items = await response.Content.ReadFromJsonAsync<List<CategoriaResponse>>(JsonOptions, cancellationToken) ?? [];
+
+        return [.. items.Select(c => new CategoriaItem
+        {
+            IdCuentaCategoria = c.IdCuentaCategoria,
+            Nombre = c.Nombre,
+            TipoMovimiento = c.TipoMovimiento
+        })];
     }
 }

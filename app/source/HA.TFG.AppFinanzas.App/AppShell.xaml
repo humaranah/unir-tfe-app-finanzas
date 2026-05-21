@@ -46,4 +46,10 @@
         ContentTemplate="{DataTemplate pages:MovimientosPage}"
         Route="movimientos" />
 
+    <ShellContent
+        Title="Nuevo movimiento"
+        ContentTemplate="{DataTemplate pages:CrearMovimientoPage}"
+        Route="crear-movimiento"
+        Shell.FlyoutItemIsVisible="False" />
+
 </Shell>

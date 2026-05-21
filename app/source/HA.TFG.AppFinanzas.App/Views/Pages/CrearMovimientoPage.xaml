@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="clr-namespace:HA.TFG.AppFinanzas.Core.ViewModels;assembly=HA.TFG.AppFinanzas.Core"
+             x:Class="HA.TFG.AppFinanzas.App.Views.Pages.CrearMovimientoPage"
+             x:DataType="viewModels:MovimientoViewModel"
+             Title="Nuevo movimiento">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="40" Spacing="16" VerticalOptions="Center" MaximumWidthRequest="600">
+
+            <Label Text="Nuevo movimiento"
+                   FontSize="28"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center" />
+
+            <!-- Tipo de movimiento -->
+            <Label Text="Tipo" FontAttributes="Bold" />
+            <Picker ItemsSource="{Binding Tipos}"
+                    SelectedItem="{Binding TipoSeleccionado}"
+                    HorizontalOptions="Fill" />
+
+            <!-- Categoría -->
+            <Picker ItemsSource="{Binding CategoriasFiltradas}"
+                    SelectedItem="{Binding CategoriaSeleccionada}"
+                    ItemDisplayBinding="{Binding Nombre}"
+                    Title="Sin categoría"
+                    HorizontalOptions="Fill" />
+
+            <!-- Importe y moneda -->
+            <Label Text="Importe" FontAttributes="Bold" />
+            <Grid ColumnDefinitions="*, auto" RowDefinitions="auto">
+                <Entry Placeholder="0.00"
+                       Text="{Binding ImporteTexto}"
+                       Keyboard="Numeric"
+                       HorizontalOptions="Fill" />
+                <Picker Grid.Column="1"
+                        IsEnabled="False"
+                        ItemsSource="{Binding Monedas}"
+                        SelectedItem="{Binding MonedaSeleccionada}"
+                        ItemDisplayBinding="{Binding Value}"
+                        HorizontalOptions="Fill"
+                        Margin="8,0,0,0"/>
+            </Grid>
+
+            <!-- Concepto -->
+            <Label Text="Concepto" FontAttributes="Bold" />
+            <Entry Placeholder="Ej. Supermercado, Nómina…"
+                   Text="{Binding Concepto}"
+                   HorizontalOptions="Fill" />
+
+            <!-- Fecha -->
+            <Label Text="Fecha" FontAttributes="Bold" />
+            <DatePicker Date="{Binding Fecha}"
+                        Format="dd/MM/yyyy"
+                        HorizontalOptions="Fill" />
+
+            <!-- Error -->
+            <Label Text="{Binding Error}"
+                   TextColor="OrangeRed"
+                   HorizontalOptions="Center"
+                   IsVisible="{Binding HasError}" />
+
+            <!-- Actividad -->
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                               IsVisible="{Binding IsBusy}"
+                               HorizontalOptions="Center" />
+
+            <!-- Acción -->
+            <Button Text="Guardar movimiento"
+                    Command="{Binding CrearMovimientoCommand}"
+                    IsEnabled="{Binding IsNotBusy}"
+                    HorizontalOptions="Fill" />
+
+            <Button Text="Cancelar"
+                    Command="{Binding CancelarCommand}"
+                    Style="{DynamicResource OutlinedButton}"
+                    IsEnabled="{Binding IsNotBusy}"
+                    HorizontalOptions="Fill" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>
