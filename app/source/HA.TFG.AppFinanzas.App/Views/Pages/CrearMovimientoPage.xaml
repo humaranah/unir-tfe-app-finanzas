@@ -69,7 +69,6 @@
             <!-- Acción -->
             <Button Text="Guardar movimiento"
                     Command="{Binding CrearMovimientoCommand}"
-                    IsEnabled="{Binding IsNotBusy}"
                     HorizontalOptions="Fill" />
 
             <Button Text="Cancelar"
