@@ -24,6 +24,7 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
+
         <Button Text="{Binding MesAnterior}"
                 Command="{Binding AnteriorCommand}"
                 IsEnabled="{Binding IsAnteriorEnabled}"
@@ -105,5 +106,20 @@
                    HorizontalOptions="Center"
                    HorizontalTextAlignment="Center" />
         </VerticalStackLayout>
+
+        <!-- FAB: nuevo movimiento -->
+        <Button Grid.Row="1"
+                Text="+"
+                Command="{Binding NuevoMovimientoCommand}"
+                AutomationProperties.Name="Nuevo movimiento"
+                FontSize="24"
+                FontAttributes="Bold"
+                WidthRequest="56"
+                HeightRequest="56"
+                CornerRadius="28"
+                HorizontalOptions="End"
+                VerticalOptions="End"
+                Margin="24" />
+
     </Grid>
 </ContentPage>

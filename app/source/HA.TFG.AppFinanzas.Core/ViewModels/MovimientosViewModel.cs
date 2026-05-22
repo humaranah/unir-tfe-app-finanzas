@@ -2,14 +2,18 @@
 using CommunityToolkit.Mvvm.Input;
 using HA.TFG.AppFinanzas.Core.Cuentas;
 using HA.TFG.AppFinanzas.Core.Movimientos;
+using HA.TFG.AppFinanzas.Core.Navigation;
 using System.Collections.ObjectModel;
 
 namespace HA.TFG.AppFinanzas.Core.ViewModels;
 
 public partial class MovimientosViewModel(
     ICuentasService cuentasService,
-    IMovimientosService movimientosService) : ObservableObject
+    IMovimientosService movimientosService,
+    INavigationService navigationService) : ObservableObject
 {
+    private Guid? _idCuenta;
+
     [ObservableProperty]
     public partial string NombreCuenta { get; set; } = string.Empty;
 
@@ -54,6 +58,13 @@ public partial class MovimientosViewModel(
     public bool HasMovimientos => !IsBusy && !HasError && Movimientos.Count > 0;
 
     [RelayCommand]
+    private async Task NuevoMovimientoAsync()
+    {
+        if (_idCuenta is not null)
+            await navigationService.GoToAsync($"//crear-movimiento?idCuenta={_idCuenta.Value}");
+    }
+
+    [RelayCommand]
     private async Task AnteriorAsync()
     {
         Fecha = Fecha.AddMonths(-1);
@@ -76,6 +87,7 @@ public partial class MovimientosViewModel(
         try
         {
             var (idCuenta, descripcion) = await cuentasService.GetDefaultCuentaAsync(cancellationToken);
+            _idCuenta = idCuenta;
             NombreCuenta = descripcion ?? string.Empty;
 
             if (idCuenta is null)
