@@ -22,6 +22,15 @@ public class CreateMovimientoCommandHandler(
         var cuenta = await cuentaRepository.GetCuentaByIdAsync(usuario.IdUsuario, request.IdCuenta, cancellationToken)
             ?? throw new NotFoundException(nameof(Cuenta), request.IdCuenta.ToString());
 
+        // Resolver categoría: si no se especifica, usar la categoría por defecto según el tipo de movimiento
+        var nombreCategoriaDefecto = request.TipoMovimiento == Domain.ValueObjects.TipoMovimiento.Ingreso
+            ? "Ingresos"
+            : "Otros gastos";
+
+        var idCuentaCategoria = request.IdCuentaCategoria
+            ?? (await cuentaRepository.GetCategoriaPorNombreAsync(cuenta.IdCuenta, nombreCategoriaDefecto, cancellationToken)
+                ?? throw new NotFoundException(nameof(CuentaCategoria), nombreCategoriaDefecto)).IdCuentaCategoria;
+
         // Subir comprobante antes de persistir en BD
         string? idComprobante = null;
         if (request.ComprobanteStream is not null
@@ -41,6 +50,7 @@ public class CreateMovimientoCommandHandler(
             var movimiento = request.ToMovimiento() with
             {
                 IdCuenta = cuenta.IdCuenta,
+                IdCuentaCategoria = idCuentaCategoria,
                 IdComprobante = idComprobante,
                 FechaCreacion = DateTime.UtcNow
             };
