@@ -10,19 +10,8 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropIndex(
-                name: "IX_cuenta_categorias_IdCuentaCategoria_IdCuenta",
-                table: "cuenta_categorias");
-        }
-
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.CreateIndex(
-                name: "IX_cuenta_categorias_IdCuentaCategoria_IdCuenta",
-                table: "cuenta_categorias",
-                columns: new[] { "IdCuentaCategoria", "IdCuenta" },
-                unique: true);
+            migrationBuilder.Sql(
+                "DROP INDEX IF EXISTS [IX_cuenta_categorias_IdCuentaCategoria_IdCuenta] ON [cuenta_categorias];");
         }
     }
 }
