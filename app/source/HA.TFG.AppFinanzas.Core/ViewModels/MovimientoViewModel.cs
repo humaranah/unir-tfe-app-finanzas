@@ -16,13 +16,15 @@ public partial class MovimientoViewModel(
     private Guid _idCuenta;
     private IReadOnlyList<CategoriaItem> _todasLasCategorias = [];
 
+    internal Task CargandoCategoriasTask { get; private set; } = Task.CompletedTask;
+
     public Guid IdCuenta
     {
         get => _idCuenta;
         set
         {
             _idCuenta = value;
-            _ = CargarCategoriasAsync();
+            CargandoCategoriasTask = CargarCategoriasAsync();
         }
     }
 
@@ -39,13 +41,16 @@ public partial class MovimientoViewModel(
         = MonedasHelper.DefaultMoneda;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(CrearMovimientoCommand))]
     [NotifyPropertyChangedFor(nameof(CategoriasFiltradas))]
     public partial TipoMovimiento TipoSeleccionado { get; set; } = TipoMovimiento.Gasto;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(CrearMovimientoCommand))]
     public partial DateTime Fecha { get; set; } = DateTime.Today;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(CrearMovimientoCommand))]
     public partial CategoriaItem? CategoriaSeleccionada { get; set; }
 
     [ObservableProperty]
@@ -67,9 +72,17 @@ public partial class MovimientoViewModel(
     public IReadOnlyList<CategoriaItem> CategoriasFiltradas =>
         [.. _todasLasCategorias.Where(c => c.TipoMovimiento == TipoSeleccionado)];
 
+    partial void OnTipoSeleccionadoChanged(TipoMovimiento value)
+    {
+        CategoriaSeleccionada = null;
+    }
+
     private bool PuedeCrear =>
         !string.IsNullOrWhiteSpace(Concepto) &&
-        decimal.TryParse(ImporteTexto, out var v) && v > 0;
+        decimal.TryParse(ImporteTexto, out var v) && v > 0 &&
+        CategoriaSeleccionada is not null &&
+        Fecha != default &&
+        Enum.IsDefined(TipoSeleccionado);
 
     public void Reset()
     {
@@ -110,13 +123,14 @@ public partial class MovimientoViewModel(
         try
         {
             await movimientosService.CreateMovimientoAsync(
-                IdCuenta,
-                Concepto.Trim(),
-                importe,
-                MonedaSeleccionada.Key,
-                TipoSeleccionado,
-                DateOnly.FromDateTime(Fecha),
-                CategoriaSeleccionada?.IdCuentaCategoria,
+                new CreateMovimientoDto(
+                    IdCuenta,
+                    Concepto.Trim(),
+                    importe,
+                    MonedaSeleccionada.Key,
+                    TipoSeleccionado,
+                    DateOnly.FromDateTime(Fecha),
+                    CategoriaSeleccionada!.IdCuentaCategoria),
                 cancellationToken);
 
             await navigationService.GoToAsync("//movimientos");

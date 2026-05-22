@@ -81,6 +81,7 @@ public partial class MovimientosViewModel(
     [RelayCommand]
     public async Task CargarMovimientosAsync(CancellationToken cancellationToken = default)
     {
+        _idCuenta = null;
         Error = string.Empty;
         IsBusy = true;
 
