@@ -7,7 +7,7 @@ public record CreateMovimientoCommand : IRequest<CreateMovimientoResult>
 {
     public string Email { get; init; } = string.Empty;
     public Guid IdCuenta { get; init; }
-    public Guid IdCuentaCategoria { get; init; }
+    public Guid? IdCuentaCategoria { get; init; }
     public TipoMovimiento TipoMovimiento { get; init; }
     public required string Concepto { get; init; }
     public decimal Importe { get; init; }

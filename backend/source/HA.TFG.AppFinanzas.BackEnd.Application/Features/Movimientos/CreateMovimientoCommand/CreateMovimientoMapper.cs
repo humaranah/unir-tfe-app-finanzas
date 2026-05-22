@@ -10,6 +10,7 @@ public static partial class CreateMovimientoMapper
     // IdCuenta se sobreescribe en el handler con el valor validado de la cuenta
     // IdComprobante y FechaCreacion los asigna el handler tras subir el archivo
     [MapperIgnoreTarget(nameof(Movimiento.IdMovimiento))]
+    [MapperIgnoreTarget(nameof(Movimiento.IdCuentaCategoria))]
     [MapperIgnoreTarget(nameof(Movimiento.IdComprobante))]
     [MapperIgnoreTarget(nameof(Movimiento.FechaCreacion))]
     [MapperIgnoreTarget(nameof(Movimiento.FechaModificacion))]
