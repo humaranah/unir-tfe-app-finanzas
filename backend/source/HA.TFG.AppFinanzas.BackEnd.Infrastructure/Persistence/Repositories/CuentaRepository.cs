@@ -42,7 +42,7 @@ public class CuentaRepository(AppDbContext context) : ICuentaRepository
             .ToListAsync(cancellationToken);
     }
 
-    public Task<CuentaCategoria?> GetCategoriaPorNombreAsync(Guid idCuenta, string nombre, CancellationToken cancellationToken) =>
+    public Task<CuentaCategoria?> GetCategoriaByNombreAsync(Guid idCuenta, string nombre, CancellationToken cancellationToken) =>
         _context.CuentaCategorias
             .Where(cc => cc.IdCuenta == idCuenta && cc.Nombre == nombre)
             .FirstOrDefaultAsync(cancellationToken);
@@ -52,7 +52,7 @@ public class CuentaRepository(AppDbContext context) : ICuentaRepository
             .Where(cc => cc.IdCuenta == idCuenta && cc.IdCuentaCategoria == idCuentaCategoria)
             .FirstOrDefaultAsync(cancellationToken);
 
-    public async Task<Cuenta> CreateCuentaConCategoriasAsync(Cuenta cuenta, CancellationToken cancellationToken)
+    public async Task<Cuenta> CreateCuentaWithCategoriasAsync(Cuenta cuenta, CancellationToken cancellationToken)
     {
         var categorias = await _context.Categorias.ToListAsync(cancellationToken);
 

@@ -27,7 +27,7 @@ public class CreateCuentaCommandHandlerTests
         var command = new CreateCuentaCommand { Email = usuario.Email, Moneda = "EUR", Descripcion = "Mi cuenta" };
 
         _usuarioRepository.GetByEmailAsync(usuario.Email, Arg.Any<CancellationToken>()).Returns(usuario);
-        _cuentaRepository.CreateCuentaConCategoriasAsync(Arg.Any<Cuenta>(), Arg.Any<CancellationToken>()).Returns(cuentaCreada);
+        _cuentaRepository.CreateCuentaWithCategoriasAsync(Arg.Any<Cuenta>(), Arg.Any<CancellationToken>()).Returns(cuentaCreada);
 
         // Act
         var result = await _sut.Handle(command, CancellationToken.None);
@@ -46,14 +46,14 @@ public class CreateCuentaCommandHandlerTests
         var command = new CreateCuentaCommand { Email = usuario.Email, Moneda = "USD", Descripcion = "Mi cuenta" };
 
         _usuarioRepository.GetByEmailAsync(usuario.Email, Arg.Any<CancellationToken>()).Returns(usuario);
-        _cuentaRepository.CreateCuentaConCategoriasAsync(Arg.Any<Cuenta>(), Arg.Any<CancellationToken>())
+        _cuentaRepository.CreateCuentaWithCategoriasAsync(Arg.Any<Cuenta>(), Arg.Any<CancellationToken>())
             .Returns(c => c.Arg<Cuenta>());
 
         // Act
         await _sut.Handle(command, CancellationToken.None);
 
         // Assert
-        await _cuentaRepository.Received(1).CreateCuentaConCategoriasAsync(
+        await _cuentaRepository.Received(1).CreateCuentaWithCategoriasAsync(
             Arg.Is<Cuenta>(c => c.Moneda == "USD" && c.Usuarios.Contains(usuario)),
             Arg.Any<CancellationToken>());
     }
@@ -69,6 +69,6 @@ public class CreateCuentaCommandHandlerTests
         await Assert.ThrowsAsync<NotFoundException>(() =>
             _sut.Handle(command, CancellationToken.None).AsTask());
 
-        await _cuentaRepository.DidNotReceive().CreateCuentaConCategoriasAsync(Arg.Any<Cuenta>(), Arg.Any<CancellationToken>());
+        await _cuentaRepository.DidNotReceive().CreateCuentaWithCategoriasAsync(Arg.Any<Cuenta>(), Arg.Any<CancellationToken>());
     }
 }
