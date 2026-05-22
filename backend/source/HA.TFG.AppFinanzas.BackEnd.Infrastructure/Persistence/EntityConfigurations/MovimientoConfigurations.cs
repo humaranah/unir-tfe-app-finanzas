@@ -41,10 +41,12 @@ internal class MovimientoConfigurations : IEntityTypeConfiguration<Movimiento>
             .OnDelete(DeleteBehavior.Restrict);
 
         // Relación: Movimiento -> CuentaCategoria (muchos a uno)
+        // FK compuesta para garantizar que la categoría pertenece a la misma cuenta del movimiento
         builder
             .HasOne(movimiento => movimiento.Categoria)
             .WithMany(categoria => categoria.Movimientos)
-            .HasForeignKey(movimiento => movimiento.IdCuentaCategoria)
+            .HasForeignKey(movimiento => new { movimiento.IdCuentaCategoria, movimiento.IdCuenta })
+            .HasPrincipalKey(cc => new { cc.IdCuentaCategoria, cc.IdCuenta })
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

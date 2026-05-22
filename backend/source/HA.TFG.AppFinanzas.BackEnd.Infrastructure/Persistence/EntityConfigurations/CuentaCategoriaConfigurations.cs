@@ -27,6 +27,7 @@ internal class CuentaCategoriaConfigurations : IEntityTypeConfiguration<CuentaCa
         builder.Property(cc => cc.FechaEliminacion).IsRequired(false);
 
         builder.HasIndex(cc => new { cc.IdCuenta, cc.Nombre }).IsUnique();
+        builder.HasIndex(cc => new { cc.IdCuentaCategoria, cc.IdCuenta }).IsUnique();
 
         // Relación: CuentaCategoria -> Cuenta (muchos a uno)
         builder

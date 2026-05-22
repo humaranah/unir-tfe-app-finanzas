@@ -13,6 +13,9 @@ public class CreateMovimientoCommandValidator : AbstractValidator<CreateMovimien
         RuleFor(x => x.IdCuenta)
             .NotEmpty().WithMessage("La cuenta es obligatoria.");
 
+        RuleFor(x => x.IdCuentaCategoria)
+            .NotEmpty().WithMessage("La categoría es obligatoria.");
+
         RuleFor(x => x.TipoMovimiento)
             .IsInEnum().WithMessage("El tipo de movimiento no es válido.");
 

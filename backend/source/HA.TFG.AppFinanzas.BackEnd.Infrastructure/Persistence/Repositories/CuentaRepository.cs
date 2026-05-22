@@ -47,6 +47,11 @@ public class CuentaRepository(AppDbContext context) : ICuentaRepository
             .Where(cc => cc.IdCuenta == idCuenta && cc.Nombre == nombre)
             .FirstOrDefaultAsync(cancellationToken);
 
+    public Task<CuentaCategoria?> GetCategoriaByIdAsync(Guid idCuenta, Guid idCuentaCategoria, CancellationToken cancellationToken) =>
+        _context.CuentaCategorias
+            .Where(cc => cc.IdCuenta == idCuenta && cc.IdCuentaCategoria == idCuentaCategoria)
+            .FirstOrDefaultAsync(cancellationToken);
+
     public async Task<Cuenta> CreateCuentaConCategoriasAsync(Cuenta cuenta, CancellationToken cancellationToken)
     {
         var categorias = await _context.Categorias.ToListAsync(cancellationToken);
