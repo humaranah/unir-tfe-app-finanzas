@@ -28,12 +28,6 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
                 table: "movimientos",
                 columns: new[] { "IdCuentaCategoria", "IdCuenta" });
 
-            migrationBuilder.CreateIndex(
-                name: "IX_cuenta_categorias_IdCuentaCategoria_IdCuenta",
-                table: "cuenta_categorias",
-                columns: new[] { "IdCuentaCategoria", "IdCuenta" },
-                unique: true);
-
             migrationBuilder.AddForeignKey(
                 name: "FK_movimientos_cuenta_categorias_IdCuentaCategoria_IdCuenta",
                 table: "movimientos",
@@ -56,10 +50,6 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Migrations
 
             migrationBuilder.DropUniqueConstraint(
                 name: "AK_cuenta_categorias_IdCuentaCategoria_IdCuenta",
-                table: "cuenta_categorias");
-
-            migrationBuilder.DropIndex(
-                name: "IX_cuenta_categorias_IdCuentaCategoria_IdCuenta",
                 table: "cuenta_categorias");
 
             migrationBuilder.CreateIndex(

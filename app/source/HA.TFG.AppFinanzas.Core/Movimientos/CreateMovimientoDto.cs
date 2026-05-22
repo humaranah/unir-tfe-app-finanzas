@@ -9,4 +9,4 @@ public sealed record CreateMovimientoDto(
     string Moneda,
     TipoMovimiento Tipo,
     DateOnly Fecha,
-    Guid IdCategoria);
+    Guid IdCuentaCategoria);

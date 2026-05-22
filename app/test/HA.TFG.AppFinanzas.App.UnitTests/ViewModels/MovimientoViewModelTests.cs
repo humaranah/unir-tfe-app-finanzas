@@ -243,7 +243,7 @@ public class MovimientoViewModelTests
         await sut.CrearMovimientoCommand.ExecuteAsync(null);
 
         await _movimientosService.Received(1).CreateMovimientoAsync(
-            Arg.Is<CreateMovimientoDto>(d => d.IdCategoria == categoria.IdCuentaCategoria),
+            Arg.Is<CreateMovimientoDto>(d => d.IdCuentaCategoria == categoria.IdCuentaCategoria),
             Arg.Any<CancellationToken>());
     }
 

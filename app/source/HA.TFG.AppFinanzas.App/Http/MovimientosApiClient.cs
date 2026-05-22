@@ -62,7 +62,7 @@ internal sealed class MovimientosApiClient(IHttpClientFactory httpClientFactory)
             { new StringContent(dto.Moneda), "Moneda" },
             { new StringContent(dto.Tipo.ToString()), "TipoMovimiento" },
             { new StringContent(dto.Fecha.ToDateTime(TimeOnly.MinValue).ToString("yyyy-MM-ddTHH:mm:ss")), "FechaMovimiento" },
-            { new StringContent(dto.IdCategoria.ToString()), "IdCuentaCategoria" }
+            { new StringContent(dto.IdCuentaCategoria.ToString()), "IdCuentaCategoria" }
         };
 
         using var response = await client.PostAsync(
