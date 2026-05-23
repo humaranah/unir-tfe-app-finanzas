@@ -17,6 +17,13 @@ public class MovimientoViewModelTests
 
     private static readonly Guid IdCuenta = Guid.NewGuid();
 
+    private static readonly CategoriaItem CategoriaDefault = new()
+    {
+        IdCuentaCategoria = Guid.NewGuid(),
+        Nombre = "Alimentación",
+        TipoMovimiento = TipoMovimiento.Gasto
+    };
+
     private MovimientoViewModel CreateSut() =>
         new(_cuentasService, _movimientosService, _navigationService);
 
@@ -101,8 +108,7 @@ public class MovimientoViewModelTests
         var sut = CreateSut();
         sut.IdCuenta = IdCuenta;
 
-        // Esperar a que la tarea async en el setter finalice
-        await Task.Delay(50);
+        await sut.CargandoCategoriasTask;
 
         await _cuentasService.Received(1).GetCategoriasAsync(IdCuenta);
     }
@@ -120,7 +126,7 @@ public class MovimientoViewModelTests
 
         var sut = CreateSut();
         sut.IdCuenta = IdCuenta;
-        await Task.Delay(50);
+        await sut.CargandoCategoriasTask;
 
         sut.TipoSeleccionado = TipoMovimiento.Gasto;
         var filtradas = sut.CategoriasFiltradas;
@@ -141,7 +147,7 @@ public class MovimientoViewModelTests
 
         var sut = CreateSut();
         sut.IdCuenta = IdCuenta;
-        await Task.Delay(50);
+        await sut.CargandoCategoriasTask;
 
         sut.TipoSeleccionado = TipoMovimiento.Ingreso;
 
@@ -160,17 +166,19 @@ public class MovimientoViewModelTests
         sut.ImporteTexto = "42.50";
         sut.TipoSeleccionado = TipoMovimiento.Gasto;
         sut.Fecha = new DateTime(2025, 6, 15);
+        sut.CategoriaSeleccionada = CategoriaDefault;
 
         await sut.CrearMovimientoCommand.ExecuteAsync(null);
 
         await _movimientosService.Received(1).CreateMovimientoAsync(
-            IdCuenta,
-            "Supermercado",
-            42.50m,
-            sut.MonedaSeleccionada.Key,
-            TipoMovimiento.Gasto,
-            new DateOnly(2025, 6, 15),
-            null,
+            new CreateMovimientoDto(
+                IdCuenta,
+                "Supermercado",
+                42.50m,
+                sut.MonedaSeleccionada.Key,
+                TipoMovimiento.Gasto,
+                new DateOnly(2025, 6, 15),
+                CategoriaDefault.IdCuentaCategoria),
             Arg.Any<CancellationToken>());
     }
 
@@ -181,6 +189,7 @@ public class MovimientoViewModelTests
         sut.IdCuenta = IdCuenta;
         sut.Concepto = "Supermercado";
         sut.ImporteTexto = "42.50";
+        sut.CategoriaSeleccionada = CategoriaDefault;
 
         await sut.CrearMovimientoCommand.ExecuteAsync(null);
 
@@ -194,6 +203,7 @@ public class MovimientoViewModelTests
         sut.IdCuenta = IdCuenta;
         sut.Concepto = "Supermercado";
         sut.ImporteTexto = "42.50";
+        sut.CategoriaSeleccionada = CategoriaDefault;
 
         await sut.CrearMovimientoCommand.ExecuteAsync(null);
 
@@ -207,6 +217,7 @@ public class MovimientoViewModelTests
         sut.IdCuenta = IdCuenta;
         sut.Concepto = "Supermercado";
         sut.ImporteTexto = "42.50";
+        sut.CategoriaSeleccionada = CategoriaDefault;
 
         await sut.CrearMovimientoCommand.ExecuteAsync(null);
 
@@ -232,9 +243,7 @@ public class MovimientoViewModelTests
         await sut.CrearMovimientoCommand.ExecuteAsync(null);
 
         await _movimientosService.Received(1).CreateMovimientoAsync(
-            Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<decimal>(),
-            Arg.Any<string>(), Arg.Any<TipoMovimiento>(), Arg.Any<DateOnly>(),
-            categoria.IdCuentaCategoria,
+            Arg.Is<CreateMovimientoDto>(d => d.IdCuentaCategoria == categoria.IdCuentaCategoria),
             Arg.Any<CancellationToken>());
     }
 
@@ -242,13 +251,14 @@ public class MovimientoViewModelTests
     public async Task CrearMovimientoAsync_WhenServiceThrows_SetsError()
     {
         _movimientosService
-            .CreateMovimientoAsync(default, default!, default, default!, default, default)
+            .CreateMovimientoAsync(Arg.Any<CreateMovimientoDto>())
             .ThrowsAsyncForAnyArgs(new HttpRequestException("Error de red"));
 
         var sut = CreateSut();
         sut.IdCuenta = IdCuenta;
         sut.Concepto = "Supermercado";
         sut.ImporteTexto = "42.50";
+        sut.CategoriaSeleccionada = CategoriaDefault;
 
         await sut.CrearMovimientoCommand.ExecuteAsync(null);
 
@@ -260,13 +270,14 @@ public class MovimientoViewModelTests
     public async Task CrearMovimientoAsync_WhenServiceThrows_IsBusyIsFalseAfterCompletion()
     {
         _movimientosService
-            .CreateMovimientoAsync(default, default!, default, default!, default, default)
+            .CreateMovimientoAsync(Arg.Any<CreateMovimientoDto>())
             .ThrowsAsyncForAnyArgs(new HttpRequestException("Error de red"));
 
         var sut = CreateSut();
         sut.IdCuenta = IdCuenta;
         sut.Concepto = "Supermercado";
         sut.ImporteTexto = "42.50";
+        sut.CategoriaSeleccionada = CategoriaDefault;
 
         await sut.CrearMovimientoCommand.ExecuteAsync(null);
 
@@ -277,13 +288,14 @@ public class MovimientoViewModelTests
     public async Task CrearMovimientoAsync_WhenServiceThrows_DoesNotNavigate()
     {
         _movimientosService
-            .CreateMovimientoAsync(default, default!, default, default!, default, default)
+            .CreateMovimientoAsync(Arg.Any<CreateMovimientoDto>())
             .ThrowsAsyncForAnyArgs(new HttpRequestException("Error de red"));
 
         var sut = CreateSut();
         sut.IdCuenta = IdCuenta;
         sut.Concepto = "Supermercado";
         sut.ImporteTexto = "42.50";
+        sut.CategoriaSeleccionada = CategoriaDefault;
 
         await sut.CrearMovimientoCommand.ExecuteAsync(null);
 
@@ -294,19 +306,20 @@ public class MovimientoViewModelTests
     public async Task CrearMovimientoAsync_WhenCalledAfterError_ClearsErrorBeforeAttempt()
     {
         _movimientosService
-            .CreateMovimientoAsync(default, default!, default, default!, default, default)
+            .CreateMovimientoAsync(Arg.Any<CreateMovimientoDto>())
             .ThrowsAsyncForAnyArgs(new HttpRequestException("Error"));
 
         var sut = CreateSut();
         sut.IdCuenta = IdCuenta;
         sut.Concepto = "Supermercado";
         sut.ImporteTexto = "42.50";
+        sut.CategoriaSeleccionada = CategoriaDefault;
 
         await sut.CrearMovimientoCommand.ExecuteAsync(null); // primer intento fallido
 
         _movimientosService.ClearReceivedCalls();
         _movimientosService
-            .CreateMovimientoAsync(default, default!, default, default!, default, default)
+            .CreateMovimientoAsync(Arg.Any<CreateMovimientoDto>())
             .ReturnsForAnyArgs(Task.CompletedTask);
 
         await sut.CrearMovimientoCommand.ExecuteAsync(null); // segundo intento exitoso

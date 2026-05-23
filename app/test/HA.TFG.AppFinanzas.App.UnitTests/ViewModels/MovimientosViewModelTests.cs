@@ -363,4 +363,46 @@ public class MovimientosViewModelTests
         sut.Fecha = DateTime.Now.AddMonths(-1);
         Assert.True(sut.IsSiguienteEnabled);
     }
+
+    // ── NuevoMovimientoCommand ────────────────────────────────────────────────
+
+    [Fact]
+    public async Task NuevoMovimientoCommand_WhenCuentaLoaded_NavigatesToCrearMovimiento()
+    {
+        ConfigurarCuenta();
+        _movimientosService.GetMovimientosAsync(IdCuenta, Arg.Any<GetMovimientosFilters?>())
+            .Returns([]);
+
+        var sut = CreateSut();
+        await sut.CargarMovimientosAsync();
+        await sut.NuevoMovimientoCommand.ExecuteAsync(null);
+
+        await _navigationService.Received(1).GoToAsync(
+            Arg.Is<string>(s => s.StartsWith("//crear-movimiento") && s.Contains(IdCuenta.ToString())));
+    }
+
+    [Fact]
+    public async Task NuevoMovimientoCommand_WhenNoCuentaLoaded_DoesNotNavigate()
+    {
+        var sut = CreateSut();
+
+        await sut.NuevoMovimientoCommand.ExecuteAsync(null);
+
+        await _navigationService.DidNotReceive().GoToAsync(Arg.Any<string>());
+    }
+
+    [Fact]
+    public async Task NuevoMovimientoCommand_WhenCuentaLoaded_PassesCorrectIdCuenta()
+    {
+        ConfigurarCuenta();
+        _movimientosService.GetMovimientosAsync(IdCuenta, Arg.Any<GetMovimientosFilters?>())
+            .Returns([]);
+
+        var sut = CreateSut();
+        await sut.CargarMovimientosAsync();
+        await sut.NuevoMovimientoCommand.ExecuteAsync(null);
+
+        await _navigationService.Received(1).GoToAsync(
+            $"//crear-movimiento?idCuenta={IdCuenta}");
+    }
 }

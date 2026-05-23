@@ -50,30 +50,23 @@ internal sealed class MovimientosApiClient(IHttpClientFactory httpClientFactory)
     }
 
     public async Task CreateMovimientoAsync(
-        Guid idCuenta,
-        string concepto,
-        decimal importe,
-        string moneda,
-        TipoMovimiento tipo,
-        DateOnly fecha,
-        Guid? idCategoria = null,
+        CreateMovimientoDto dto,
         CancellationToken cancellationToken = default)
     {
         var client = httpClientFactory.CreateClient("Backend");
 
         using var content = new MultipartFormDataContent
         {
-            { new StringContent(concepto), "Concepto" },
-            { new StringContent(importe.ToString(System.Globalization.CultureInfo.InvariantCulture)), "Importe" },
-            { new StringContent(moneda), "Moneda" },
-            { new StringContent(tipo.ToString()), "TipoMovimiento" },
-            { new StringContent(fecha.ToDateTime(TimeOnly.MinValue).ToString("yyyy-MM-ddTHH:mm:ss")), "FechaMovimiento" }
+            { new StringContent(dto.Concepto), "Concepto" },
+            { new StringContent(dto.Importe.ToString(System.Globalization.CultureInfo.InvariantCulture)), "Importe" },
+            { new StringContent(dto.Moneda), "Moneda" },
+            { new StringContent(dto.Tipo.ToString()), "TipoMovimiento" },
+            { new StringContent(dto.Fecha.ToDateTime(TimeOnly.MinValue).ToString("yyyy-MM-ddTHH:mm:ss")), "FechaMovimiento" },
+            { new StringContent(dto.IdCuentaCategoria.ToString()), "IdCuentaCategoria" }
         };
-        if (idCategoria.HasValue)
-            content.Add(new StringContent(idCategoria.Value.ToString()), "IdCuentaCategoria");
 
         using var response = await client.PostAsync(
-            $"api/cuentas/{idCuenta}/movimientos", content, cancellationToken);
+            $"api/cuentas/{dto.IdCuenta}/movimientos", content, cancellationToken);
 
         if (!response.IsSuccessStatusCode)
         {

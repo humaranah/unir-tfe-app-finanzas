@@ -18,10 +18,12 @@ public class CreateMovimientoCommandHandlerTests
     private readonly CreateMovimientoCommandHandler _sut;
 
     private static readonly Guid IdUsuario = Guid.Parse("00000000-0000-7000-8000-000000000001");
-    private static readonly Guid IdCuenta  = Guid.Parse("00000000-0000-7000-8000-000000000010");
+    private static readonly Guid IdCuenta = Guid.Parse("00000000-0000-7000-8000-000000000010");
+    private static readonly Guid IdCuentaCategoria = Guid.Parse("00000000-0000-7000-8000-000000000020");
 
     private readonly Usuario _usuario;
     private readonly Cuenta _cuenta;
+    private readonly CuentaCategoria _cuentaCategoria;
 
     public CreateMovimientoCommandHandlerTests()
     {
@@ -33,24 +35,26 @@ public class CreateMovimientoCommandHandlerTests
             NullLogger<CreateMovimientoCommandHandler>.Instance);
 
         _usuario = new Usuario { IdUsuario = IdUsuario, Email = "test@test.com" };
-        _cuenta  = new Cuenta  { IdCuenta  = IdCuenta,  Moneda = "EUR", Descripcion = "Cuenta test" };
+        _cuenta = new Cuenta { IdCuenta = IdCuenta, Moneda = "EUR", Descripcion = "Cuenta test" };
+        _cuentaCategoria = new CuentaCategoria { IdCuentaCategoria = IdCuentaCategoria, IdCuenta = IdCuenta, Nombre = "Otros gastos" };
 
         _usuarioRepository.GetByEmailAsync(_usuario.Email, Arg.Any<CancellationToken>()).Returns(_usuario);
         _cuentaRepository.GetCuentaByIdAsync(IdUsuario, IdCuenta, Arg.Any<CancellationToken>()).Returns(_cuenta);
+        _cuentaRepository.GetCategoriaByIdAsync(IdCuenta, IdCuentaCategoria, Arg.Any<CancellationToken>()).Returns(_cuentaCategoria);
     }
 
     private CreateMovimientoCommand BuildCommand(Stream? comprobanteStream = null) => new()
     {
-        Email            = _usuario.Email,
-        IdCuenta         = IdCuenta,
-        IdCuentaCategoria = Guid.NewGuid(),
-        TipoMovimiento   = TipoMovimiento.Gasto,
-        Concepto         = "Compra",
-        Importe          = 50m,
-        Moneda           = "EUR",
-        FechaMovimiento  = DateTime.UtcNow,
-        ComprobanteStream      = comprobanteStream,
-        ComprobanteFileName    = comprobanteStream is not null ? "recibo.jpg" : null,
+        Email = _usuario.Email,
+        IdCuenta = IdCuenta,
+        IdCuentaCategoria = IdCuentaCategoria,
+        TipoMovimiento = TipoMovimiento.Gasto,
+        Concepto = "Compra",
+        Importe = 50m,
+        Moneda = "EUR",
+        FechaMovimiento = DateTime.UtcNow,
+        ComprobanteStream = comprobanteStream,
+        ComprobanteFileName = comprobanteStream is not null ? "recibo.jpg" : null,
         ComprobanteContentType = comprobanteStream is not null ? "image/jpeg" : null
     };
 
@@ -58,7 +62,7 @@ public class CreateMovimientoCommandHandlerTests
     public async Task Handle_SinComprobante_CreaMovimientoSinSubirArchivo()
     {
         // Arrange
-        var command   = BuildCommand();
+        var command = BuildCommand();
         var movimiento = new Movimiento { IdMovimiento = Guid.NewGuid(), Concepto = "Compra" };
         _movimientoRepository.AddMovimientoAsync(Arg.Any<Movimiento>(), Arg.Any<CancellationToken>())
             .Returns(movimiento);
@@ -77,7 +81,7 @@ public class CreateMovimientoCommandHandlerTests
     {
         // Arrange
         await using var stream = new MemoryStream([0x01, 0x02]);
-        var command   = BuildCommand(stream);
+        var command = BuildCommand(stream);
         var idComprobante = $"{Guid.NewGuid()}.jpg";
         var movimiento = new Movimiento { IdMovimiento = Guid.NewGuid(), IdComprobante = idComprobante };
 
@@ -101,7 +105,7 @@ public class CreateMovimientoCommandHandlerTests
     {
         // Arrange
         await using var stream = new MemoryStream([0x01, 0x02]);
-        var command       = BuildCommand(stream);
+        var command = BuildCommand(stream);
         var idComprobante = $"{Guid.NewGuid()}.jpg";
 
         _comprobanteStorage

@@ -25,7 +25,7 @@ public class CreateCuentaCommandHandler(
             Usuarios = [usuario]
         };
 
-        var resultado = await _cuentaRepository.CreateCuentaConCategoriasAsync(cuenta, cancellationToken);
+        var resultado = await _cuentaRepository.CreateCuentaWithCategoriasAsync(cuenta, cancellationToken);
 
         return resultado.ToResult();
     }
