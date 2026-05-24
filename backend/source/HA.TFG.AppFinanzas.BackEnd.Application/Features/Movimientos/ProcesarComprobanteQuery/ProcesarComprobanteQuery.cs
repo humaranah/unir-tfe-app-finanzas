@@ -7,7 +7,7 @@ namespace HA.TFG.AppFinanzas.BackEnd.Application.Features.Movimientos.ProcesarCo
 /// obtiene las categorías de la cuenta desde la base de datos, construye el prompt
 /// y lo envía a Foundry AI para obtener un JSON listo para crear un movimiento.
 /// </summary>
-public record ProcesarComprobanteQuery : IRequest<string>
+public record ProcesarComprobanteQuery : IRequest<ComprobanteExtraidoDto>
 {
     public required Stream ComprobanteStream { get; init; }
     public required string ContentType { get; init; }
