@@ -1,7 +1,6 @@
 using Azure.AI.Projects;
 using Azure.Identity;
 using HA.TFG.AppFinanzas.BackEnd.Application.Contracts;
-using Microsoft.Agents.AI;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -14,7 +13,7 @@ internal sealed class FoundryComprobanteExtraccionService(
 {
     private readonly FoundryConfig _config = options.Value;
 
-    public async Task<string?> ExtractDatosAsync(string textoComprobante, CancellationToken cancellationToken)
+    public async Task<string?> EnviarPromptAsync(string prompt, CancellationToken cancellationToken)
     {
         try
         {
@@ -22,28 +21,18 @@ internal sealed class FoundryComprobanteExtraccionService(
                 new Uri(_config.ProjectEndpoint!),
                 new DefaultAzureCredential());
 
-            AIAgent agent = await projectClient.CreateAIAgentAsync(
-                name: $"comprobante-extractor-{Guid.NewGuid():N}",
+            // AsAIAgent usa la Responses API del proyecto: es una llamada directa al modelo,
+            // equivalente a chat completion. No crea ningún recurso en Azure.
+            var agent = projectClient.AsAIAgent(
                 model: _config.DeploymentName,
-                instructions: _config.SystemPrompt,
-                cancellationToken: cancellationToken);
+                instructions: "Eres un asistente que procesa comprobantes y devuelve únicamente JSON estructurado.");
 
-            try
-            {
-                var response = await agent.RunAsync(
-                    textoComprobante,
-                    cancellationToken: cancellationToken);
-
-                return response?.ToString();
-            }
-            finally
-            {
-                await projectClient.Agents.DeleteAgentAsync(agent.Name, cancellationToken);
-            }
+            var response = await agent.RunAsync(prompt, cancellationToken: cancellationToken);
+            return response?.ToString();
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error al llamar a Azure AI Foundry para extracción de datos del comprobante.");
+            logger.LogError(ex, "Error al llamar a Azure AI Foundry.");
             return null;
         }
     }

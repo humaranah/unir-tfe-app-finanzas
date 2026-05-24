@@ -8,6 +8,6 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.ExternalServices.Foundry;
 /// </summary>
 internal sealed class NullComprobanteExtraccionService : IComprobanteExtraccionService
 {
-    public Task<string?> ExtractDatosAsync(string textoComprobante, CancellationToken cancellationToken)
+    public Task<string?> EnviarPromptAsync(string prompt, CancellationToken cancellationToken)
         => Task.FromResult<string?>(null);
 }
