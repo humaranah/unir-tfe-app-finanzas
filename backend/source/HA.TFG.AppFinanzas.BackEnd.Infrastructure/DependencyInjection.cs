@@ -3,6 +3,7 @@ using Azure.Storage.Blobs;
 using HA.TFG.AppFinanzas.BackEnd.Application.Contracts;
 using HA.TFG.AppFinanzas.BackEnd.Infrastructure.ExternalServices.Auth0;
 using HA.TFG.AppFinanzas.BackEnd.Infrastructure.ExternalServices.DocumentIntelligence;
+using HA.TFG.AppFinanzas.BackEnd.Infrastructure.ExternalServices.Foundry;
 using HA.TFG.AppFinanzas.BackEnd.Infrastructure.ExternalServices.Storage;
 using HA.TFG.AppFinanzas.BackEnd.Infrastructure.Persistence;
 using HA.TFG.AppFinanzas.BackEnd.Infrastructure.Persistence.Repositories;
@@ -23,6 +24,7 @@ public static class DependencyInjection
         services.AddAuth0(configuration);
         services.AddComprobanteStorage(configuration);
         services.AddDocumentIntelligence(configuration);
+        services.AddFoundry(configuration);
 
         return services;
     }
@@ -143,6 +145,36 @@ public static class DependencyInjection
                 }
 
                 return new NullDocumentIntelligenceService();
+            });
+        }
+    }
+
+    private static void AddFoundry(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddOptions<FoundryConfig>()
+            .Bind(configuration.GetSection(FoundryConfig.SectionName));
+
+        var foundryConfig = configuration
+            .GetSection(FoundryConfig.SectionName)
+            .Get<FoundryConfig>() ?? new FoundryConfig();
+
+        if (foundryConfig.Provider.Equals("Azure", StringComparison.OrdinalIgnoreCase)
+            && !string.IsNullOrWhiteSpace(foundryConfig.ProjectEndpoint))
+        {
+            services.AddScoped<IComprobanteExtraccionService, FoundryComprobanteExtraccionService>();
+        }
+        else
+        {
+            services.AddScoped<IComprobanteExtraccionService>(sp =>
+            {
+                if (foundryConfig.Provider.Equals("Azure", StringComparison.OrdinalIgnoreCase))
+                {
+                    sp.GetRequiredService<ILogger<NullComprobanteExtraccionService>>()
+                        .LogWarning("Foundry: Provider es 'Azure' pero ProjectEndpoint no está configurado. " +
+                                    "La extracción de datos con LLM está deshabilitada.");
+                }
+
+                return new NullComprobanteExtraccionService();
             });
         }
     }
