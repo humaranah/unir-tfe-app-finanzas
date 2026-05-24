@@ -1,6 +1,8 @@
+using Azure.AI.FormRecognizer.DocumentAnalysis;
 using Azure.Storage.Blobs;
 using HA.TFG.AppFinanzas.BackEnd.Application.Contracts;
 using HA.TFG.AppFinanzas.BackEnd.Infrastructure.ExternalServices.Auth0;
+using HA.TFG.AppFinanzas.BackEnd.Infrastructure.ExternalServices.DocumentIntelligence;
 using HA.TFG.AppFinanzas.BackEnd.Infrastructure.ExternalServices.Storage;
 using HA.TFG.AppFinanzas.BackEnd.Infrastructure.Persistence;
 using HA.TFG.AppFinanzas.BackEnd.Infrastructure.Persistence.Repositories;
@@ -20,6 +22,7 @@ public static class DependencyInjection
         services.AddRepositories();
         services.AddAuth0(configuration);
         services.AddComprobanteStorage(configuration);
+        services.AddDocumentIntelligence(configuration);
 
         return services;
     }
@@ -104,6 +107,42 @@ public static class DependencyInjection
                               "El almacenamiento de comprobantes está deshabilitado.",
                               storageConfig.Provider);
                 return new NullComprobanteStorageService();
+            });
+        }
+    }
+
+    private static void AddDocumentIntelligence(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddOptions<DocumentIntelligenceConfig>()
+            .Bind(configuration.GetSection(DocumentIntelligenceConfig.SectionName));
+
+        var diConfig = configuration
+            .GetSection(DocumentIntelligenceConfig.SectionName)
+            .Get<DocumentIntelligenceConfig>() ?? new DocumentIntelligenceConfig();
+
+        if (diConfig.Provider.Equals("Azure", StringComparison.OrdinalIgnoreCase)
+            && !string.IsNullOrWhiteSpace(diConfig.Endpoint)
+            && !string.IsNullOrWhiteSpace(diConfig.ApiKey))
+        {
+            services.AddSingleton(_ =>
+                new DocumentAnalysisClient(
+                    new Uri(diConfig.Endpoint),
+                    new Azure.AzureKeyCredential(diConfig.ApiKey)));
+
+            services.AddScoped<IComprobanteAnalysisService, AzureDocumentIntelligenceService>();
+        }
+        else
+        {
+            services.AddScoped<IComprobanteAnalysisService>(sp =>
+            {
+                if (diConfig.Provider.Equals("Azure", StringComparison.OrdinalIgnoreCase))
+                {
+                    sp.GetRequiredService<ILogger<NullDocumentIntelligenceService>>()
+                        .LogWarning("DocumentIntelligence: Provider es 'Azure' pero Endpoint o ApiKey no están configurados. " +
+                                    "El análisis de comprobantes está deshabilitado.");
+                }
+
+                return new NullDocumentIntelligenceService();
             });
         }
     }
