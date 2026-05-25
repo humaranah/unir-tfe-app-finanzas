@@ -1,10 +1,8 @@
-using HA.TFG.AppFinanzas.BackEnd.Application;
 using HA.TFG.AppFinanzas.BackEnd.Application.Features.Movimientos.ProcesarComprobanteQuery;
 using HA.TFG.AppFinanzas.BackEnd.Controllers;
 using Mediator;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using NSubstitute;
 
 namespace HA.TFG.AppFinanzas.BackEnd.Tests.Movimientos;
@@ -16,8 +14,7 @@ public class ComprobantesControllerTests
 
     public ComprobantesControllerTests()
     {
-        var options = Options.Create(new ComprobanteConfig());
-        _sut = new ComprobantesController(_mediator, options);
+        _sut = new ComprobantesController(_mediator);
     }
 
     private static IFormFile CrearFormFile(string contentType = "image/jpeg", int size = 512)

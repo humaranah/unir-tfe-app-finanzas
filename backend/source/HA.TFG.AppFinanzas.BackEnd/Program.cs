@@ -37,6 +37,13 @@ try
         }
     });
 
+    builder.WebHost.ConfigureKestrel(options =>
+    {
+        // Límite global conservador a nivel servidor; la política de negocio
+        // por endpoint se aplica en los validadores de Application.
+        options.Limits.MaxRequestBodySize = 10 * 1024 * 1024; // 10 MB
+    });
+
     builder.Services.AddApplication(builder.Configuration);
     builder.Services.AddInfrastructure(builder.Configuration);
     builder.Services.AddMediator(options =>

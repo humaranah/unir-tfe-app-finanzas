@@ -34,7 +34,7 @@ public sealed class ProcesarComprobanteQueryValidator : AbstractValidator<Proces
         RuleFor(x => x.ComprobanteStream)
             .Must(s => s.Length <= maxSizeBytes)
             .OverridePropertyName("file")
-            .WithMessage($"El archivo supera el tamaño máximo permitido de {maxSizeBytes / 1024} KB.")
+            .WithMessage($"El archivo supera el tamaño máximo permitido de {maxSizeBytes / 1024 / 1024} MB ({maxSizeBytes:N0} bytes).")
             .Must(HasValidMagicBytes)
             .OverridePropertyName("file")
             .WithMessage("El contenido del archivo no coincide con el tipo declarado.")
@@ -42,7 +42,7 @@ public sealed class ProcesarComprobanteQueryValidator : AbstractValidator<Proces
                         AllowedMagicBytes.ContainsKey(x.ContentType?.ToLowerInvariant() ?? string.Empty));
     }
 
-    private bool HasValidMagicBytes(ProcesarComprobanteQuery query, Stream stream)
+    private static bool HasValidMagicBytes(ProcesarComprobanteQuery query, Stream stream)
     {
         var expected = AllowedMagicBytes[query.ContentType.ToLowerInvariant()];
         var buffer = new byte[expected.Length];
