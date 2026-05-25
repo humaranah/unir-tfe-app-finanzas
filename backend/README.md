@@ -6,12 +6,12 @@ Solución _backend_, desarrollada con **ASP.NET Core 10** siguiendo los principi
 
 ```
 backend/
-├── HA.TFG.AppFinanzas.BackEnd.slnx       # Archivo de solución
+├── HA.TFG.AppFinanzas.BackEnd.slnx                 # Archivo de solución
 ├── source/
-│   ├── HA.TFG.AppFinanzas.BackEnd/               # Capa de presentación (Web API)
-│   ├── HA.TFG.AppFinanzas.BackEnd.Application/   # Capa de aplicación (casos de uso)
-│   ├── HA.TFG.AppFinanzas.BackEnd.Domain/        # Capa de dominio (entidades y contratos)
-│   └── HA.TFG.AppFinanzas.BackEnd.Infrastructure/ # Capa de infraestructura (persistencia y servicios externos)
+│   ├── HA.TFG.AppFinanzas.BackEnd/                 # Capa de presentación (Web API)
+│   ├── HA.TFG.AppFinanzas.BackEnd.Application/     # Capa de aplicación (casos de uso)
+│   ├── HA.TFG.AppFinanzas.BackEnd.Domain/          # Capa de dominio (entidades y contratos)
+│   └── HA.TFG.AppFinanzas.BackEnd.Infrastructure/  # Capa de infraestructura (persistencia y servicios externos)
 └── test/
     ├── HA.TFG.AppFinanzas.BackEnd.Tests/
     ├── HA.TFG.AppFinanzas.BackEnd.Application.Tests/
@@ -40,6 +40,18 @@ backend/
 | **Mapperly** | Mapeo de objetos mediante generación de código |
 | **Scalar** | Interfaz de documentación OpenAPI |
 | **Azure Blob Storage** | Almacenamiento de comprobantes |
+| **Azure Document Intelligence** | OCR y análisis de layout de comprobantes (`prebuilt-layout`) |
+| **Azure AI Foundry / GPT-4o mini** | Extracción estructurada de datos mediante LLM |
+
+## Procesamiento de comprobantes (OCR + LLM)
+
+Al enviar una imagen de comprobante, el sistema realiza los siguientes pasos de forma automática:
+
+1. **Azure Document Intelligence** analiza el documento y extrae el texto respetando el layout visual.
+2. **Azure AI Foundry (GPT-4o mini)** recibe el texto junto con las categorías disponibles y devuelve un JSON estructurado.
+3. El JSON se deserializa a `ComprobanteExtraidoDto` con los campos: establecimiento, concepto, importe, moneda, fecha, tipo de movimiento, categoría y nota.
+
+La configuración de ambos servicios se gestiona en `appsettings.json` bajo las claves `DocumentIntelligence` y `FoundryAI`.
 
 ## Recursos expuestos
 
@@ -67,6 +79,16 @@ Variables de configuración necesarias:
     "Provider": "Azure | Local",
     "AzureConnectionString": "<cadena de conexión Azure Storage>",
     "LocalBasePath": "<ruta local para desarrollo>"
+  },
+  "DocumentIntelligence": {
+    "Endpoint": "<endpoint Azure Document Intelligence>",
+    "ApiKey": "<clave de API>",
+    "ModelId": "prebuilt-layout"
+  },
+  "FoundryAI": {
+    "Endpoint": "<endpoint Azure AI Foundry>",
+    "ApiKey": "<clave de API>",
+    "ModelId": "gpt-4o-mini"
   },
   "ApplicationInsights": {
     "ConnectionString": "<cadena de conexión Application Insights>"

@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Elementos de la solución/">
+    <File Path="README.md" />
+  </Folder>
   <Folder Name="/source/">
     <Project Path="source/HA.TFG.AppFinanzas.BackEnd.Application/HA.TFG.AppFinanzas.BackEnd.Application.csproj" Id="1f27222d-aadc-4f40-8017-9e29fb7e5655" />
     <Project Path="source/HA.TFG.AppFinanzas.BackEnd.Domain/HA.TFG.AppFinanzas.BackEnd.Domain.csproj" Id="7a4a5ea1-d15b-4d80-9697-8fbbdbe10b7c" />
