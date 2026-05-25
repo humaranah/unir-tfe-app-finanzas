@@ -66,7 +66,7 @@ public class ProcesarComprobanteQueryHandler(
                 "FoundryAI",
                 "El modelo de IA no devolvió una respuesta válida. Inténtalo de nuevo más tarde.");
 
-        var json = ExtractJson(respuesta);
+        var json = MarkdownJsonExtractor.Extract(respuesta);
 
         try
         {
@@ -81,19 +81,6 @@ public class ProcesarComprobanteQueryHandler(
                 "FoundryAI",
                 $"La respuesta del modelo no es un JSON válido: {ex.Message}");
         }
-    }
-
-    private static string ExtractJson(string respuesta)
-    {
-        var texto = respuesta.Trim();
-        if (texto.StartsWith("```", StringComparison.Ordinal))
-        {
-            var inicio = texto.IndexOf('\n');
-            var fin = texto.LastIndexOf("```", StringComparison.Ordinal);
-            if (inicio >= 0 && fin > inicio)
-                return texto[(inicio + 1)..fin].Trim();
-        }
-        return texto;
     }
 
     private static string BuildPrompt(string textoComprobante, IReadOnlyList<Categoria> categorias)
@@ -112,6 +99,7 @@ public class ProcesarComprobanteQueryHandler(
               "fechaMovimiento": "<YYYY-MM-DDTHH:mm:ss±HH:MM|null>",
               "tipoMovimiento": "<Ingreso|Gasto|Transferencia|null>",
               "idCuentaCategoria": "<uuid|null>",
+              "categoriaPropuesta:": "<string|null>",
               "nota": "<string|null>"
             }
 
@@ -119,14 +107,18 @@ public class ProcesarComprobanteQueryHandler(
             - establecimiento: nombre del comercio o razón social.
             - concepto: descripción principal del producto/servicio.
             - importe: total pagado.
-            - moneda: si no aparece, usa la moneda local del país del comprobante.
+            - moneda: establecer en formato ISO; si no aparece, usa la moneda local del país del comprobante.
             - fechaMovimiento: usar fecha y hora del ticket en ISO 8601 con TZ; si no hay hora, usar T00:00:00.
             - tipoMovimiento: compras->{{TipoMovimiento.Gasto}}; ingresos->{{TipoMovimiento.Ingreso}}; entre cuentas->{{TipoMovimiento.Transferencia}}.
-            - idCuentaCategoria: elegir la categoría más relacionada; si no es claro, usar "c73ebca7-2bf5-fd6e-e041-642b86a9aa02".
-            - nota: info útil como método de pago o tienda.
+            - idCuentaCategoria: elegir la categoría más relacionada en base a nombre de establecimiento o descripción de productos; si no es claro, usar "c73ebca7-2bf5-fd6e-e041-642b86a9aa02".
+            - categoriaPropuesta: en caso la categoría sea "c73ebca7-2bf5-fd6e-e041-642b86a9aa02", sugerir un nombre de categoría; de lo contrario, null.
+            - nota: info útil como método de pago o tienda, de forma expresiva y concisa.
 
             CATEGORÍAS:
             {{sbCategorias.ToString().TrimEnd()}}
+
+            NOTAS:
+            - En algunos comprobantes, la descripción incluye un código, el cual puede estar en una línea separada.
 
             TEXTO DEL COMPROBANTE:
             {{textoComprobante}}

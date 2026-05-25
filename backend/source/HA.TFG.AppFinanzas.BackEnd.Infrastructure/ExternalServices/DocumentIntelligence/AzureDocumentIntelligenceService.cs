@@ -33,10 +33,9 @@ internal sealed class AzureDocumentIntelligenceService(
             var sb = new StringBuilder();
             foreach (var page in result.Pages)
             {
-                foreach (var line in page.Lines)
-                {
-                    sb.AppendLine(line.Content);
-                }
+                if (sb.Length > 0) sb.AppendLine(); // separador entre páginas
+
+                DocumentLayoutReconstructor.ReconstruirPagina(page, sb);
             }
 
             return new ComprobanteAnalysisResult { Texto = sb.ToString().TrimEnd() };
@@ -49,3 +48,4 @@ internal sealed class AzureDocumentIntelligenceService(
         }
     }
 }
+

@@ -12,5 +12,6 @@ public sealed record ComprobanteExtraidoDto
     public DateTimeOffset? FechaMovimiento { get; init; }
     public string? TipoMovimiento { get; init; }
     public Guid? IdCuentaCategoria { get; init; }
+    public string? CategoriaPropuesta { get; init; }
     public string? Nota { get; init; }
 }
