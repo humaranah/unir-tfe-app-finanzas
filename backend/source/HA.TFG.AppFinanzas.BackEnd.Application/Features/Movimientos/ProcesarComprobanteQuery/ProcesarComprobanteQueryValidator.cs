@@ -1,0 +1,56 @@
+using FluentValidation;
+using Microsoft.Extensions.Options;
+
+namespace HA.TFG.AppFinanzas.BackEnd.Application.Features.Movimientos.ProcesarComprobanteQuery;
+
+public sealed class ProcesarComprobanteQueryValidator : AbstractValidator<ProcesarComprobanteQuery>
+{
+    private static readonly Dictionary<string, byte[]> AllowedMagicBytes = new()
+    {
+        ["application/pdf"] = [0x25, 0x50, 0x44, 0x46],   // %PDF
+        ["image/jpeg"]      = [0xFF, 0xD8, 0xFF]           // JFIF / EXIF
+    };
+
+    public ProcesarComprobanteQueryValidator(IOptions<ComprobanteConfig> options)
+    {
+        var maxSizeBytes = options.Value.MaxSizeBytes;
+
+        RuleFor(x => x.ContentType)
+            .Must(ct => AllowedMagicBytes.ContainsKey(ct?.ToLowerInvariant() ?? string.Empty))
+            .OverridePropertyName("file")
+            .WithMessage("Tipo de archivo no admitido. Se aceptan únicamente PDF y JPEG.");
+
+        RuleFor(x => x.ComprobanteStream)
+            .NotNull()
+            .OverridePropertyName("file")
+            .WithMessage("No se ha enviado ningún archivo.");
+
+        RuleFor(x => x.ComprobanteStream)
+            .Must(s => s.Length > 0)
+            .OverridePropertyName("file")
+            .WithMessage("El archivo está vacío.")
+            .When(x => x.ComprobanteStream is not null);
+
+        RuleFor(x => x.ComprobanteStream)
+            .Must(s => s.Length <= maxSizeBytes)
+            .OverridePropertyName("file")
+            .WithMessage($"El archivo supera el tamaño máximo permitido de {maxSizeBytes / 1024 / 1024} MB ({maxSizeBytes:N0} bytes).")
+            .Must(HasValidMagicBytes)
+            .OverridePropertyName("file")
+            .WithMessage("El contenido del archivo no coincide con el tipo declarado.")
+            .When(x => x.ComprobanteStream is { Length: > 0 } &&
+                        AllowedMagicBytes.ContainsKey(x.ContentType?.ToLowerInvariant() ?? string.Empty));
+    }
+
+    private static bool HasValidMagicBytes(ProcesarComprobanteQuery query, Stream stream)
+    {
+        var expected = AllowedMagicBytes[query.ContentType.ToLowerInvariant()];
+        var buffer = new byte[expected.Length];
+
+        stream.Position = 0;
+        var bytesRead = stream.Read(buffer, 0, expected.Length);
+        stream.Position = 0;
+
+        return bytesRead == expected.Length && buffer.AsSpan(0, expected.Length).SequenceEqual(expected);
+    }
+}

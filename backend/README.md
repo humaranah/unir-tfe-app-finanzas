@@ -80,6 +80,9 @@ Variables de configuración necesarias:
     "AzureConnectionString": "<cadena de conexión Azure Storage>",
     "LocalBasePath": "<ruta local para desarrollo>"
   },
+  "Comprobante": {
+    "MaxSizeBytes": 1048576
+  },
   "DocumentIntelligence": {
     "Endpoint": "<endpoint Azure Document Intelligence>",
     "ApiKey": "<clave de API>",
