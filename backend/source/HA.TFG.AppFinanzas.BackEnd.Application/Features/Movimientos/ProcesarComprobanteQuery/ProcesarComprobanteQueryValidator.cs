@@ -16,23 +16,26 @@ public sealed class ProcesarComprobanteQueryValidator : AbstractValidator<Proces
     {
         RuleFor(x => x.ContentType)
             .Must(ct => AllowedMagicBytes.ContainsKey(ct?.ToLowerInvariant() ?? string.Empty))
-            .WithName("file")
+            .OverridePropertyName("file")
             .WithMessage("Tipo de archivo no admitido. Se aceptan únicamente PDF y JPEG.");
 
         RuleFor(x => x.ComprobanteStream)
             .NotNull()
-            .WithName("file")
+            .OverridePropertyName("file")
             .WithMessage("No se ha enviado ningún archivo.");
 
         RuleFor(x => x.ComprobanteStream)
-            .Must(s => s is { Length: > 0 })
-            .WithName("file")
+            .Must(s => s.Length > 0)
+            .OverridePropertyName("file")
             .WithMessage("El archivo está vacío.")
+            .When(x => x.ComprobanteStream is not null);
+
+        RuleFor(x => x.ComprobanteStream)
             .Must(s => s.Length <= MaxSizeBytes)
-            .WithName("file")
+            .OverridePropertyName("file")
             .WithMessage($"El archivo supera el tamaño máximo permitido de {MaxSizeBytes / 1024} KB.")
             .Must(HasValidMagicBytes)
-            .WithName("file")
+            .OverridePropertyName("file")
             .WithMessage("El contenido del archivo no coincide con el tipo declarado.")
             .When(x => x.ComprobanteStream is { Length: > 0 } &&
                         AllowedMagicBytes.ContainsKey(x.ContentType?.ToLowerInvariant() ?? string.Empty));
