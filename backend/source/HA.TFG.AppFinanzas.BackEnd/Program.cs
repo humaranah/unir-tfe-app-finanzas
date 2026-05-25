@@ -52,8 +52,9 @@ try
 
     var app = builder.Build();
 
-    // Diagnóstico de configuración de servicios Azure al arrancar
-    app.LogAzureServicesConfig();
+    // Diagnóstico de configuración de servicios Azure al arrancar (solo en desarrollo)
+    if (app.Environment.IsDevelopment())
+        app.LogAzureServicesConfig();
 
     app.UseSerilogRequestLogging(options =>
     {

@@ -51,7 +51,7 @@ Al enviar una imagen de comprobante, el sistema realiza los siguientes pasos de 
 2. **Azure AI Foundry (GPT-4o mini)** recibe el texto junto con las categorías disponibles y devuelve un JSON estructurado.
 3. El JSON se deserializa a `ComprobanteExtraidoDto` con los campos: establecimiento, concepto, importe, moneda, fecha, tipo de movimiento, categoría y nota.
 
-La configuración de ambos servicios se gestiona en `appsettings.json` bajo las claves `DocumentIntelligence` y `FoundryAI`.
+La configuración de ambos servicios se gestiona en `appsettings.json` bajo las claves `DocumentIntelligence` y `Foundry`.
 
 ## Recursos expuestos
 
@@ -85,10 +85,9 @@ Variables de configuración necesarias:
     "ApiKey": "<clave de API>",
     "ModelId": "prebuilt-layout"
   },
-  "FoundryAI": {
-    "Endpoint": "<endpoint Azure AI Foundry>",
-    "ApiKey": "<clave de API>",
-    "ModelId": "gpt-4o-mini"
+  "Foundry": {
+    "ProjectEndpoint": "<endpoint del proyecto Azure AI Foundry>",
+    "DeploymentName": "gpt-4o-mini"
   },
   "ApplicationInsights": {
     "ConnectionString": "<cadena de conexión Application Insights>"

@@ -25,7 +25,7 @@ internal sealed class FoundryComprobanteExtraccionService(
             // equivalente a chat completion. No crea ningún recurso en Azure.
             var agent = projectClient.AsAIAgent(
                 model: _config.DeploymentName,
-                instructions: "Eres un asistente que procesa comprobantes y devuelve únicamente JSON estructurado.");
+                instructions: _config.Instructions);
 
             var response = await agent.RunAsync(prompt, cancellationToken: cancellationToken);
             return response?.ToString();

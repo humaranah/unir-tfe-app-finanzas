@@ -78,38 +78,29 @@ public static class DependencyInjection
             .GetSection(ComprobanteStorageConfig.SectionName)
             .Get<ComprobanteStorageConfig>() ?? new ComprobanteStorageConfig();
 
-        if (storageConfig.Provider.Equals("Azure", StringComparison.OrdinalIgnoreCase))
+        switch (storageConfig.Provider)
         {
-            if (string.IsNullOrWhiteSpace(storageConfig.AzureConnectionString))
-            {
-                services.AddScoped<IComprobanteStorageService>(sp =>
-                {
-                    sp.GetRequiredService<ILogger<NullComprobanteStorageService>>()
-                        .LogError("ComprobanteStorage: Provider es 'Azure' pero AzureConnectionString no está configurada. " +
-                                  "El almacenamiento de comprobantes está deshabilitado.");
-                    return new NullComprobanteStorageService();
-                });
-            }
-            else
-            {
+            case ComprobanteStorageProvider.Azure when !string.IsNullOrWhiteSpace(storageConfig.AzureConnectionString):
                 services.AddSingleton(_ => new BlobServiceClient(storageConfig.AzureConnectionString));
                 services.AddScoped<IComprobanteStorageService, AzureBlobComprobanteStorageService>();
-            }
-        }
-        else if (storageConfig.Provider.Equals("Local", StringComparison.OrdinalIgnoreCase))
-        {
-            services.AddScoped<IComprobanteStorageService, LocalComprobanteStorageService>();
-        }
-        else
-        {
-            services.AddScoped<IComprobanteStorageService>(sp =>
-            {
-                sp.GetRequiredService<ILogger<NullComprobanteStorageService>>()
-                    .LogError("ComprobanteStorage: Provider '{Provider}' no es válido. " +
-                              "El almacenamiento de comprobantes está deshabilitado.",
-                              storageConfig.Provider);
-                return new NullComprobanteStorageService();
-            });
+                break;
+
+            case ComprobanteStorageProvider.Azure:
+                services.AddLogging();
+                using (var sp = services.BuildServiceProvider())
+                    sp.GetRequiredService<ILogger<NullComprobanteStorageService>>()
+                        .LogError("ComprobanteStorage: Provider es '{Provider}' pero AzureConnectionString no está configurada. " +
+                                  "El almacenamiento de comprobantes está deshabilitado.", storageConfig.Provider);
+                services.AddScoped<IComprobanteStorageService, NullComprobanteStorageService>();
+                break;
+
+            case ComprobanteStorageProvider.Local:
+                services.AddScoped<IComprobanteStorageService, LocalComprobanteStorageService>();
+                break;
+
+            default:
+                services.AddScoped<IComprobanteStorageService, NullComprobanteStorageService>();
+                break;
         }
     }
 
@@ -122,9 +113,7 @@ public static class DependencyInjection
             .GetSection(DocumentIntelligenceConfig.SectionName)
             .Get<DocumentIntelligenceConfig>() ?? new DocumentIntelligenceConfig();
 
-        if (diConfig.Provider.Equals("Azure", StringComparison.OrdinalIgnoreCase)
-            && !string.IsNullOrWhiteSpace(diConfig.Endpoint)
-            && !string.IsNullOrWhiteSpace(diConfig.ApiKey))
+        if (!string.IsNullOrWhiteSpace(diConfig.Endpoint) && !string.IsNullOrWhiteSpace(diConfig.ApiKey))
         {
             services.AddSingleton(_ =>
                 new DocumentAnalysisClient(
@@ -135,17 +124,7 @@ public static class DependencyInjection
         }
         else
         {
-            services.AddScoped<IComprobanteAnalysisService>(sp =>
-            {
-                if (diConfig.Provider.Equals("Azure", StringComparison.OrdinalIgnoreCase))
-                {
-                    sp.GetRequiredService<ILogger<NullDocumentIntelligenceService>>()
-                        .LogWarning("DocumentIntelligence: Provider es 'Azure' pero Endpoint o ApiKey no están configurados. " +
-                                    "El análisis de comprobantes está deshabilitado.");
-                }
-
-                return new NullDocumentIntelligenceService();
-            });
+            services.AddScoped<IComprobanteAnalysisService, NullDocumentIntelligenceService>();
         }
     }
 
@@ -158,24 +137,13 @@ public static class DependencyInjection
             .GetSection(FoundryConfig.SectionName)
             .Get<FoundryConfig>() ?? new FoundryConfig();
 
-        if (foundryConfig.Provider.Equals("Azure", StringComparison.OrdinalIgnoreCase)
-            && !string.IsNullOrWhiteSpace(foundryConfig.ProjectEndpoint))
+        if (!string.IsNullOrWhiteSpace(foundryConfig.ProjectEndpoint))
         {
             services.AddScoped<IComprobanteExtraccionService, FoundryComprobanteExtraccionService>();
         }
         else
         {
-            services.AddScoped<IComprobanteExtraccionService>(sp =>
-            {
-                if (foundryConfig.Provider.Equals("Azure", StringComparison.OrdinalIgnoreCase))
-                {
-                    sp.GetRequiredService<ILogger<NullComprobanteExtraccionService>>()
-                        .LogWarning("Foundry: Provider es 'Azure' pero ProjectEndpoint no está configurado. " +
-                                    "La extracción de datos con LLM está deshabilitada.");
-                }
-
-                return new NullComprobanteExtraccionService();
-            });
+            services.AddScoped<IComprobanteExtraccionService, NullComprobanteExtraccionService>();
         }
     }
 }

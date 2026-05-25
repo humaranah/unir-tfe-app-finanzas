@@ -99,7 +99,7 @@ public class ProcesarComprobanteQueryHandler(
               "fechaMovimiento": "<YYYY-MM-DDTHH:mm:ss±HH:MM|null>",
               "tipoMovimiento": "<Ingreso|Gasto|Transferencia|null>",
               "idCuentaCategoria": "<uuid|null>",
-              "categoriaPropuesta:": "<string|null>",
+              "categoriaPropuesta": "<string|null>",
               "nota": "<string|null>"
             }
 

@@ -4,13 +4,10 @@ public sealed class DocumentIntelligenceConfig
 {
     public const string SectionName = "DocumentIntelligence";
 
-    /// <summary>Proveedor activo: "Azure" o "Null".</summary>
-    public string Provider { get; init; } = string.Empty;
-
-    /// <summary>Endpoint del recurso Azure Document Intelligence (solo si Provider = "Azure").</summary>
+    /// <summary>Endpoint del recurso Azure Document Intelligence.</summary>
     public string? Endpoint { get; init; }
 
-    /// <summary>Clave de API del recurso Azure Document Intelligence (solo si Provider = "Azure").</summary>
+    /// <summary>Clave de API del recurso Azure Document Intelligence.</summary>
     public string? ApiKey { get; init; }
 
     /// <summary>Identificador del modelo a usar. Por defecto "prebuilt-layout".</summary>

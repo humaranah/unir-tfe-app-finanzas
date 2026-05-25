@@ -18,17 +18,17 @@ internal static class AzureStartupDiagnosticsExtensions
 
         // Document Intelligence
         var diConfig = app.Services.GetRequiredService<IOptions<DocumentIntelligenceConfig>>().Value;
-        if (diConfig.Provider.Equals("Azure", StringComparison.OrdinalIgnoreCase))
+        if (!string.IsNullOrWhiteSpace(diConfig.Endpoint))
             logger.LogInformation("[Config] Document Intelligence -> Azure | Endpoint: {Endpoint} | Modelo: {ModelId}",
-                diConfig.Endpoint ?? "(no configurado)", diConfig.ModelId);
+                diConfig.Endpoint, diConfig.ModelId);
         else
-            logger.LogWarning("[Config] Document Intelligence -> Proveedor '{Provider}' (servicio deshabilitado)", diConfig.Provider);
+            logger.LogWarning("[Config] Document Intelligence -> Endpoint no configurado (servicio deshabilitado)");
 
         // Azure Blob Storage
         var storageConfig = app.Services.GetRequiredService<IOptions<ComprobanteStorageConfig>>().Value;
-        if (storageConfig.Provider.Equals("Azure", StringComparison.OrdinalIgnoreCase))
+        if (storageConfig.Provider == ComprobanteStorageProvider.Azure)
             logger.LogInformation("[Config] Blob Storage -> Azure");
-        else if (storageConfig.Provider.Equals("Local", StringComparison.OrdinalIgnoreCase))
+        else if (storageConfig.Provider == ComprobanteStorageProvider.Local)
             logger.LogInformation("[Config] Blob Storage -> Local | Ruta: {Path}",
                 storageConfig.LocalBasePath ?? "(no configurada)");
         else
@@ -36,11 +36,11 @@ internal static class AzureStartupDiagnosticsExtensions
 
         // Azure AI Foundry
         var foundryConfig = app.Services.GetRequiredService<IOptions<FoundryConfig>>().Value;
-        if (foundryConfig.Provider.Equals("Azure", StringComparison.OrdinalIgnoreCase))
+        if (!string.IsNullOrWhiteSpace(foundryConfig.ProjectEndpoint))
             logger.LogInformation("[Config] Foundry AI -> Azure | Endpoint: {Endpoint} | Modelo: {Model}",
-                foundryConfig.ProjectEndpoint ?? "(no configurado)", foundryConfig.DeploymentName);
+                foundryConfig.ProjectEndpoint, foundryConfig.DeploymentName);
         else
-            logger.LogWarning("[Config] Foundry AI -> Proveedor '{Provider}' (servicio deshabilitado)", foundryConfig.Provider);
+            logger.LogWarning("[Config] Foundry AI -> ProjectEndpoint no configurado (servicio deshabilitado)");
     }
 
     private static string ExtractHostConnection(string connectionString)
