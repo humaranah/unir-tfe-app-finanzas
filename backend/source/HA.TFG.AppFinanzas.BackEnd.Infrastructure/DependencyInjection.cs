@@ -1,6 +1,9 @@
+using Azure.AI.FormRecognizer.DocumentAnalysis;
 using Azure.Storage.Blobs;
 using HA.TFG.AppFinanzas.BackEnd.Application.Contracts;
 using HA.TFG.AppFinanzas.BackEnd.Infrastructure.ExternalServices.Auth0;
+using HA.TFG.AppFinanzas.BackEnd.Infrastructure.ExternalServices.DocumentIntelligence;
+using HA.TFG.AppFinanzas.BackEnd.Infrastructure.ExternalServices.Foundry;
 using HA.TFG.AppFinanzas.BackEnd.Infrastructure.ExternalServices.Storage;
 using HA.TFG.AppFinanzas.BackEnd.Infrastructure.Persistence;
 using HA.TFG.AppFinanzas.BackEnd.Infrastructure.Persistence.Repositories;
@@ -20,6 +23,8 @@ public static class DependencyInjection
         services.AddRepositories();
         services.AddAuth0(configuration);
         services.AddComprobanteStorage(configuration);
+        services.AddDocumentIntelligence(configuration);
+        services.AddFoundry(configuration);
 
         return services;
     }
@@ -73,38 +78,72 @@ public static class DependencyInjection
             .GetSection(ComprobanteStorageConfig.SectionName)
             .Get<ComprobanteStorageConfig>() ?? new ComprobanteStorageConfig();
 
-        if (storageConfig.Provider.Equals("Azure", StringComparison.OrdinalIgnoreCase))
+        switch (storageConfig.Provider)
         {
-            if (string.IsNullOrWhiteSpace(storageConfig.AzureConnectionString))
-            {
-                services.AddScoped<IComprobanteStorageService>(sp =>
-                {
-                    sp.GetRequiredService<ILogger<NullComprobanteStorageService>>()
-                        .LogError("ComprobanteStorage: Provider es 'Azure' pero AzureConnectionString no está configurada. " +
-                                  "El almacenamiento de comprobantes está deshabilitado.");
-                    return new NullComprobanteStorageService();
-                });
-            }
-            else
-            {
+            case ComprobanteStorageProvider.Azure when !string.IsNullOrWhiteSpace(storageConfig.AzureConnectionString):
                 services.AddSingleton(_ => new BlobServiceClient(storageConfig.AzureConnectionString));
                 services.AddScoped<IComprobanteStorageService, AzureBlobComprobanteStorageService>();
-            }
+                break;
+
+            case ComprobanteStorageProvider.Azure:
+                services.AddLogging();
+                using (var sp = services.BuildServiceProvider())
+                    sp.GetRequiredService<ILogger<NullComprobanteStorageService>>()
+                        .LogError("ComprobanteStorage: Provider es '{Provider}' pero AzureConnectionString no está configurada. " +
+                                  "El almacenamiento de comprobantes está deshabilitado.", storageConfig.Provider);
+                services.AddScoped<IComprobanteStorageService, NullComprobanteStorageService>();
+                break;
+
+            case ComprobanteStorageProvider.Local:
+                services.AddScoped<IComprobanteStorageService, LocalComprobanteStorageService>();
+                break;
+
+            default:
+                services.AddScoped<IComprobanteStorageService, NullComprobanteStorageService>();
+                break;
         }
-        else if (storageConfig.Provider.Equals("Local", StringComparison.OrdinalIgnoreCase))
+    }
+
+    private static void AddDocumentIntelligence(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddOptions<DocumentIntelligenceConfig>()
+            .Bind(configuration.GetSection(DocumentIntelligenceConfig.SectionName));
+
+        var diConfig = configuration
+            .GetSection(DocumentIntelligenceConfig.SectionName)
+            .Get<DocumentIntelligenceConfig>() ?? new DocumentIntelligenceConfig();
+
+        if (!string.IsNullOrWhiteSpace(diConfig.Endpoint) && !string.IsNullOrWhiteSpace(diConfig.ApiKey))
         {
-            services.AddScoped<IComprobanteStorageService, LocalComprobanteStorageService>();
+            services.AddSingleton(_ =>
+                new DocumentAnalysisClient(
+                    new Uri(diConfig.Endpoint),
+                    new Azure.AzureKeyCredential(diConfig.ApiKey)));
+
+            services.AddScoped<IComprobanteAnalysisService, AzureDocumentIntelligenceService>();
         }
         else
         {
-            services.AddScoped<IComprobanteStorageService>(sp =>
-            {
-                sp.GetRequiredService<ILogger<NullComprobanteStorageService>>()
-                    .LogError("ComprobanteStorage: Provider '{Provider}' no es válido. " +
-                              "El almacenamiento de comprobantes está deshabilitado.",
-                              storageConfig.Provider);
-                return new NullComprobanteStorageService();
-            });
+            services.AddScoped<IComprobanteAnalysisService, NullDocumentIntelligenceService>();
+        }
+    }
+
+    private static void AddFoundry(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddOptions<FoundryConfig>()
+            .Bind(configuration.GetSection(FoundryConfig.SectionName));
+
+        var foundryConfig = configuration
+            .GetSection(FoundryConfig.SectionName)
+            .Get<FoundryConfig>() ?? new FoundryConfig();
+
+        if (!string.IsNullOrWhiteSpace(foundryConfig.ProjectEndpoint))
+        {
+            services.AddScoped<IComprobanteExtraccionService, FoundryComprobanteExtraccionService>();
+        }
+        else
+        {
+            services.AddScoped<IComprobanteExtraccionService, NullComprobanteExtraccionService>();
         }
     }
 }

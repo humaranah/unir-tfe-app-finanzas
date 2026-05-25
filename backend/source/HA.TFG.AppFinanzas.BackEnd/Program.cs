@@ -52,6 +52,10 @@ try
 
     var app = builder.Build();
 
+    // Diagnóstico de configuración de servicios Azure al arrancar (solo en desarrollo)
+    if (app.Environment.IsDevelopment())
+        app.LogAzureServicesConfig();
+
     app.UseSerilogRequestLogging(options =>
     {
         options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
@@ -85,5 +89,5 @@ catch (Exception ex)
 }
 finally
 {
-    Log.CloseAndFlush();
+    await Log.CloseAndFlushAsync();
 }
