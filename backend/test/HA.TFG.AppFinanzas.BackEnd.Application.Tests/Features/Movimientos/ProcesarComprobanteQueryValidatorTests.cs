@@ -1,10 +1,15 @@
+using HA.TFG.AppFinanzas.BackEnd.Application;
 using HA.TFG.AppFinanzas.BackEnd.Application.Features.Movimientos.ProcesarComprobanteQuery;
+using Microsoft.Extensions.Options;
 
 namespace HA.TFG.AppFinanzas.BackEnd.Application.Tests.Features.Movimientos;
 
 public class ProcesarComprobanteQueryValidatorTests
 {
-    private readonly ProcesarComprobanteQueryValidator _sut = new();
+    private static readonly long MaxSizeBytes = 1 * 1024 * 1024;
+
+    private static ProcesarComprobanteQueryValidator CrearValidator(long? maxSizeBytes = null) =>
+        new(Options.Create(new ComprobanteConfig { MaxSizeBytes = maxSizeBytes ?? MaxSizeBytes }));
 
     // Magic bytes válidos
     private static readonly byte[] MagicJpeg = [0xFF, 0xD8, 0xFF, 0x00, 0x00];
@@ -37,7 +42,7 @@ public class ProcesarComprobanteQueryValidatorTests
         var magic = contentType == "image/jpeg" ? MagicJpeg : MagicPdf;
         var query = CrearQuery(contentType, magic);
 
-        var result = _sut.Validate(query);
+        var result = CrearValidator().Validate(query);
 
         Assert.True(result.IsValid);
     }
@@ -51,7 +56,7 @@ public class ProcesarComprobanteQueryValidatorTests
     {
         var query = CrearQuery(contentType);
 
-        var result = _sut.Validate(query);
+        var result = CrearValidator().Validate(query);
 
         Assert.False(result.IsValid);
         Assert.Contains(result.Errors, e => e.PropertyName == "file");
@@ -68,7 +73,19 @@ public class ProcesarComprobanteQueryValidatorTests
             ComprobanteStream = new MemoryStream([])
         };
 
-        var result = _sut.Validate(query);
+        var result = CrearValidator().Validate(query);
+
+        Assert.False(result.IsValid);
+        Assert.Contains(result.Errors, e => e.PropertyName == "file");
+    }
+
+    [Fact]
+    public void Validate_StreamSuperaLimitePersonalizado_TieneError()
+    {
+        const long limitePersonalizado = 512;
+        var query = CrearQuery("image/jpeg", sizeOverride: 513);
+
+        var result = CrearValidator(limitePersonalizado).Validate(query);
 
         Assert.False(result.IsValid);
         Assert.Contains(result.Errors, e => e.PropertyName == "file");
@@ -79,7 +96,7 @@ public class ProcesarComprobanteQueryValidatorTests
     {
         var query = CrearQuery("image/jpeg", sizeOverride: 1 * 1024 * 1024 + 1);
 
-        var result = _sut.Validate(query);
+        var result = CrearValidator().Validate(query);
 
         Assert.False(result.IsValid);
         Assert.Contains(result.Errors, e => e.PropertyName == "file");
@@ -93,19 +110,17 @@ public class ProcesarComprobanteQueryValidatorTests
         MagicJpeg.CopyTo(bytes, 0);
         var query = CrearQuery("image/jpeg", bytes);
 
-        var result = _sut.Validate(query);
+        var result = CrearValidator().Validate(query);
 
         Assert.True(result.IsValid);
     }
-
-    // ─── Magic bytes ──────────────────────────────────────────────────────────
 
     [Fact]
     public void Validate_ContentTypeJpegConMagicBytesPdf_TieneError()
     {
         var query = CrearQuery("image/jpeg", MagicPdf);
 
-        var result = _sut.Validate(query);
+        var result = CrearValidator().Validate(query);
 
         Assert.False(result.IsValid);
         Assert.Contains(result.Errors, e => e.PropertyName == "file");
@@ -116,7 +131,7 @@ public class ProcesarComprobanteQueryValidatorTests
     {
         var query = CrearQuery("application/pdf", MagicJpeg);
 
-        var result = _sut.Validate(query);
+        var result = CrearValidator().Validate(query);
 
         Assert.False(result.IsValid);
         Assert.Contains(result.Errors, e => e.PropertyName == "file");
@@ -127,7 +142,7 @@ public class ProcesarComprobanteQueryValidatorTests
     {
         var query = CrearQuery("application/pdf", MagicPdf);
 
-        var result = _sut.Validate(query);
+        var result = CrearValidator().Validate(query);
 
         Assert.True(result.IsValid);
     }
@@ -137,7 +152,7 @@ public class ProcesarComprobanteQueryValidatorTests
     {
         var query = CrearQuery("image/jpeg", [0x00, 0x00, 0x00]);
 
-        var result = _sut.Validate(query);
+        var result = CrearValidator().Validate(query);
 
         Assert.False(result.IsValid);
         Assert.Contains(result.Errors, e => e.PropertyName == "file");

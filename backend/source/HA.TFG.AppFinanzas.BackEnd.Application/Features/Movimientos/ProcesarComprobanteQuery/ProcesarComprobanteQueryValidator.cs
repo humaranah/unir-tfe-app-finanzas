@@ -1,19 +1,20 @@
 using FluentValidation;
+using Microsoft.Extensions.Options;
 
 namespace HA.TFG.AppFinanzas.BackEnd.Application.Features.Movimientos.ProcesarComprobanteQuery;
 
 public sealed class ProcesarComprobanteQueryValidator : AbstractValidator<ProcesarComprobanteQuery>
 {
-    private const long MaxSizeBytes = 1 * 1024 * 1024; // 1 MB
-
     private static readonly Dictionary<string, byte[]> AllowedMagicBytes = new()
     {
         ["application/pdf"] = [0x25, 0x50, 0x44, 0x46],   // %PDF
         ["image/jpeg"]      = [0xFF, 0xD8, 0xFF]           // JFIF / EXIF
     };
 
-    public ProcesarComprobanteQueryValidator()
+    public ProcesarComprobanteQueryValidator(IOptions<ComprobanteConfig> options)
     {
+        var maxSizeBytes = options.Value.MaxSizeBytes;
+
         RuleFor(x => x.ContentType)
             .Must(ct => AllowedMagicBytes.ContainsKey(ct?.ToLowerInvariant() ?? string.Empty))
             .OverridePropertyName("file")
@@ -31,9 +32,9 @@ public sealed class ProcesarComprobanteQueryValidator : AbstractValidator<Proces
             .When(x => x.ComprobanteStream is not null);
 
         RuleFor(x => x.ComprobanteStream)
-            .Must(s => s.Length <= MaxSizeBytes)
+            .Must(s => s.Length <= maxSizeBytes)
             .OverridePropertyName("file")
-            .WithMessage($"El archivo supera el tamaño máximo permitido de {MaxSizeBytes / 1024} KB.")
+            .WithMessage($"El archivo supera el tamaño máximo permitido de {maxSizeBytes / 1024} KB.")
             .Must(HasValidMagicBytes)
             .OverridePropertyName("file")
             .WithMessage("El contenido del archivo no coincide con el tipo declarado.")
