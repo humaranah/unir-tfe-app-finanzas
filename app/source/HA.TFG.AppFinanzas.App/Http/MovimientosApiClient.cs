@@ -61,9 +61,15 @@ internal sealed class MovimientosApiClient(IHttpClientFactory httpClientFactory)
             { new StringContent(dto.Importe.ToString(System.Globalization.CultureInfo.InvariantCulture)), "Importe" },
             { new StringContent(dto.Moneda), "Moneda" },
             { new StringContent(dto.Tipo.ToString()), "TipoMovimiento" },
-            { new StringContent(dto.Fecha.ToDateTime(TimeOnly.MinValue).ToString("yyyy-MM-ddTHH:mm:ss")), "FechaMovimiento" },
+            { new StringContent(dto.FechaHora.ToString("yyyy-MM-ddTHH:mm:ss")), "FechaMovimiento" },
             { new StringContent(dto.IdCuentaCategoria.ToString()), "IdCuentaCategoria" }
         };
+
+        if (dto.Establecimiento is not null)
+            content.Add(new StringContent(dto.Establecimiento), "Establecimiento");
+
+        if (dto.Notas is not null)
+            content.Add(new StringContent(dto.Notas), "Notas");
 
         using var response = await client.PostAsync(
             $"api/cuentas/{dto.IdCuenta}/movimientos", content, cancellationToken);

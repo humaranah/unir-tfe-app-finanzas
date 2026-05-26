@@ -33,6 +33,15 @@ public partial class MovimientoViewModel(
     public partial string Concepto { get; set; } = string.Empty;
 
     [ObservableProperty]
+    public partial string Establecimiento { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string Notas { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial bool MostrarOpcionales { get; set; } = false;
+
+    [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(CrearMovimientoCommand))]
     public partial string ImporteTexto { get; set; } = string.Empty;
 
@@ -43,11 +52,15 @@ public partial class MovimientoViewModel(
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(CrearMovimientoCommand))]
     [NotifyPropertyChangedFor(nameof(CategoriasFiltradas))]
+    [NotifyPropertyChangedFor(nameof(SinCategorias))]
     public partial TipoMovimiento TipoSeleccionado { get; set; } = TipoMovimiento.Gasto;
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(CrearMovimientoCommand))]
     public partial DateTime Fecha { get; set; } = DateTime.Today;
+
+    [ObservableProperty]
+    public partial TimeSpan Hora { get; set; } = TimeSpan.Zero;
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(CrearMovimientoCommand))]
@@ -72,6 +85,8 @@ public partial class MovimientoViewModel(
     public IReadOnlyList<CategoriaItem> CategoriasFiltradas =>
         [.. _todasLasCategorias.Where(c => c.TipoMovimiento == TipoSeleccionado)];
 
+    public bool SinCategorias => CategoriasFiltradas.Count == 0;
+
     partial void OnTipoSeleccionadoChanged(TipoMovimiento value)
     {
         CategoriaSeleccionada = null;
@@ -87,10 +102,14 @@ public partial class MovimientoViewModel(
     public void Reset()
     {
         Concepto = string.Empty;
+        Establecimiento = string.Empty;
+        Notas = string.Empty;
+        MostrarOpcionales = false;
         ImporteTexto = string.Empty;
         MonedaSeleccionada = MonedasHelper.DefaultMoneda;
         TipoSeleccionado = TipoMovimiento.Gasto;
         Fecha = DateTime.Today;
+        Hora = TimeSpan.Zero;
         CategoriaSeleccionada = null;
         Error = string.Empty;
     }
@@ -102,6 +121,7 @@ public partial class MovimientoViewModel(
         {
             _todasLasCategorias = await cuentasService.GetCategoriasAsync(_idCuenta);
             OnPropertyChanged(nameof(CategoriasFiltradas));
+            OnPropertyChanged(nameof(SinCategorias));
         }
         catch (Exception ex)
         {
@@ -129,8 +149,10 @@ public partial class MovimientoViewModel(
                     importe,
                     MonedaSeleccionada.Key,
                     TipoSeleccionado,
-                    DateOnly.FromDateTime(Fecha),
-                    CategoriaSeleccionada!.IdCuentaCategoria),
+                    Fecha.Date + Hora,
+                    CategoriaSeleccionada!.IdCuentaCategoria,
+                    string.IsNullOrWhiteSpace(Establecimiento) ? null : Establecimiento.Trim(),
+                    string.IsNullOrWhiteSpace(Notas) ? null : Notas.Trim()),
                 cancellationToken);
 
             await navigationService.GoToAsync("//movimientos");
@@ -145,6 +167,9 @@ public partial class MovimientoViewModel(
             IsBusy = false;
         }
     }
+
+    [RelayCommand]
+    private Task EscanearComprobanteAsync() => Task.CompletedTask;
 
     [RelayCommand]
     private Task CancelarAsync() => navigationService.GoToAsync("//movimientos");

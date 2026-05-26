@@ -166,6 +166,7 @@ public class MovimientoViewModelTests
         sut.ImporteTexto = "42.50";
         sut.TipoSeleccionado = TipoMovimiento.Gasto;
         sut.Fecha = new DateTime(2025, 6, 15);
+        sut.Hora = new TimeSpan(14, 30, 0);
         sut.CategoriaSeleccionada = CategoriaDefault;
 
         await sut.CrearMovimientoCommand.ExecuteAsync(null);
@@ -177,7 +178,7 @@ public class MovimientoViewModelTests
                 42.50m,
                 sut.MonedaSeleccionada.Key,
                 TipoMovimiento.Gasto,
-                new DateOnly(2025, 6, 15),
+                new DateTime(2025, 6, 15, 14, 30, 0),
                 CategoriaDefault.IdCuentaCategoria),
             Arg.Any<CancellationToken>());
     }
