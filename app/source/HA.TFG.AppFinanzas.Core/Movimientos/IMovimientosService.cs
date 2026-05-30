@@ -10,4 +10,8 @@ public interface IMovimientosService
     Task CreateMovimientoAsync(
         CreateMovimientoDto dto,
         CancellationToken cancellationToken = default);
+
+    Task<ComprobanteExtraidoDto> EscanearComprobanteAsync(
+        ComprobanteResult comprobante,
+        CancellationToken cancellationToken = default);
 }

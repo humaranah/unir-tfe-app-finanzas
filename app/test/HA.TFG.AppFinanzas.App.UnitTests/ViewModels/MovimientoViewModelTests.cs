@@ -332,11 +332,11 @@ public class MovimientoViewModelTests
     // ── CancelarCommand ───────────────────────────────────────────────────────
 
     [Fact]
-    public async Task CancelarCommand_NavigatesToMovimientos()
+    public async Task CancelCommand_NavigatesToMovimientos()
     {
         var sut = CreateSut();
 
-        await sut.CancelarCommand.ExecuteAsync(null);
+        await sut.CancelCommand.ExecuteAsync(null);
 
         await _navigationService.Received(1).GoToAsync("//movimientos");
     }

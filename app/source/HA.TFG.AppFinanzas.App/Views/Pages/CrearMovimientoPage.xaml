@@ -35,7 +35,7 @@
                 <Button Grid.Column="1"
                         Text="Escanear"
                         ContentLayout="Left,8"
-                        Command="{Binding EscanearComprobanteCommand}"
+                        Command="{Binding ScanComprobanteCommand}"
                         Style="{DynamicResource OutlinedButton}"
                         HorizontalOptions="End">
                     <Button.ImageSource>
@@ -192,7 +192,7 @@
                     <!-- Botón para abrir el modal de opciones (visible si no hay comprobante) -->
                     <Button Text="Adjuntar comprobante"
                             ContentLayout="Left,8"
-                            Command="{Binding AbrirOpcionesComprobanteCommand}"
+                            Command="{Binding OpenComprobanteOptionsCommand}"
                             Style="{DynamicResource OutlinedButton}"
                             HorizontalOptions="Fill"
                             IsVisible="{Binding NoTieneComprobante}">
@@ -214,7 +214,7 @@
                                TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}" />
                         <Button Grid.Column="1"
                                 Text="Quitar"
-                                Command="{Binding EliminarComprobanteCommand}"
+                                Command="{Binding RemoveComprobanteCommand}"
                                 Style="{DynamicResource OutlinedButton}"
                                 TextColor="OrangeRed"
                                 HorizontalOptions="End" />
@@ -254,7 +254,7 @@
                     Margin="0,0,0,8" />
 
             <Button Text="Cancelar"
-                    Command="{Binding CancelarCommand}"
+                    Command="{Binding CancelCommand}"
                     Style="{DynamicResource OutlinedButton}"
                     HorizontalOptions="Fill" />
 

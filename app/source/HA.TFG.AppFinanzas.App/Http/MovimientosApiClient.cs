@@ -89,4 +89,29 @@ internal sealed class MovimientosApiClient(IHttpClientFactory httpClientFactory)
                 $"Error al crear movimiento. Status={(int)response.StatusCode}. Body={responseBody}");
         }
     }
+
+    public async Task<ComprobanteExtraidoDto> EscanearComprobanteAsync(
+        ComprobanteResult comprobante,
+        CancellationToken cancellationToken = default)
+    {
+        var client = httpClientFactory.CreateClient("Backend");
+
+        using var content = new MultipartFormDataContent();
+        var fileContent = new ByteArrayContent(comprobante.Bytes);
+        fileContent.Headers.ContentType =
+            new System.Net.Http.Headers.MediaTypeHeaderValue(comprobante.ContentType);
+        content.Add(fileContent, "file", comprobante.NombreArchivo);
+
+        using var response = await client.PostAsync("api/comprobantes/scan", content, cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
+            throw new HttpRequestException(
+                $"Error al escanear comprobante. Status={(int)response.StatusCode}. Body={responseBody}");
+        }
+
+        return await response.Content.ReadFromJsonAsync<ComprobanteExtraidoDto>(JsonOptions, cancellationToken)
+            ?? throw new HttpRequestException("El servicio de escaneo no devolvió datos válidos.");
+    }
 }

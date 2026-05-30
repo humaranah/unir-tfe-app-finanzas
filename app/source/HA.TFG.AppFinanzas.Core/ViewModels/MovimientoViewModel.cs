@@ -182,26 +182,43 @@ public partial class MovimientoViewModel(
     }
 
     [RelayCommand]
-    private async Task AbrirOpcionesComprobanteAsync(CancellationToken cancellationToken)
+    private async Task OpenComprobanteOptionsAsync(CancellationToken cancellationToken)
     {
-        var opcion = await navigationService.DisplayActionSheetAsync(
+        var result = await SelectComprobanteAsync(cancellationToken);
+        if (result is not null)
+            Comprobante = result;
+    }
+
+    private async Task<ComprobanteResult?> SelectComprobanteAsync(CancellationToken cancellationToken)
+    {
+        var option = await navigationService.DisplayActionSheetAsync(
             "Adjuntar comprobante", "Cancelar", null,
             "Seleccionar archivo", "Tomar foto");
 
-        if (opcion == "Seleccionar archivo")
-            await AdjuntarArchivoAsync(cancellationToken);
-        else if (opcion == "Tomar foto")
-            await TomarFotoAsync(cancellationToken);
+        try
+        {
+            return option switch
+            {
+                "Seleccionar archivo" => await comprobantePickerService.SeleccionarArchivoAsync(cancellationToken),
+                "Tomar foto" => await comprobantePickerService.TomarFotoAsync(cancellationToken),
+                _ => null
+            };
+        }
+        catch (InvalidOperationException ex)
+        {
+            Error = ex.Message;
+            return null;
+        }
     }
 
     [RelayCommand]
-    private async Task AdjuntarArchivoAsync(CancellationToken cancellationToken)
+    private async Task AttachFileAsync(CancellationToken cancellationToken)
     {
         try
         {
-            var resultado = await comprobantePickerService.SeleccionarArchivoAsync(cancellationToken);
-            if (resultado is not null)
-                Comprobante = resultado;
+            var result = await comprobantePickerService.SeleccionarArchivoAsync(cancellationToken);
+            if (result is not null)
+                Comprobante = result;
         }
         catch (InvalidOperationException ex)
         {
@@ -210,13 +227,13 @@ public partial class MovimientoViewModel(
     }
 
     [RelayCommand]
-    private async Task TomarFotoAsync(CancellationToken cancellationToken)
+    private async Task TakePhotoAsync(CancellationToken cancellationToken)
     {
         try
         {
-            var resultado = await comprobantePickerService.TomarFotoAsync(cancellationToken);
-            if (resultado is not null)
-                Comprobante = resultado;
+            var result = await comprobantePickerService.TomarFotoAsync(cancellationToken);
+            if (result is not null)
+                Comprobante = result;
         }
         catch (InvalidOperationException ex)
         {
@@ -225,11 +242,78 @@ public partial class MovimientoViewModel(
     }
 
     [RelayCommand]
-    private void EliminarComprobante() => Comprobante = null;
+    private void RemoveComprobante() => Comprobante = null;
 
     [RelayCommand]
-    private Task EscanearComprobanteAsync() => Task.CompletedTask;
+    private async Task ScanComprobanteAsync(CancellationToken cancellationToken)
+    {
+        var comprobante = await SelectComprobanteAsync(cancellationToken);
+        if (comprobante is null)
+            return;
+
+        Error = string.Empty;
+        IsBusy = true;
+        try
+        {
+            var data = await movimientosService.EscanearComprobanteAsync(comprobante, cancellationToken);
+            FillFromComprobante(data);
+            Comprobante = comprobante;
+        }
+        catch (Exception ex)
+        {
+            Error = "No se pudo escanear el comprobante. Inténtalo de nuevo.";
+            System.Diagnostics.Debug.WriteLine($"Error al escanear comprobante: {ex}");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private void FillFromComprobante(ComprobanteExtraidoDto data)
+    {
+        if (Enum.TryParse<TipoMovimiento>(data.TipoMovimiento, ignoreCase: true, out var tipo))
+            TipoSeleccionado = tipo;
+
+        SetIfNotEmpty(data.Concepto, v => Concepto = v);
+        SetIfNotEmpty(data.Establecimiento, v => Establecimiento = v);
+        SetIfNotEmpty(data.Nota, v => Notas = v);
+
+        if (data.Importe is > 0)
+            ImporteTexto = data.Importe.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+        var moneda = Monedas.FirstOrDefault(m =>
+            string.Equals(m.Key, data.Moneda, StringComparison.OrdinalIgnoreCase));
+        if (!moneda.Equals(default(KeyValuePair<string, string>)))
+            MonedaSeleccionada = moneda;
+
+        if (data.FechaMovimiento is { } fecha)
+        {
+            Fecha = fecha.Date;
+            Hora = fecha.TimeOfDay;
+        }
+
+        var categoria = _todasLasCategorias.FirstOrDefault(c => c.IdCuentaCategoria == data.IdCuentaCategoria);
+        if (categoria is not null)
+        {
+            TipoSeleccionado = categoria.TipoMovimiento;
+            CategoriaSeleccionada = categoria;
+        }
+
+        MostrarOpcionales = HasOptionalFieldsFilled();
+    }
+
+    private static void SetIfNotEmpty(string? value, Action<string> assign)
+    {
+        if (!string.IsNullOrWhiteSpace(value))
+            assign(value);
+    }
+
+    private bool HasOptionalFieldsFilled() =>
+        !string.IsNullOrWhiteSpace(Establecimiento)
+        || !string.IsNullOrWhiteSpace(Notas)
+        || Hora != TimeSpan.Zero;
 
     [RelayCommand]
-    private Task CancelarAsync() => navigationService.GoToAsync("//movimientos");
+    private Task CancelAsync() => navigationService.GoToAsync("//movimientos");
 }
