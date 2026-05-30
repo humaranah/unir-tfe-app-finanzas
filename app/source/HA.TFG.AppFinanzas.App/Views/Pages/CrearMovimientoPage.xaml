@@ -185,6 +185,46 @@
                             HorizontalOptions="Fill" />
                 </VerticalStackLayout>
 
+                <!-- Comprobante -->
+                <VerticalStackLayout Spacing="4" Margin="0,0,0,16">
+                    <Label Text="Comprobante" FontAttributes="Bold" />
+
+                    <!-- Botón para abrir el modal de opciones (visible si no hay comprobante) -->
+                    <Button Text="Adjuntar comprobante"
+                            ContentLayout="Left,8"
+                            Command="{Binding AbrirOpcionesComprobanteCommand}"
+                            Style="{DynamicResource OutlinedButton}"
+                            HorizontalOptions="Fill"
+                            IsVisible="{Binding NoTieneComprobante}">
+                        <Button.ImageSource>
+                            <FontImageSource FontFamily="FluentIcons"
+                                             Glyph="&#xF157;"
+                                             Size="18"
+                                             Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
+                        </Button.ImageSource>
+                    </Button>
+
+                    <!-- Vista previa del comprobante adjunto -->
+                    <Grid ColumnDefinitions="*,auto" ColumnSpacing="8"
+                          IsVisible="{Binding TieneComprobante}">
+                        <Label Grid.Column="0"
+                               Text="{Binding Comprobante.NombreArchivo}"
+                               VerticalOptions="Center"
+                               LineBreakMode="MiddleTruncation"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}" />
+                        <Button Grid.Column="1"
+                                Text="Quitar"
+                                Command="{Binding EliminarComprobanteCommand}"
+                                Style="{DynamicResource OutlinedButton}"
+                                TextColor="OrangeRed"
+                                HorizontalOptions="End" />
+                    </Grid>
+
+                    <Label Text="Imagen o PDF, máximo 1 MB"
+                           FontSize="11"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}" />
+                </VerticalStackLayout>
+
             </VerticalStackLayout>
 
             <!-- Error -->

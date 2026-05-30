@@ -1,4 +1,5 @@
 using HA.TFG.AppFinanzas.App.Http;
+using HA.TFG.AppFinanzas.App.Services;
 using HA.TFG.AppFinanzas.Core.Authentication;
 using HA.TFG.AppFinanzas.Core.Cuentas;
 using HA.TFG.AppFinanzas.Core.Movimientos;
@@ -19,6 +20,7 @@ internal static class BackendExtensions
         builder.Services.AddSingleton<IUsuarioService, UsuarioService>();
         builder.Services.AddSingleton<ICuentasService, CuentasApiClient>();
         builder.Services.AddSingleton<IMovimientosService, MovimientosApiClient>();
+        builder.Services.AddSingleton<IComprobantePickerService, ComprobantePickerService>();
         builder.Services.AddTransient<AuthHeaderHandler>();
 
         builder.Services.AddHttpClient("Backend", client =>

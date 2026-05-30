@@ -11,7 +11,8 @@ namespace HA.TFG.AppFinanzas.Core.ViewModels;
 public partial class MovimientoViewModel(
     ICuentasService cuentasService,
     IMovimientosService movimientosService,
-    INavigationService navigationService) : ObservableObject
+    INavigationService navigationService,
+    IComprobantePickerService comprobantePickerService) : ObservableObject
 {
     private Guid _idCuenta;
     private IReadOnlyList<CategoriaItem> _todasLasCategorias = [];
@@ -37,6 +38,14 @@ public partial class MovimientoViewModel(
 
     [ObservableProperty]
     public partial string Notas { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(TieneComprobante))]
+    [NotifyPropertyChangedFor(nameof(NoTieneComprobante))]
+    private ComprobanteResult? _comprobante;
+
+    public bool TieneComprobante => Comprobante is not null;
+    public bool NoTieneComprobante => Comprobante is null;
 
     [ObservableProperty]
     public partial bool MostrarOpcionales { get; set; } = false;
@@ -104,6 +113,7 @@ public partial class MovimientoViewModel(
         Concepto = string.Empty;
         Establecimiento = string.Empty;
         Notas = string.Empty;
+        Comprobante = null;
         MostrarOpcionales = false;
         ImporteTexto = string.Empty;
         MonedaSeleccionada = MonedasHelper.DefaultMoneda;
@@ -152,7 +162,10 @@ public partial class MovimientoViewModel(
                     Fecha.Date + Hora,
                     CategoriaSeleccionada!.IdCuentaCategoria,
                     string.IsNullOrWhiteSpace(Establecimiento) ? null : Establecimiento.Trim(),
-                    string.IsNullOrWhiteSpace(Notas) ? null : Notas.Trim()),
+                    string.IsNullOrWhiteSpace(Notas) ? null : Notas.Trim(),
+                    Comprobante?.Bytes,
+                    Comprobante?.NombreArchivo,
+                    Comprobante?.ContentType),
                 cancellationToken);
 
             await navigationService.GoToAsync("//movimientos");
@@ -167,6 +180,52 @@ public partial class MovimientoViewModel(
             IsBusy = false;
         }
     }
+
+    [RelayCommand]
+    private async Task AbrirOpcionesComprobanteAsync(CancellationToken cancellationToken)
+    {
+        var opcion = await navigationService.DisplayActionSheetAsync(
+            "Adjuntar comprobante", "Cancelar", null,
+            "Seleccionar archivo", "Tomar foto");
+
+        if (opcion == "Seleccionar archivo")
+            await AdjuntarArchivoAsync(cancellationToken);
+        else if (opcion == "Tomar foto")
+            await TomarFotoAsync(cancellationToken);
+    }
+
+    [RelayCommand]
+    private async Task AdjuntarArchivoAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            var resultado = await comprobantePickerService.SeleccionarArchivoAsync(cancellationToken);
+            if (resultado is not null)
+                Comprobante = resultado;
+        }
+        catch (InvalidOperationException ex)
+        {
+            Error = ex.Message;
+        }
+    }
+
+    [RelayCommand]
+    private async Task TomarFotoAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            var resultado = await comprobantePickerService.TomarFotoAsync(cancellationToken);
+            if (resultado is not null)
+                Comprobante = resultado;
+        }
+        catch (InvalidOperationException ex)
+        {
+            Error = ex.Message;
+        }
+    }
+
+    [RelayCommand]
+    private void EliminarComprobante() => Comprobante = null;
 
     [RelayCommand]
     private Task EscanearComprobanteAsync() => Task.CompletedTask;

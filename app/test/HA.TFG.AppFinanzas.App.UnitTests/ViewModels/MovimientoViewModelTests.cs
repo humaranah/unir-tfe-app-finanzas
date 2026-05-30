@@ -14,6 +14,7 @@ public class MovimientoViewModelTests
     private readonly ICuentasService _cuentasService = Substitute.For<ICuentasService>();
     private readonly IMovimientosService _movimientosService = Substitute.For<IMovimientosService>();
     private readonly INavigationService _navigationService = Substitute.For<INavigationService>();
+    private readonly IComprobantePickerService _comprobantePickerService = Substitute.For<IComprobantePickerService>();
 
     private static readonly Guid IdCuenta = Guid.NewGuid();
 
@@ -25,7 +26,7 @@ public class MovimientoViewModelTests
     };
 
     private MovimientoViewModel CreateSut() =>
-        new(_cuentasService, _movimientosService, _navigationService);
+        new(_cuentasService, _movimientosService, _navigationService, _comprobantePickerService);
 
     // ── Estado inicial ────────────────────────────────────────────────────────
 

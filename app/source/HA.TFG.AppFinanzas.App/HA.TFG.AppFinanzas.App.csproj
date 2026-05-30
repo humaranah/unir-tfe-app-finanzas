@@ -84,7 +84,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiXaml Update="Authentication\WebViewPage.xaml">
+		<MauiXaml Update="Authentication\WebViewPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\LoginPage.xaml">
@@ -102,6 +102,10 @@
 	  <MauiXaml Update="Views\SplashLoadingPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="Converters\" />
 	</ItemGroup>
 
 </Project>
