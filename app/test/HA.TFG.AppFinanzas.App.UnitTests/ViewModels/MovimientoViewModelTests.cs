@@ -14,6 +14,7 @@ public class MovimientoViewModelTests
     private readonly ICuentasService _cuentasService = Substitute.For<ICuentasService>();
     private readonly IMovimientosService _movimientosService = Substitute.For<IMovimientosService>();
     private readonly INavigationService _navigationService = Substitute.For<INavigationService>();
+    private readonly IComprobantePickerService _comprobantePickerService = Substitute.For<IComprobantePickerService>();
 
     private static readonly Guid IdCuenta = Guid.NewGuid();
 
@@ -25,7 +26,7 @@ public class MovimientoViewModelTests
     };
 
     private MovimientoViewModel CreateSut() =>
-        new(_cuentasService, _movimientosService, _navigationService);
+        new(_cuentasService, _movimientosService, _navigationService, _comprobantePickerService);
 
     // ── Estado inicial ────────────────────────────────────────────────────────
 
@@ -166,6 +167,7 @@ public class MovimientoViewModelTests
         sut.ImporteTexto = "42.50";
         sut.TipoSeleccionado = TipoMovimiento.Gasto;
         sut.Fecha = new DateTime(2025, 6, 15);
+        sut.Hora = new TimeSpan(14, 30, 0);
         sut.CategoriaSeleccionada = CategoriaDefault;
 
         await sut.CrearMovimientoCommand.ExecuteAsync(null);
@@ -177,7 +179,7 @@ public class MovimientoViewModelTests
                 42.50m,
                 sut.MonedaSeleccionada.Key,
                 TipoMovimiento.Gasto,
-                new DateOnly(2025, 6, 15),
+                new DateTime(2025, 6, 15, 14, 30, 0),
                 CategoriaDefault.IdCuentaCategoria),
             Arg.Any<CancellationToken>());
     }
@@ -330,11 +332,11 @@ public class MovimientoViewModelTests
     // ── CancelarCommand ───────────────────────────────────────────────────────
 
     [Fact]
-    public async Task CancelarCommand_NavigatesToMovimientos()
+    public async Task CancelCommand_NavigatesToMovimientos()
     {
         var sut = CreateSut();
 
-        await sut.CancelarCommand.ExecuteAsync(null);
+        await sut.CancelCommand.ExecuteAsync(null);
 
         await _navigationService.Received(1).GoToAsync("//movimientos");
     }

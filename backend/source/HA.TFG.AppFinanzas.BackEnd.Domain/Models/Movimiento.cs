@@ -10,6 +10,7 @@ public record Movimiento : IAuditable, ISoftDeleteable
     public Guid IdCuentaCategoria { get; init; }
     public TipoMovimiento TipoMovimiento { get; set; }
     public string Concepto { get; init; } = string.Empty;
+    public string? Establecimiento { get; init; }
     public decimal Importe { get; init; }
     public string Moneda { get; init; } = string.Empty;
     public decimal? TipoCambio { get; init; }

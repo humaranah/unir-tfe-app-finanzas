@@ -9,4 +9,7 @@ internal sealed class ShellNavigationService : INavigationService
 
     public Task GoBackAsync() =>
         Shell.Current.GoToAsync("..");
+
+    public Task<string?> DisplayActionSheetAsync(string title, string cancel, string? destruction, params string[] buttons) =>
+        Shell.Current.DisplayActionSheetAsync(title, cancel, destruction, buttons);
 }

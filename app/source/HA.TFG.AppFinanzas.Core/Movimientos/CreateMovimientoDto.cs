@@ -8,5 +8,10 @@ public sealed record CreateMovimientoDto(
     decimal Importe,
     string Moneda,
     TipoMovimiento Tipo,
-    DateOnly Fecha,
-    Guid IdCuentaCategoria);
+    DateTime FechaHora,
+    Guid IdCuentaCategoria,
+    string? Establecimiento = null,
+    string? Nota = null,
+    byte[]? ComprobanteBytes = null,
+    string? ComprobanteNombre = null,
+    string? ComprobanteContentType = null);

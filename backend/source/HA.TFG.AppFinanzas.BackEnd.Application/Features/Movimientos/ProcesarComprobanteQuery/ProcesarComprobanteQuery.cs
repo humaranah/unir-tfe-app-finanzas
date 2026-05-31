@@ -11,4 +11,6 @@ public record ProcesarComprobanteQuery : IRequest<ComprobanteExtraidoDto>
 {
     public required Stream ComprobanteStream { get; init; }
     public required string ContentType { get; init; }
+    public required Guid IdCuenta { get; init; }
+    public required string Email { get; init; }
 }

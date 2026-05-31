@@ -12,13 +12,20 @@ public class ProcesarComprobanteQueryHandlerTests
 {
     private readonly IComprobanteAnalysisService _analysisService = Substitute.For<IComprobanteAnalysisService>();
     private readonly IComprobanteExtraccionService _extraccionService = Substitute.For<IComprobanteExtraccionService>();
-    private readonly ICategoriaRepository _categoriaRepository = Substitute.For<ICategoriaRepository>();
+    private readonly IUsuarioRepository _usuarioRepository = Substitute.For<IUsuarioRepository>();
+    private readonly ICuentaRepository _cuentaRepository = Substitute.For<ICuentaRepository>();
     private readonly ProcesarComprobanteQueryHandler _sut;
 
-    private static readonly IReadOnlyList<Categoria> CategoriasDefault =
+    private static readonly Guid IdCuenta = Guid.CreateVersion7();
+    private static readonly Guid IdUsuario = Guid.CreateVersion7();
+    private const string Email = "usuario@test.com";
+
+    private static readonly Usuario UsuarioDefault = new() { IdUsuario = IdUsuario, Email = Email };
+
+    private static readonly IReadOnlyList<CuentaCategoria> CategoriasDefault =
     [
-        Categoria.CrearNuevo(TipoMovimiento.Gasto, "Alimentación", "Supermercados y comida"),
-        Categoria.CrearNuevo(TipoMovimiento.Gasto, "Transporte",   "Gasolina y transporte público"),
+        new() { IdCuentaCategoria = Guid.CreateVersion7(), IdCuenta = IdCuenta, TipoMovimiento = TipoMovimiento.Gasto, Nombre = "Alimentación", Descripcion = "Supermercados y comida" },
+        new() { IdCuentaCategoria = Guid.CreateVersion7(), IdCuenta = IdCuenta, TipoMovimiento = TipoMovimiento.Gasto, Nombre = "Transporte",   Descripcion = "Gasolina y transporte público" },
     ];
 
     private static readonly string JsonValido = """
@@ -36,16 +43,22 @@ public class ProcesarComprobanteQueryHandlerTests
 
     public ProcesarComprobanteQueryHandlerTests()
     {
+        _usuarioRepository.GetByEmailAsync(Email, Arg.Any<CancellationToken>())
+            .Returns(UsuarioDefault);
+
         _sut = new ProcesarComprobanteQueryHandler(
             _analysisService,
             _extraccionService,
-            _categoriaRepository);
+            _usuarioRepository,
+            _cuentaRepository);
     }
 
     private static ProcesarComprobanteQuery CrearQuery() => new()
     {
         ComprobanteStream = new MemoryStream([0x89, 0x50]),
-        ContentType = "image/jpeg"
+        ContentType = "image/jpeg",
+        IdCuenta = IdCuenta,
+        Email = Email
     };
 
     // ─── Paso 1: Document Intelligence ───────────────────────────────────────
@@ -82,7 +95,7 @@ public class ProcesarComprobanteQueryHandlerTests
         _analysisService.AnalyzeAsync(Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(new ComprobanteAnalysisResult { Texto = "Texto del ticket" });
 
-        _categoriaRepository.GetAllAsync(Arg.Any<CancellationToken>())
+        _cuentaRepository.GetCategoriasByCuentaAsync(IdUsuario, IdCuenta, Arg.Any<CancellationToken>())
             .ThrowsAsync(new InvalidOperationException("Fallo de BD"));
 
         var ex = await Assert.ThrowsAsync<ExternalServiceException>(() =>
@@ -97,8 +110,8 @@ public class ProcesarComprobanteQueryHandlerTests
         _analysisService.AnalyzeAsync(Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(new ComprobanteAnalysisResult { Texto = "Texto del ticket" });
 
-        _categoriaRepository.GetAllAsync(Arg.Any<CancellationToken>())
-            .Returns(Array.Empty<Categoria>());
+        _cuentaRepository.GetCategoriasByCuentaAsync(IdUsuario, IdCuenta, Arg.Any<CancellationToken>())
+            .Returns(Array.Empty<CuentaCategoria>());
 
         var ex = await Assert.ThrowsAsync<ExternalServiceException>(() =>
             _sut.Handle(CrearQuery(), CancellationToken.None).AsTask());
@@ -114,7 +127,7 @@ public class ProcesarComprobanteQueryHandlerTests
         _analysisService.AnalyzeAsync(Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(new ComprobanteAnalysisResult { Texto = "Texto del ticket" });
 
-        _categoriaRepository.GetAllAsync(Arg.Any<CancellationToken>())
+        _cuentaRepository.GetCategoriasByCuentaAsync(IdUsuario, IdCuenta, Arg.Any<CancellationToken>())
             .Returns(CategoriasDefault);
 
         _extraccionService.EnviarPromptAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
@@ -132,7 +145,7 @@ public class ProcesarComprobanteQueryHandlerTests
         _analysisService.AnalyzeAsync(Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(new ComprobanteAnalysisResult { Texto = "Texto del ticket" });
 
-        _categoriaRepository.GetAllAsync(Arg.Any<CancellationToken>())
+        _cuentaRepository.GetCategoriasByCuentaAsync(IdUsuario, IdCuenta, Arg.Any<CancellationToken>())
             .Returns(CategoriasDefault);
 
         _extraccionService.EnviarPromptAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
@@ -152,7 +165,7 @@ public class ProcesarComprobanteQueryHandlerTests
         _analysisService.AnalyzeAsync(Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(new ComprobanteAnalysisResult { Texto = "HIPER ASIA\nTotal: 3.90" });
 
-        _categoriaRepository.GetAllAsync(Arg.Any<CancellationToken>())
+        _cuentaRepository.GetCategoriasByCuentaAsync(IdUsuario, IdCuenta, Arg.Any<CancellationToken>())
             .Returns(CategoriasDefault);
 
         _extraccionService.EnviarPromptAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
@@ -172,7 +185,7 @@ public class ProcesarComprobanteQueryHandlerTests
         _analysisService.AnalyzeAsync(Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(new ComprobanteAnalysisResult { Texto = "HIPER ASIA\nTotal: 3.90" });
 
-        _categoriaRepository.GetAllAsync(Arg.Any<CancellationToken>())
+        _cuentaRepository.GetCategoriasByCuentaAsync(IdUsuario, IdCuenta, Arg.Any<CancellationToken>())
             .Returns(CategoriasDefault);
 
         _extraccionService.EnviarPromptAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
@@ -190,7 +203,7 @@ public class ProcesarComprobanteQueryHandlerTests
         _analysisService.AnalyzeAsync(Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(new ComprobanteAnalysisResult { Texto = "Texto del ticket" });
 
-        _categoriaRepository.GetAllAsync(Arg.Any<CancellationToken>())
+        _cuentaRepository.GetCategoriasByCuentaAsync(IdUsuario, IdCuenta, Arg.Any<CancellationToken>())
             .Returns(CategoriasDefault);
 
         _extraccionService.EnviarPromptAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())

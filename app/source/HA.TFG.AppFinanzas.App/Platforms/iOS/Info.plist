@@ -30,5 +30,14 @@
 	<string>Assets.xcassets/appicon.appiconset</string>
 	<key>CFBundleDisplayName</key>
 	<string>App Finanzas</string>
+	<!-- Cámara (MediaPicker.CapturePhotoAsync) -->
+	<key>NSCameraUsageDescription</key>
+	<string>Se necesita acceso a la cámara para fotografiar comprobantes.</string>
+	<!-- Galería / fotos (MediaPicker, FilePicker) -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Se necesita acceso a la biblioteca de fotos para adjuntar comprobantes.</string>
+	<!-- Documentos / FilePicker -->
+	<key>NSDocumentPickerUsageDescription</key>
+	<string>Se necesita acceso a los documentos para seleccionar archivos de comprobante.</string>
 </dict>
 </plist>
