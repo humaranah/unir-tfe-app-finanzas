@@ -28,7 +28,9 @@ public class ProcesarComprobanteQueryValidatorTests
         return new ProcesarComprobanteQuery
         {
             ContentType       = contentType,
-            ComprobanteStream = stream
+            ComprobanteStream = stream,
+            IdCuenta          = Guid.CreateVersion7(),
+            Email             = "usuario@test.com"
         };
     }
 
@@ -70,7 +72,9 @@ public class ProcesarComprobanteQueryValidatorTests
         var query = new ProcesarComprobanteQuery
         {
             ContentType       = "image/jpeg",
-            ComprobanteStream = new MemoryStream([])
+            ComprobanteStream = new MemoryStream([]),
+            IdCuenta          = Guid.CreateVersion7(),
+            Email             = "usuario@test.com"
         };
 
         var result = CrearValidator().Validate(query);

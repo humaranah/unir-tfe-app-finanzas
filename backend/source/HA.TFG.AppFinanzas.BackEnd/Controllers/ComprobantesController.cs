@@ -22,6 +22,7 @@ public sealed class ComprobantesController(IMediator mediator) : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> EscanearComprobante(
         [FromForm] IFormFile file,
+        [FromForm] Guid idCuenta,
         CancellationToken cancellationToken)
     {
         await using var stream = file.OpenReadStream();
@@ -29,7 +30,9 @@ public sealed class ComprobantesController(IMediator mediator) : ControllerBase
         var query = new ProcesarComprobanteQuery
         {
             ComprobanteStream = stream,
-            ContentType       = file.ContentType
+            ContentType       = file.ContentType,
+            IdCuenta          = idCuenta,
+            Email             = User.Identity?.Name ?? string.Empty
         };
 
         var result = await _mediator.Send(query, cancellationToken);

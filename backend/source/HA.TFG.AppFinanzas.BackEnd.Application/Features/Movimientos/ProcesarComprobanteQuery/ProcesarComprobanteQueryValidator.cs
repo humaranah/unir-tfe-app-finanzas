@@ -15,6 +15,10 @@ public sealed class ProcesarComprobanteQueryValidator : AbstractValidator<Proces
     {
         var maxSizeBytes = options.Value.MaxSizeBytes;
 
+        RuleFor(x => x.IdCuenta)
+            .NotEmpty()
+            .WithMessage("Es obligatorio indicar la cuenta del comprobante.");
+
         RuleFor(x => x.ContentType)
             .Must(ct => AllowedMagicBytes.ContainsKey(ct?.ToLowerInvariant() ?? string.Empty))
             .OverridePropertyName("file")

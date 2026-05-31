@@ -12,13 +12,17 @@ namespace HA.TFG.AppFinanzas.BackEnd.Application.Features.Movimientos.ProcesarCo
 public class ProcesarComprobanteQueryHandler(
     IComprobanteAnalysisService analysisService,
     IComprobanteExtraccionService extraccionService,
-    ICategoriaRepository categoriaRepository)
+    IUsuarioRepository usuarioRepository,
+    ICuentaRepository cuentaRepository)
     : IRequestHandler<ProcesarComprobanteQuery, ComprobanteExtraidoDto>
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)
     {
         UnmappedMemberHandling = JsonUnmappedMemberHandling.Skip
     };
+
+    // Identificador de la categoría base "Otros gastos" usada como respaldo al clasificar.
+    private static readonly Guid IdCategoriaOtrosGastos = new("c73ebca7-2bf5-fd6e-e041-642b86a9aa02");
 
     public async ValueTask<ComprobanteExtraidoDto> Handle(
         ProcesarComprobanteQuery request,
@@ -35,24 +39,32 @@ public class ProcesarComprobanteQueryHandler(
                 "DocumentIntelligence",
                 "No se pudo extraer texto del comprobante. Comprueba la configuración del servicio o el archivo enviado.");
 
-        // Paso 2: Obtener categorías desde la base de datos
-        IReadOnlyList<Categoria> categorias;
+        // Paso 2: Obtener las categorías de la cuenta desde la base de datos
+        var usuario = await usuarioRepository.GetByEmailAsync(request.Email, cancellationToken)
+            ?? throw new NotFoundException(nameof(Usuario), request.Email);
+
+        IReadOnlyList<CuentaCategoria> categorias;
         try
         {
-            categorias = await categoriaRepository.GetAllAsync(cancellationToken);
+            categorias = await cuentaRepository.GetCategoriasByCuentaAsync(
+                usuario.IdUsuario, request.IdCuenta, cancellationToken);
+        }
+        catch (NotFoundException)
+        {
+            throw;
         }
         catch (Exception ex)
         {
             throw new ExternalServiceException(
                 "BaseDeDatos",
-                "Error al obtener las categorías desde la base de datos.",
+                "Error al obtener las categorías de la cuenta desde la base de datos.",
                 ex);
         }
 
         if (categorias.Count == 0)
             throw new ExternalServiceException(
                 "BaseDeDatos",
-                "No hay categorías disponibles en la base de datos. No es posible procesar el comprobante.");
+                "No hay categorías disponibles para la cuenta. No es posible procesar el comprobante.");
 
         // Paso 3: Construir el prompt optimizado
         var prompt = BuildPrompt(analysisResult.Texto, categorias);
@@ -83,11 +95,15 @@ public class ProcesarComprobanteQueryHandler(
         }
     }
 
-    private static string BuildPrompt(string textoComprobante, IReadOnlyList<Categoria> categorias)
+    private static string BuildPrompt(string textoComprobante, IReadOnlyList<CuentaCategoria> categorias)
     {
         var sbCategorias = new StringBuilder();
         foreach (var cat in categorias)
-            sbCategorias.AppendLine($"- id={cat.IdCategoria} | tipo={cat.TipoMovimiento} | nombre={cat.Nombre}");
+            sbCategorias.AppendLine($"- id={cat.IdCuentaCategoria} | tipo={cat.TipoMovimiento} | nombre={cat.Nombre}");
+
+        // Categoría de respaldo: la derivada de "Otros gastos" o, en su defecto, la primera disponible.
+        var idCuentaCategoriaPorDefecto = (categorias.FirstOrDefault(c => c.IdCategoria == IdCategoriaOtrosGastos)
+            ?? categorias[0]).IdCuentaCategoria;
 
         return $$"""
             Extrae datos del comprobante y devuelve SOLO este JSON:
@@ -110,8 +126,8 @@ public class ProcesarComprobanteQueryHandler(
             - moneda: establecer en formato ISO; si no aparece, usa la moneda local del país del comprobante.
             - fechaMovimiento: usar fecha y hora del ticket en ISO 8601 con TZ; si no hay hora, usar T00:00:00.
             - tipoMovimiento: compras->{{TipoMovimiento.Gasto}}; ingresos->{{TipoMovimiento.Ingreso}}; entre cuentas->{{TipoMovimiento.Transferencia}}.
-            - idCuentaCategoria: elegir la categoría más relacionada en base a nombre de establecimiento o descripción de productos; si no es claro, usar "c73ebca7-2bf5-fd6e-e041-642b86a9aa02".
-            - categoriaPropuesta: en caso la categoría sea "c73ebca7-2bf5-fd6e-e041-642b86a9aa02", sugerir un nombre de categoría; de lo contrario, null.
+            - idCuentaCategoria: elegir la categoría más relacionada en base a nombre de establecimiento o descripción de productos; si no es claro, usar "{{idCuentaCategoriaPorDefecto}}".
+            - categoriaPropuesta: en caso la categoría sea "{{idCuentaCategoriaPorDefecto}}", sugerir un nombre de categoría; de lo contrario, null.
             - nota: info útil como método de pago o tienda, de forma expresiva y concisa.
 
             CATEGORÍAS:
