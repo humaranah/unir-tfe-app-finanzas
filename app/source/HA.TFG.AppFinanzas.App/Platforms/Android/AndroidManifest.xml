@@ -3,4 +3,10 @@
 	<application android:allowBackup="true" android:icon="@mipmap/appicon" android:supportsRtl="true" android:label="App Finanzas"></application>
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 	<uses-permission android:name="android.permission.INTERNET" />
+	<!-- Cámara (MediaPicker.CapturePhotoAsync) -->
+	<uses-permission android:name="android.permission.CAMERA" />
+	<!-- Lectura de archivos multimedia (FilePicker, API < 33) -->
+	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+	<!-- Lectura de archivos multimedia por tipo (API >= 33) -->
+	<uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 </manifest>

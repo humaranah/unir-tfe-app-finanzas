@@ -44,10 +44,16 @@ internal sealed class ComprobantePickerService : IComprobantePickerService
     {
         using var stream = await file.OpenReadAsync();
         using var memoryStream = new MemoryStream();
-        await stream.CopyToAsync(memoryStream, cancellationToken);
 
-        if (memoryStream.Length > MaxBytes)
-            throw new InvalidOperationException("El archivo supera el tamaño máximo permitido de 1 MB.");
+        var buffer = new byte[81920]; // 80 KB por bloque
+        int bytesRead;
+        while ((bytesRead = await stream.ReadAsync(buffer, cancellationToken)) > 0)
+        {
+            if (memoryStream.Length + bytesRead > MaxBytes)
+                throw new InvalidOperationException("El archivo supera el tamaño máximo permitido de 1 MB.");
+
+            await memoryStream.WriteAsync(buffer.AsMemory(0, bytesRead), cancellationToken);
+        }
 
         return new ComprobanteResult(memoryStream.ToArray(), file.FileName, file.ContentType);
     }
