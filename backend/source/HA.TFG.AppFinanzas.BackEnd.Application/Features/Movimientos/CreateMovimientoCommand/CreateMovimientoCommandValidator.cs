@@ -23,6 +23,10 @@ public class CreateMovimientoCommandValidator : AbstractValidator<CreateMovimien
             .NotEmpty().WithMessage("El concepto no puede estar vacío.")
             .MaximumLength(500).WithMessage("El concepto no puede superar los 500 caracteres.");
 
+        RuleFor(x => x.Establecimiento)
+            .MaximumLength(200).When(x => x.Establecimiento is not null)
+            .WithMessage("El establecimiento no puede superar los 200 caracteres.");
+
         RuleFor(x => x.Importe)
             .GreaterThan(0).WithMessage("El importe debe ser mayor que cero.");
 

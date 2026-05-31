@@ -9,6 +9,7 @@ public record CreateMovimientoResult
     public Guid IdCuentaCategoria { get; init; }
     public TipoMovimiento TipoMovimiento { get; init; }
     public string Concepto { get; init; } = string.Empty;
+    public string? Establecimiento { get; init; }
     public decimal Importe { get; init; }
     public string Moneda { get; init; } = string.Empty;
     public decimal? TipoCambio { get; init; }

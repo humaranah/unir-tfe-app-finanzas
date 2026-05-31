@@ -22,6 +22,7 @@ internal class MovimientoConfigurations : IEntityTypeConfiguration<Movimiento>
             .HasConversion(new EnumToStringConverter<TipoMovimiento>())
             .HasMaxLength(20);
         builder.Property(movimiento => movimiento.Concepto).HasMaxLength(500);
+        builder.Property(movimiento => movimiento.Establecimiento).HasMaxLength(200);
         builder.Property(movimiento => movimiento.Importe).HasPrecision(18, 2).IsRequired();
         builder.Property(movimiento => movimiento.Moneda).IsRequired().HasMaxLength(3);
         builder.Property(movimiento => movimiento.TipoCambio).HasPrecision(18, 6);
