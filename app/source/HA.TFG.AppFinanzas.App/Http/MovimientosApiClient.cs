@@ -68,8 +68,8 @@ internal sealed class MovimientosApiClient(IHttpClientFactory httpClientFactory)
         if (dto.Establecimiento is not null)
             content.Add(new StringContent(dto.Establecimiento), "Establecimiento");
 
-        if (dto.Notas is not null)
-            content.Add(new StringContent(dto.Notas), "Notas");
+        if (dto.Nota is not null)
+            content.Add(new StringContent(dto.Nota), "Nota");
 
         if (dto.ComprobanteBytes is not null && dto.ComprobanteNombre is not null)
         {
@@ -91,6 +91,7 @@ internal sealed class MovimientosApiClient(IHttpClientFactory httpClientFactory)
     }
 
     public async Task<ComprobanteExtraidoDto> EscanearComprobanteAsync(
+        Guid idCuenta,
         ComprobanteResult comprobante,
         CancellationToken cancellationToken = default)
     {
@@ -101,6 +102,7 @@ internal sealed class MovimientosApiClient(IHttpClientFactory httpClientFactory)
         fileContent.Headers.ContentType =
             new System.Net.Http.Headers.MediaTypeHeaderValue(comprobante.ContentType);
         content.Add(fileContent, "file", comprobante.NombreArchivo);
+        content.Add(new StringContent(idCuenta.ToString()), "IdCuenta");
 
         using var response = await client.PostAsync("api/comprobantes/scan", content, cancellationToken);
 

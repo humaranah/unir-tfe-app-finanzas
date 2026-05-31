@@ -37,7 +37,7 @@ public partial class MovimientoViewModel(
     public partial string Establecimiento { get; set; } = string.Empty;
 
     [ObservableProperty]
-    public partial string Notas { get; set; } = string.Empty;
+    public partial string Nota { get; set; } = string.Empty;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(TieneComprobante))]
@@ -112,7 +112,7 @@ public partial class MovimientoViewModel(
     {
         Concepto = string.Empty;
         Establecimiento = string.Empty;
-        Notas = string.Empty;
+        Nota = string.Empty;
         Comprobante = null;
         MostrarOpcionales = false;
         ImporteTexto = string.Empty;
@@ -162,7 +162,7 @@ public partial class MovimientoViewModel(
                     Fecha.Date + Hora,
                     CategoriaSeleccionada!.IdCuentaCategoria,
                     string.IsNullOrWhiteSpace(Establecimiento) ? null : Establecimiento.Trim(),
-                    string.IsNullOrWhiteSpace(Notas) ? null : Notas.Trim(),
+                    string.IsNullOrWhiteSpace(Nota) ? null : Nota.Trim(),
                     Comprobante?.Bytes,
                     Comprobante?.NombreArchivo,
                     Comprobante?.ContentType),
@@ -255,7 +255,7 @@ public partial class MovimientoViewModel(
         IsBusy = true;
         try
         {
-            var data = await movimientosService.EscanearComprobanteAsync(comprobante, cancellationToken);
+            var data = await movimientosService.EscanearComprobanteAsync(IdCuenta, comprobante, cancellationToken);
             FillFromComprobante(data);
             Comprobante = comprobante;
         }
@@ -277,7 +277,7 @@ public partial class MovimientoViewModel(
 
         SetIfNotEmpty(data.Concepto, v => Concepto = v);
         SetIfNotEmpty(data.Establecimiento, v => Establecimiento = v);
-        SetIfNotEmpty(data.Nota, v => Notas = v);
+        SetIfNotEmpty(data.Nota, v => Nota = v);
 
         if (data.Importe is > 0)
             ImporteTexto = data.Importe.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
@@ -311,7 +311,7 @@ public partial class MovimientoViewModel(
 
     private bool HasOptionalFieldsFilled() =>
         !string.IsNullOrWhiteSpace(Establecimiento)
-        || !string.IsNullOrWhiteSpace(Notas)
+        || !string.IsNullOrWhiteSpace(Nota)
         || Hora != TimeSpan.Zero;
 
     [RelayCommand]

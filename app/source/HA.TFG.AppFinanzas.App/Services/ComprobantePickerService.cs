@@ -24,7 +24,7 @@ internal sealed class ComprobantePickerService : IComprobantePickerService
         if (result is null)
             return null;
 
-        return await LeerArchivoAsync(result.FullPath, result.FileName, result.ContentType, cancellationToken);
+        return await LeerArchivoAsync(result, cancellationToken);
     }
 
     public async Task<ComprobanteResult?> TomarFotoAsync(CancellationToken cancellationToken = default)
@@ -36,16 +36,19 @@ internal sealed class ComprobantePickerService : IComprobantePickerService
         if (photo is null)
             return null;
 
-        return await LeerArchivoAsync(photo.FullPath, photo.FileName, photo.ContentType, cancellationToken);
+        return await LeerArchivoAsync(photo, cancellationToken);
     }
 
     private static async Task<ComprobanteResult?> LeerArchivoAsync(
-        string fullPath, string fileName, string contentType, CancellationToken cancellationToken)
+        FileResult file, CancellationToken cancellationToken)
     {
-        var bytes = await File.ReadAllBytesAsync(fullPath, cancellationToken);
-        if (bytes.Length > MaxBytes)
+        using var stream = await file.OpenReadAsync();
+        using var memoryStream = new MemoryStream();
+        await stream.CopyToAsync(memoryStream, cancellationToken);
+
+        if (memoryStream.Length > MaxBytes)
             throw new InvalidOperationException("El archivo supera el tamaño máximo permitido de 1 MB.");
 
-        return new ComprobanteResult(bytes, fileName, contentType);
+        return new ComprobanteResult(memoryStream.ToArray(), file.FileName, file.ContentType);
     }
 }

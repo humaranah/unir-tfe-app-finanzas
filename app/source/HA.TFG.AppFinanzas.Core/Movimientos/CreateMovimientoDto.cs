@@ -11,7 +11,7 @@ public sealed record CreateMovimientoDto(
     DateTime FechaHora,
     Guid IdCuentaCategoria,
     string? Establecimiento = null,
-    string? Notas = null,
+    string? Nota = null,
     byte[]? ComprobanteBytes = null,
     string? ComprobanteNombre = null,
     string? ComprobanteContentType = null);
