@@ -11,7 +11,7 @@ namespace HA.TFG.AppFinanzas.BackEnd.Application.Features.Movimientos.ProcesarCo
 
 public class ProcesarComprobanteQueryHandler(
     IComprobanteAnalysisService analysisService,
-    IComprobanteExtraccionService extraccionService,
+    ILlmService extraccionService,
     IUsuarioRepository usuarioRepository,
     ICuentaRepository cuentaRepository)
     : IRequestHandler<ProcesarComprobanteQuery, ComprobanteExtraidoDto>

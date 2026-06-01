@@ -11,7 +11,7 @@ namespace HA.TFG.AppFinanzas.BackEnd.Application.Tests.Features.Movimientos;
 public class ProcesarComprobanteQueryHandlerTests
 {
     private readonly IComprobanteAnalysisService _analysisService = Substitute.For<IComprobanteAnalysisService>();
-    private readonly IComprobanteExtraccionService _extraccionService = Substitute.For<IComprobanteExtraccionService>();
+    private readonly ILlmService _extraccionService = Substitute.For<ILlmService>();
     private readonly IUsuarioRepository _usuarioRepository = Substitute.For<IUsuarioRepository>();
     private readonly ICuentaRepository _cuentaRepository = Substitute.For<ICuentaRepository>();
     private readonly ProcesarComprobanteQueryHandler _sut;
