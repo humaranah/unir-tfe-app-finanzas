@@ -28,9 +28,9 @@ public sealed class RecomendacionesController(IMediator mediator) : ControllerBa
     {
         var query = new ObtenerRecomendacionesQuery
         {
-            IdCuenta      = request.IdCuenta,
-            EmailUsuario  = User.Identity?.Name ?? string.Empty,
-            Consulta      = request.Consulta
+            IdCuenta   = request.IdCuenta,
+            UserEmail  = User.Identity?.Name ?? string.Empty,
+            Query      = request.Query
         };
 
         var result = await _mediator.Send(query, cancellationToken);

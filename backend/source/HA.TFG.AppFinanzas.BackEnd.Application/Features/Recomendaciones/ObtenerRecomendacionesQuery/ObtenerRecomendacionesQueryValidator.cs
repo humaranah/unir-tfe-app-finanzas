@@ -6,14 +6,14 @@ public class ObtenerRecomendacionesQueryValidator : AbstractValidator<ObtenerRec
 {
     public ObtenerRecomendacionesQueryValidator()
     {
-        RuleFor(x => x.EmailUsuario)
+        RuleFor(x => x.UserEmail)
             .NotEmpty().WithMessage("El email no puede estar vacío.");
 
         RuleFor(x => x.IdCuenta)
             .NotEmpty().WithMessage("El identificador de la cuenta no puede estar vacío.");
 
-        RuleFor(x => x.Consulta)
+        RuleFor(x => x.Query)
             .MaximumLength(500).WithMessage("La consulta no puede superar los 500 caracteres.")
-            .When(x => x.Consulta is not null);
+            .When(x => x.Query is not null);
     }
 }

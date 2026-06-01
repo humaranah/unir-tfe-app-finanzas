@@ -11,8 +11,8 @@ public class ObtenerRecomendacionesQueryValidatorTests
     {
         var query = new ObtenerRecomendacionesQuery
         {
-            IdCuenta     = Guid.CreateVersion7(),
-            EmailUsuario = "usuario@test.com"
+            IdCuenta  = Guid.CreateVersion7(),
+            UserEmail = "usuario@test.com"
         };
 
         var result = _sut.Validate(query);
@@ -25,9 +25,9 @@ public class ObtenerRecomendacionesQueryValidatorTests
     {
         var query = new ObtenerRecomendacionesQuery
         {
-            IdCuenta     = Guid.CreateVersion7(),
-            EmailUsuario = "usuario@test.com",
-            Consulta     = "¿Estoy gastando demasiado?"
+            IdCuenta  = Guid.CreateVersion7(),
+            UserEmail = "usuario@test.com",
+            Query     = "¿Estoy gastando demasiado?"
         };
 
         var result = _sut.Validate(query);
@@ -44,14 +44,14 @@ public class ObtenerRecomendacionesQueryValidatorTests
     {
         var query = new ObtenerRecomendacionesQuery
         {
-            IdCuenta     = Guid.CreateVersion7(),
-            EmailUsuario = email
+            IdCuenta  = Guid.CreateVersion7(),
+            UserEmail = email
         };
 
         var result = _sut.Validate(query);
 
         Assert.False(result.IsValid);
-        Assert.Contains(result.Errors, e => e.PropertyName == nameof(ObtenerRecomendacionesQuery.EmailUsuario));
+        Assert.Contains(result.Errors, e => e.PropertyName == nameof(ObtenerRecomendacionesQuery.UserEmail));
     }
 
     // ─── IdCuenta ─────────────────────────────────────────────────────────────
@@ -61,8 +61,8 @@ public class ObtenerRecomendacionesQueryValidatorTests
     {
         var query = new ObtenerRecomendacionesQuery
         {
-            IdCuenta     = Guid.Empty,
-            EmailUsuario = "usuario@test.com"
+            IdCuenta  = Guid.Empty,
+            UserEmail = "usuario@test.com"
         };
 
         var result = _sut.Validate(query);
@@ -78,9 +78,9 @@ public class ObtenerRecomendacionesQueryValidatorTests
     {
         var query = new ObtenerRecomendacionesQuery
         {
-            IdCuenta     = Guid.CreateVersion7(),
-            EmailUsuario = "usuario@test.com",
-            Consulta     = null
+            IdCuenta  = Guid.CreateVersion7(),
+            UserEmail = "usuario@test.com",
+            Query     = null
         };
 
         var result = _sut.Validate(query);
@@ -93,15 +93,15 @@ public class ObtenerRecomendacionesQueryValidatorTests
     {
         var query = new ObtenerRecomendacionesQuery
         {
-            IdCuenta     = Guid.CreateVersion7(),
-            EmailUsuario = "usuario@test.com",
-            Consulta     = new string('a', 501)
+            IdCuenta  = Guid.CreateVersion7(),
+            UserEmail = "usuario@test.com",
+            Query     = new string('a', 501)
         };
 
         var result = _sut.Validate(query);
 
         Assert.False(result.IsValid);
-        Assert.Contains(result.Errors, e => e.PropertyName == nameof(ObtenerRecomendacionesQuery.Consulta));
+        Assert.Contains(result.Errors, e => e.PropertyName == nameof(ObtenerRecomendacionesQuery.Query));
     }
 
     [Fact]
@@ -109,9 +109,9 @@ public class ObtenerRecomendacionesQueryValidatorTests
     {
         var query = new ObtenerRecomendacionesQuery
         {
-            IdCuenta     = Guid.CreateVersion7(),
-            EmailUsuario = "usuario@test.com",
-            Consulta     = new string('a', 500)
+            IdCuenta  = Guid.CreateVersion7(),
+            UserEmail = "usuario@test.com",
+            Query     = new string('a', 500)
         };
 
         var result = _sut.Validate(query);

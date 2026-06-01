@@ -46,19 +46,19 @@ public sealed class MovimientoRepository(AppDbContext context) : IMovimientoRepo
             .FirstOrDefaultAsync(cancellationToken);
 
     public async Task<IReadOnlyList<ResumenGastoCategoria>> GetResumenGastosPorCategoriaAsync(
-        Guid idCuenta,
-        DateOnly fechaDesde,
-        DateOnly fechaHasta,
+        Guid accountId,
+        DateOnly from,
+        DateOnly to,
         CancellationToken cancellationToken)
     {
         // El JOIN explícito con CuentaCategorias evita el acceso a la navegación dentro del GroupBy.
         // La proyección al tipo anónimo con Sum se resuelve en SQL; el mapeo al record se hace en memoria
         // para evitar que EF Core genere un AsQueryable().Sum() no traducible.
         var rows = await context.Movimientos
-            .Where(m => m.IdCuenta == idCuenta
+            .Where(m => m.IdCuenta == accountId
                 && m.TipoMovimiento == TipoMovimiento.Gasto
-                && DateOnly.FromDateTime(m.FechaMovimiento) >= fechaDesde
-                && DateOnly.FromDateTime(m.FechaMovimiento) <= fechaHasta)
+                && DateOnly.FromDateTime(m.FechaMovimiento) >= from
+                && DateOnly.FromDateTime(m.FechaMovimiento) <= to)
             .Join(
                 context.CuentaCategorias,
                 m => m.IdCuentaCategoria,
@@ -68,8 +68,8 @@ public sealed class MovimientoRepository(AppDbContext context) : IMovimientoRepo
                     m.FechaMovimiento.Year,
                     m.FechaMovimiento.Month,
                     m.IdCuentaCategoria,
-                    Categoria = c.Nombre,
-                    m.Moneda,
+                    CategoryName = c.Nombre,
+                    Currency     = m.Moneda,
                     m.Importe
                 })
             .GroupBy(x => new
@@ -77,16 +77,16 @@ public sealed class MovimientoRepository(AppDbContext context) : IMovimientoRepo
                 x.Year,
                 x.Month,
                 x.IdCuentaCategoria,
-                x.Categoria,
-                x.Moneda
+                x.CategoryName,
+                x.Currency
             })
             .Select(g => new
             {
                 g.Key.Year,
                 g.Key.Month,
                 g.Key.IdCuentaCategoria,
-                g.Key.Categoria,
-                g.Key.Moneda,
+                g.Key.CategoryName,
+                g.Key.Currency,
                 Total = g.Sum(x => x.Importe)
             })
             .OrderByDescending(r => r.Year)
@@ -95,6 +95,6 @@ public sealed class MovimientoRepository(AppDbContext context) : IMovimientoRepo
             .ToListAsync(cancellationToken);
 
         return [.. rows.Select(r => new ResumenGastoCategoria(
-            r.Year, r.Month, r.IdCuentaCategoria, r.Categoria, r.Moneda, r.Total))];
+            r.Year, r.Month, r.IdCuentaCategoria, r.CategoryName, r.Currency, r.Total))];
     }
 }

@@ -24,8 +24,8 @@ public interface IMovimientoRepository
     /// <param name="fechaHasta">Fecha final del rango (inclusive).</param>
     /// <param name="cancellationToken">Token de cancelación.</param>
     Task<IReadOnlyList<ResumenGastoCategoria>> GetResumenGastosPorCategoriaAsync(
-        Guid idCuenta,
-        DateOnly fechaDesde,
-        DateOnly fechaHasta,
+        Guid accountId,
+        DateOnly from,
+        DateOnly to,
         CancellationToken cancellationToken);
 }

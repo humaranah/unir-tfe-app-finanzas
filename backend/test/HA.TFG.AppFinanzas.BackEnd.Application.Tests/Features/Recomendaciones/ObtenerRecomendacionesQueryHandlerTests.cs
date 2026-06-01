@@ -29,12 +29,6 @@ public class ObtenerRecomendacionesQueryHandlerTests
         new(DateTime.UtcNow.Year, DateTime.UtcNow.Month, Guid.CreateVersion7(), "Transporte",   "EUR",  85.00m),
     ];
 
-    private static readonly IReadOnlyList<ResumenGastoCategoria> ResumenHistorico =
-    [
-        new(DateTime.UtcNow.Year, DateTime.UtcNow.AddMonths(-1).Month, Guid.CreateVersion7(), "Alimentación", "EUR", 280.00m),
-        new(DateTime.UtcNow.Year, DateTime.UtcNow.AddMonths(-1).Month, Guid.CreateVersion7(), "Transporte",   "EUR",  75.00m),
-    ];
-
     public ObtenerRecomendacionesQueryHandlerTests()
     {
         _usuarioRepository.GetByEmailAsync(Email, Arg.Any<CancellationToken>())
@@ -59,11 +53,11 @@ public class ObtenerRecomendacionesQueryHandlerTests
             NullLogger<ObtenerRecomendacionesQueryHandler>.Instance);
     }
 
-    private static ObtenerRecomendacionesQuery CrearQuery(string? consulta = null) => new()
+    private static ObtenerRecomendacionesQuery CrearQuery(string? query = null) => new()
     {
-        IdCuenta     = IdCuenta,
-        EmailUsuario = Email,
-        Consulta     = consulta
+        IdCuenta  = IdCuenta,
+        UserEmail = Email,
+        Query     = query
     };
 
     // ─── Paso 1: resolución de usuario y cuenta ──────────────────────────────
@@ -123,14 +117,14 @@ public class ObtenerRecomendacionesQueryHandlerTests
     {
         var result = await _sut.Handle(CrearQuery(), CancellationToken.None);
 
-        Assert.Equal(RespuestaLlm, result.Contenido);
-        Assert.True(result.GeneradoEn <= DateTimeOffset.UtcNow);
+        Assert.Equal(RespuestaLlm, result.Content);
+        Assert.True(result.GeneratedAt <= DateTimeOffset.UtcNow);
     }
 
     [Fact]
     public async Task Handle_SinConsulta_PromptContieneInstruccionGenerica()
     {
-        await _sut.Handle(CrearQuery(consulta: null), CancellationToken.None);
+        await _sut.Handle(CrearQuery(query: null), CancellationToken.None);
 
         await _llmService.Received(1).EnviarPromptAsync(
             Arg.Is<string>(p => p.Contains("no ha indicado una consulta específica")),
@@ -143,7 +137,7 @@ public class ObtenerRecomendacionesQueryHandlerTests
     {
         const string consulta = "¿Estoy gastando demasiado en ocio?";
 
-        await _sut.Handle(CrearQuery(consulta: consulta), CancellationToken.None);
+        await _sut.Handle(CrearQuery(query: consulta), CancellationToken.None);
 
         await _llmService.Received(1).EnviarPromptAsync(
             Arg.Is<string>(p => p.Contains(consulta)),
