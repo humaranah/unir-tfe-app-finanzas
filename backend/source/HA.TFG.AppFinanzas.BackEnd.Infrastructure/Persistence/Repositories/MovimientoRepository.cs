@@ -51,29 +51,50 @@ public sealed class MovimientoRepository(AppDbContext context) : IMovimientoRepo
         DateOnly fechaHasta,
         CancellationToken cancellationToken)
     {
-        return await context.Movimientos
+        // El JOIN explícito con CuentaCategorias evita el acceso a la navegación dentro del GroupBy.
+        // La proyección al tipo anónimo con Sum se resuelve en SQL; el mapeo al record se hace en memoria
+        // para evitar que EF Core genere un AsQueryable().Sum() no traducible.
+        var rows = await context.Movimientos
             .Where(m => m.IdCuenta == idCuenta
                 && m.TipoMovimiento == TipoMovimiento.Gasto
                 && DateOnly.FromDateTime(m.FechaMovimiento) >= fechaDesde
                 && DateOnly.FromDateTime(m.FechaMovimiento) <= fechaHasta)
-            .GroupBy(m => new
+            .Join(
+                context.CuentaCategorias,
+                m => m.IdCuentaCategoria,
+                c => c.IdCuentaCategoria,
+                (m, c) => new
+                {
+                    m.FechaMovimiento.Year,
+                    m.FechaMovimiento.Month,
+                    m.IdCuentaCategoria,
+                    Categoria = c.Nombre,
+                    m.Moneda,
+                    m.Importe
+                })
+            .GroupBy(x => new
             {
-                m.FechaMovimiento.Year,
-                m.FechaMovimiento.Month,
-                m.IdCuentaCategoria,
-                Categoria = m.Categoria!.Nombre,
-                m.Moneda
+                x.Year,
+                x.Month,
+                x.IdCuentaCategoria,
+                x.Categoria,
+                x.Moneda
             })
-            .Select(g => new ResumenGastoCategoria(
+            .Select(g => new
+            {
                 g.Key.Year,
                 g.Key.Month,
                 g.Key.IdCuentaCategoria,
                 g.Key.Categoria,
                 g.Key.Moneda,
-                g.Sum(m => m.Importe)))
-            .OrderByDescending(r => r.Anio)
-            .ThenByDescending(r => r.Mes)
+                Total = g.Sum(x => x.Importe)
+            })
+            .OrderByDescending(r => r.Year)
+            .ThenByDescending(r => r.Month)
             .ThenByDescending(r => r.Total)
             .ToListAsync(cancellationToken);
+
+        return [.. rows.Select(r => new ResumenGastoCategoria(
+            r.Year, r.Month, r.IdCuentaCategoria, r.Categoria, r.Moneda, r.Total))];
     }
 }
