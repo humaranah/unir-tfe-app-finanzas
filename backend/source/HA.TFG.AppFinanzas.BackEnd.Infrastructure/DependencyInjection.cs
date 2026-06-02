@@ -139,11 +139,11 @@ public static class DependencyInjection
 
         if (!string.IsNullOrWhiteSpace(foundryConfig.ProjectEndpoint))
         {
-            services.AddScoped<IComprobanteExtraccionService, FoundryComprobanteExtraccionService>();
+            services.AddScoped<ILlmService, FoundryLlmService>();
         }
         else
         {
-            services.AddScoped<IComprobanteExtraccionService, NullComprobanteExtraccionService>();
+            services.AddScoped<ILlmService, NullLlmService>();
         }
     }
 }

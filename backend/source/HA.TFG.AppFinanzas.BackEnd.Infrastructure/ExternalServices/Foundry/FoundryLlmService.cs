@@ -6,14 +6,17 @@ using Microsoft.Extensions.Options;
 
 namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.ExternalServices.Foundry;
 
-internal sealed class FoundryComprobanteExtraccionService(
+internal sealed class FoundryLlmService(
     IOptions<FoundryConfig> options,
-    ILogger<FoundryComprobanteExtraccionService> logger)
-    : IComprobanteExtraccionService
+    ILogger<FoundryLlmService> logger)
+    : ILlmService
 {
     private readonly FoundryConfig _config = options.Value;
 
-    public async Task<string?> EnviarPromptAsync(string prompt, CancellationToken cancellationToken)
+    public async Task<string?> EnviarPromptAsync(
+        string prompt,
+        CancellationToken cancellationToken,
+        string? instructions = null)
     {
         try
         {
@@ -25,7 +28,7 @@ internal sealed class FoundryComprobanteExtraccionService(
             // equivalente a chat completion. No crea ningún recurso en Azure.
             var agent = projectClient.AsAIAgent(
                 model: _config.DeploymentName,
-                instructions: _config.Instructions);
+                instructions: instructions ?? _config.Instructions);
 
             var response = await agent.RunAsync(prompt, cancellationToken: cancellationToken);
             return response?.ToString();
