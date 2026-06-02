@@ -1,6 +1,8 @@
 using HA.TFG.AppFinanzas.BackEnd.Application.Contracts;
 using HA.TFG.AppFinanzas.BackEnd.Domain.Models;
 using HA.TFG.AppFinanzas.BackEnd.Domain.ValueObjects;
+using HA.TFG.AppFinanzas.BackEnd.Infrastructure.Persistence.Repositories.Dtos;
+using HA.TFG.AppFinanzas.BackEnd.Infrastructure.Persistence.Repositories.Mappers;
 using Microsoft.EntityFrameworkCore;
 
 namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Persistence.Repositories;
@@ -46,55 +48,45 @@ public sealed class MovimientoRepository(AppDbContext context) : IMovimientoRepo
             .FirstOrDefaultAsync(cancellationToken);
 
     public async Task<IReadOnlyList<ResumenGastoCategoria>> GetResumenGastosPorCategoriaAsync(
-        Guid accountId,
-        DateOnly from,
-        DateOnly to,
+        Guid idCuenta,
+        DateOnly fechaDesde,
+        DateOnly fechaHasta,
         CancellationToken cancellationToken)
     {
-        // El JOIN explícito con CuentaCategorias evita el acceso a la navegación dentro del GroupBy.
-        // La proyección al tipo anónimo con Sum se resuelve en SQL; el mapeo al record se hace en memoria
+        // El JOIN se ejecuta en base de datos; el GroupBy+Sum se evalúa en cliente
         // para evitar que EF Core genere un AsQueryable().Sum() no traducible.
-        var rows = await context.Movimientos
-            .Where(m => m.IdCuenta == accountId
+        var joinRows = await context.Movimientos
+            .Where(m => m.IdCuenta == idCuenta
                 && m.TipoMovimiento == TipoMovimiento.Gasto
-                && DateOnly.FromDateTime(m.FechaMovimiento) >= from
-                && DateOnly.FromDateTime(m.FechaMovimiento) <= to)
+                && DateOnly.FromDateTime(m.FechaMovimiento) >= fechaDesde
+                && DateOnly.FromDateTime(m.FechaMovimiento) <= fechaHasta)
             .Join(
                 context.CuentaCategorias,
                 m => m.IdCuentaCategoria,
                 c => c.IdCuentaCategoria,
                 (m, c) => new
                 {
-                    m.FechaMovimiento.Year,
-                    m.FechaMovimiento.Month,
+                    Año = m.FechaMovimiento.Year,
+                    Mes = m.FechaMovimiento.Month,
                     m.IdCuentaCategoria,
-                    CategoryName = c.Nombre,
-                    Currency     = m.Moneda,
+                    NombreCategoria = c.Nombre,
+                    m.Moneda,
                     m.Importe
                 })
-            .GroupBy(x => new
-            {
-                x.Year,
-                x.Month,
-                x.IdCuentaCategoria,
-                x.CategoryName,
-                x.Currency
-            })
-            .Select(g => new
-            {
-                g.Key.Year,
-                g.Key.Month,
-                g.Key.IdCuentaCategoria,
-                g.Key.CategoryName,
-                g.Key.Currency,
-                Total = g.Sum(x => x.Importe)
-            })
-            .OrderByDescending(r => r.Year)
-            .ThenByDescending(r => r.Month)
-            .ThenByDescending(r => r.Total)
             .ToListAsync(cancellationToken);
 
-        return [.. rows.Select(r => new ResumenGastoCategoria(
-            r.Year, r.Month, r.IdCuentaCategoria, r.CategoryName, r.Currency, r.Total))];
+        return [.. joinRows
+            .GroupBy(x => (x.Año, x.Mes, x.IdCuentaCategoria, x.NombreCategoria, x.Moneda))
+            .Select(g => new ResumenGastoCategoriaRowDto(
+                g.Key.Año,
+                g.Key.Mes,
+                g.Key.IdCuentaCategoria,
+                g.Key.NombreCategoria,
+                g.Key.Moneda,
+                g.Sum(x => x.Importe)))
+            .OrderByDescending(r => r.Año)
+            .ThenByDescending(r => r.Mes)
+            .ThenByDescending(r => r.Total)
+            .Select(r => r.ToContract())];
     }
 }
