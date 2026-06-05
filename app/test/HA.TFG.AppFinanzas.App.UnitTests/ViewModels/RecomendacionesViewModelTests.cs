@@ -70,7 +70,8 @@ public class RecomendacionesViewModelTests
         Assert.NotEmpty(sut.Error);
         Assert.Empty(sut.Content);
         Assert.False(sut.IsBusy);
-        await _recomendacionesService.DidNotReceive().GetRecomendacionAsync(Arg.Any<Guid>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
+        _ = _recomendacionesService.DidNotReceive()
+            .GetRecomendacionAsync(Arg.Any<Guid>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -114,7 +115,8 @@ public class RecomendacionesViewModelTests
         sut.Query = string.Empty;
         await sut.PreguntarCommand.ExecuteAsync(null);
 
-        await _recomendacionesService.DidNotReceive().GetRecomendacionAsync(Arg.Any<Guid>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
+        _ = _recomendacionesService.DidNotReceive()
+            .GetRecomendacionAsync(Arg.Any<Guid>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]

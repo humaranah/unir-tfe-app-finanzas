@@ -23,7 +23,7 @@ public partial class RecomendacionesPage : ContentPage
         if (_resumenCargado)
             return;
 
-        _resumenCargado = true;
+        _resumenCargado = _viewModel.HasContent;
         await _viewModel.CargarResumenAsync();
     }
 }
