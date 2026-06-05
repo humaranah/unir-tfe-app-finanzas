@@ -3,6 +3,7 @@ using HA.TFG.AppFinanzas.App.Services;
 using HA.TFG.AppFinanzas.Core.Authentication;
 using HA.TFG.AppFinanzas.Core.Cuentas;
 using HA.TFG.AppFinanzas.Core.Movimientos;
+using HA.TFG.AppFinanzas.Core.Recomendaciones;
 
 namespace HA.TFG.AppFinanzas.App.Extensions;
 
@@ -20,6 +21,7 @@ internal static class BackendExtensions
         builder.Services.AddSingleton<IUsuarioService, UsuarioService>();
         builder.Services.AddSingleton<ICuentasService, CuentasApiClient>();
         builder.Services.AddSingleton<IMovimientosService, MovimientosApiClient>();
+        builder.Services.AddSingleton<IRecomendacionesService, RecomendacionesApiClient>();
         builder.Services.AddSingleton<IComprobantePickerService, ComprobantePickerService>();
         builder.Services.AddTransient<AuthHeaderHandler>();
 

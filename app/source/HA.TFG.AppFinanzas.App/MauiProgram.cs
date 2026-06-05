@@ -43,11 +43,13 @@ public static class MauiProgram
         builder.Services.AddSingleton<CrearCuentaViewModel>();
         builder.Services.AddSingleton<MovimientosViewModel>();
         builder.Services.AddTransient<MovimientoViewModel>();
+        builder.Services.AddSingleton<RecomendacionesViewModel>();
         builder.Services.AddSingleton<Views.LoginPage>();
         builder.Services.AddSingleton<Views.SplashLoadingPage>();
         builder.Services.AddTransient<Views.Pages.CrearCuentaPage>();
         builder.Services.AddSingleton<Views.Pages.MovimientosPage>();
         builder.Services.AddTransient<Views.Pages.CrearMovimientoPage>();
+        builder.Services.AddSingleton<Views.Pages.RecomendacionesPage>();
         builder.Services.AddSingleton<AppShell>();
         builder.Services.AddSingleton<App>();
 

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:HA.TFG.AppFinanzas.Core.ViewModels;assembly=HA.TFG.AppFinanzas.Core"
+             xmlns:markdown="clr-namespace:Indiko.Maui.Controls.Markdown;assembly=Indiko.Maui.Controls.Markdown"
+             x:DataType="vm:RecomendacionesViewModel"
+             x:Class="HA.TFG.AppFinanzas.App.Views.Pages.RecomendacionesPage"
+             Title="Recomendaciones">
+
+    <Grid MaximumWidthRequest="800" RowSpacing="12" Padding="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout Spacing="12">
+
+                <markdown:MarkdownView x:Name="markdownView"
+                                       MarkdownText="{Binding Content}"
+                                       UseAppTheme="True"
+                                       IsVisible="{Binding HasContent}" />
+
+                <VerticalStackLayout IsVisible="{Binding HasError}"
+                                     HorizontalOptions="Center"
+                                     VerticalOptions="Center"
+                                     Spacing="12">
+                    <Label Text="Algo salió mal"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center" />
+                    <Label Text="No pudimos obtener tus recomendaciones. Comprueba tu conexión e intenta de nuevo."
+                           FontSize="14"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <ActivityIndicator Grid.Row="0"
+                           IsRunning="{Binding IsBusy}"
+                           IsVisible="{Binding IsBusy}"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+
+        <Grid Grid.Row="1" ColumnSpacing="8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Entry Grid.Column="0"
+                   Placeholder="Pregunta algo sobre tus finanzas..."
+                   Text="{Binding Query}"
+                   IsEnabled="{Binding IsNotBusy}"
+                   ReturnCommand="{Binding PreguntarCommand}" />
+
+            <Button Grid.Column="1"
+                    Text="Enviar"
+                    Command="{Binding PreguntarCommand}"
+                    IsEnabled="{Binding IsNotBusy}" />
+        </Grid>
+    </Grid>
+
+</ContentPage>
