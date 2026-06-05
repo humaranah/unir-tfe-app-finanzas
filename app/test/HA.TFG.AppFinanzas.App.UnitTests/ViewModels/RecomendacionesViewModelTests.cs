@@ -74,7 +74,7 @@ public class RecomendacionesViewModelTests
     }
 
     [Fact]
-    public async Task CargarResumenAsync_WhenServiceThrows_CapturexError()
+    public async Task CargarResumenAsync_WhenServiceThrows_CapturedError()
     {
         ConfigurarCuentaPorDefecto();
         _recomendacionesService.GetRecomendacionAsync(Arg.Any<Guid>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())

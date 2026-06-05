@@ -64,6 +64,7 @@ public partial class RecomendacionesViewModel(
 
             if (_idCuenta is null)
             {
+                Content = string.Empty;
                 Error = "No se encontró una cuenta para generar recomendaciones.";
                 return;
             }
@@ -75,6 +76,7 @@ public partial class RecomendacionesViewModel(
         }
         catch (Exception ex)
         {
+            Content = string.Empty;
             Error = ex.Message;
         }
         finally
