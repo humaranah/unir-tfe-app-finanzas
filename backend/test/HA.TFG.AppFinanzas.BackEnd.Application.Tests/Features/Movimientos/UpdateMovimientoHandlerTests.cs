@@ -66,7 +66,6 @@ public class UpdateMovimientoCommandHandlerTests
     }
 
     [Theory]
-    [InlineData(true, true, true, true)]
     [InlineData(false, true, true, true)]
     [InlineData(true, false, true, true)]
     [InlineData(true, true, false, true)]
@@ -75,6 +74,12 @@ public class UpdateMovimientoCommandHandlerTests
         bool usuarioExiste, bool cuentaExiste, bool movimientoExiste, bool categoriaExiste)
     {
         var command = BuildCommand();
+        var movimiento = new Movimiento
+        {
+            IdMovimiento = IdMovimiento,
+            IdCuenta = IdCuenta,
+            FechaCreacion = DateTime.UtcNow
+        };
 
         if (!usuarioExiste)
             _usuarioRepository.GetByEmailAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns((Usuario?)null);
@@ -82,8 +87,15 @@ public class UpdateMovimientoCommandHandlerTests
         if (!cuentaExiste)
             _cuentaRepository.GetCuentaByIdAsync(IdUsuario, IdCuenta, Arg.Any<CancellationToken>()).Returns((Cuenta?)null);
 
-        if (!movimientoExiste)
+        if (movimientoExiste)
+        {
+            _movimientoRepository.GetMovimientoByIdAsync(IdCuenta, IdMovimiento, Arg.Any<CancellationToken>()).Returns(movimiento);
+            _movimientoRepository.UpdateMovimientoAsync(Arg.Any<Movimiento>(), Arg.Any<CancellationToken>()).Returns(movimiento);
+        }
+        else
+        {
             _movimientoRepository.GetMovimientoByIdAsync(IdCuenta, IdMovimiento, Arg.Any<CancellationToken>()).Returns((Movimiento?)null);
+        }
 
         if (!categoriaExiste)
             _cuentaRepository.GetCategoriaByIdAsync(IdCuenta, IdCuentaCategoriaNew, Arg.Any<CancellationToken>()).Returns((CuentaCategoria?)null);

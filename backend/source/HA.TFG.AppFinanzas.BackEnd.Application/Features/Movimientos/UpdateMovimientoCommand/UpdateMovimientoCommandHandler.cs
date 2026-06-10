@@ -37,6 +37,7 @@ public class UpdateMovimientoCommandHandler(
             TipoCambio = request.TipoCambio,
             Nota = request.Nota,
             FechaMovimiento = request.FechaMovimiento,
+            FechaModificacion = DateTime.UtcNow,
             Categoria = null
         };
 

@@ -8,4 +8,7 @@ public static partial class UpdateMovimientoMapper
 {
     // Movimiento → UpdateMovimientoResult
     public static partial UpdateMovimientoResult ToResult(this Movimiento movimiento);
+
+    private static DateTime MapFechaModificacion(DateTime? fechaModificacion) =>
+        fechaModificacion!.Value;
 }

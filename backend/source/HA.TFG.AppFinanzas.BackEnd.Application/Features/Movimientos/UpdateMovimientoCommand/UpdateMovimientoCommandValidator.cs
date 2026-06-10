@@ -1,5 +1,4 @@
 using FluentValidation;
-using HA.TFG.AppFinanzas.BackEnd.Domain.ValueObjects;
 
 namespace HA.TFG.AppFinanzas.BackEnd.Application.Features.Movimientos.UpdateMovimientoCommand;
 
@@ -42,6 +41,7 @@ public class UpdateMovimientoCommandValidator : AbstractValidator<UpdateMovimien
             .When(x => x.TipoCambio.HasValue);
 
         RuleFor(x => x.Nota)
+            .NotNull().WithMessage("La nota no puede ser nula.")
             .MaximumLength(1000).WithMessage("La nota no puede exceder 1000 caracteres.");
 
         RuleFor(x => x.FechaMovimiento)
