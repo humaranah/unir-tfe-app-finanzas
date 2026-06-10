@@ -1,0 +1,16 @@
+using HA.TFG.AppFinanzas.BackEnd.Domain.ValueObjects;
+
+namespace HA.TFG.AppFinanzas.BackEnd.Controllers.Requests;
+
+public record UpdateMovimientoRequest
+{
+    public required Guid IdCuentaCategoria { get; init; }
+    public required TipoMovimiento TipoMovimiento { get; init; }
+    public required string Concepto { get; init; }
+    public string? Establecimiento { get; init; }
+    public required decimal Importe { get; init; }
+    public required string Moneda { get; init; }
+    public decimal? TipoCambio { get; init; }
+    public string Nota { get; init; } = string.Empty;
+    public required DateTime FechaMovimiento { get; init; }
+}

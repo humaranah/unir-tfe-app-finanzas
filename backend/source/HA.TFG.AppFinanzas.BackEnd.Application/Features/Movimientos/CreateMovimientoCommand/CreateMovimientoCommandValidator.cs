@@ -32,7 +32,7 @@ public class CreateMovimientoCommandValidator : AbstractValidator<CreateMovimien
 
         RuleFor(x => x.Moneda)
             .NotEmpty().WithMessage("La moneda es obligatoria.")
-            .MaximumLength(3).WithMessage("La moneda no puede superar los 3 caracteres.");
+            .Length(3).WithMessage("La moneda debe tener 3 caracteres.");
 
         RuleFor(x => x.TipoCambio)
             .GreaterThan(0).When(x => x.TipoCambio.HasValue)
