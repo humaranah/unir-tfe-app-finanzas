@@ -5,6 +5,7 @@ using HA.TFG.AppFinanzas.BackEnd.Application.Features.Movimientos.CreateMovimien
 using HA.TFG.AppFinanzas.BackEnd.Application.Features.Movimientos.GetComprobanteMovimientoQuery;
 using HA.TFG.AppFinanzas.BackEnd.Application.Features.Movimientos.GetMovimientoDetalleQuery;
 using HA.TFG.AppFinanzas.BackEnd.Application.Features.Movimientos.GetMovimientosQuery;
+using HA.TFG.AppFinanzas.BackEnd.Application.Features.Movimientos.UpdateMovimientoCommand;
 using HA.TFG.AppFinanzas.BackEnd.Controllers.Mappers;
 using HA.TFG.AppFinanzas.BackEnd.Controllers.Requests;
 using HA.TFG.AppFinanzas.BackEnd.Domain.Common;
@@ -125,5 +126,21 @@ public sealed class CuentasController(IMediator mediator) : ControllerBase
                 await command.ComprobanteStream.DisposeAsync();
             }
         }
+    }
+
+    [HttpPut("{idCuenta:guid}/movimientos/{idMovimiento:guid}")]
+    [ProducesResponseType<UpdateMovimientoResult>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UpdateMovimiento(
+        [FromRoute] Guid idCuenta,
+        [FromRoute] Guid idMovimiento,
+        [FromBody] UpdateMovimientoRequest request,
+        CancellationToken cancellationToken)
+    {
+        var email = User.Identity?.Name ?? string.Empty;
+        var command = request.ToCommand(email, idCuenta, idMovimiento);
+        var result = await _mediator.Send(command, cancellationToken);
+        return Ok(result);
     }
 }

@@ -46,8 +46,7 @@ public class CreateMovimientoCommandHandler(
             {
                 IdCuenta = cuenta.IdCuenta,
                 IdCuentaCategoria = request.IdCuentaCategoria,
-                IdComprobante = idComprobante,
-                FechaCreacion = DateTime.UtcNow
+                IdComprobante = idComprobante
             };
 
             var resultado = await movimientoRepository.AddMovimientoAsync(movimiento, cancellationToken);

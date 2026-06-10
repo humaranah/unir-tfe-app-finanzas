@@ -6,6 +6,7 @@ using HA.TFG.AppFinanzas.BackEnd.Infrastructure.ExternalServices.DocumentIntelli
 using HA.TFG.AppFinanzas.BackEnd.Infrastructure.ExternalServices.Foundry;
 using HA.TFG.AppFinanzas.BackEnd.Infrastructure.ExternalServices.Storage;
 using HA.TFG.AppFinanzas.BackEnd.Infrastructure.Persistence;
+using HA.TFG.AppFinanzas.BackEnd.Infrastructure.Persistence.Interceptors;
 using HA.TFG.AppFinanzas.BackEnd.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -39,11 +40,13 @@ public static class DependencyInjection
                 "Revisa appsettings.json o las variables de entorno del entorno actual.");
 
         services.AddDbContext<AppDbContext>(options =>
-            options.UseSqlServer(connectionString, sqlServerOptions =>
-                sqlServerOptions.EnableRetryOnFailure(
-                    maxRetryCount: 5,
-                    maxRetryDelay: TimeSpan.FromSeconds(30),
-                    errorNumbersToAdd: null)));
+            options
+                .AddInterceptors(new AuditInterceptor())
+                .UseSqlServer(connectionString, sqlServerOptions =>
+                    sqlServerOptions.EnableRetryOnFailure(
+                        maxRetryCount: 5,
+                        maxRetryDelay: TimeSpan.FromSeconds(30),
+                        errorNumbersToAdd: null)));
     }
 
     private static void AddRepositories(this IServiceCollection services)
