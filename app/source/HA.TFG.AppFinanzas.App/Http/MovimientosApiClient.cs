@@ -125,6 +125,14 @@ internal sealed class MovimientosApiClient(IHttpClientFactory httpClientFactory)
         if (dto.Nota is not null)
             content.Add(new StringContent(dto.Nota), "Nota");
 
+        if (dto.ComprobanteBytes is not null && dto.ComprobanteNombre is not null)
+        {
+            var fileContent = new ByteArrayContent(dto.ComprobanteBytes);
+            fileContent.Headers.ContentType =
+                new System.Net.Http.Headers.MediaTypeHeaderValue(dto.ComprobanteContentType ?? "application/octet-stream");
+            content.Add(fileContent, "Comprobante", dto.ComprobanteNombre);
+        }
+
         using var response = await client.PutAsync(
             $"api/cuentas/{dto.IdCuenta}/movimientos/{dto.IdMovimiento}", content, cancellationToken);
 

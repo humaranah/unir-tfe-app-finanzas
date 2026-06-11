@@ -154,8 +154,7 @@ public partial class MovimientoViewModel(
             TipoSeleccionado = detalle.TipoMovimiento;
             Fecha = detalle.FechaMovimiento.Date;
             Hora = detalle.FechaMovimiento.TimeOfDay;
-            MostrarOpcionales = !string.IsNullOrWhiteSpace(detalle.Establecimiento)
-                             || !string.IsNullOrWhiteSpace(detalle.Nota);
+            MostrarOpcionales = HasOptionalFieldsFilled();
             Comprobante = null;
 
             var moneda = Monedas.FirstOrDefault(m =>
@@ -220,7 +219,10 @@ public partial class MovimientoViewModel(
                     Fecha.Date + Hora,
                     CategoriaSeleccionada!.IdCuentaCategoria,
                     string.IsNullOrWhiteSpace(Establecimiento) ? null : Establecimiento.Trim(),
-                    string.IsNullOrWhiteSpace(Nota) ? null : Nota.Trim()),
+                    string.IsNullOrWhiteSpace(Nota) ? null : Nota.Trim(),
+                    Comprobante?.Bytes,
+                    Comprobante?.NombreArchivo,
+                    Comprobante?.ContentType),
                 cancellationToken);
 
             await navigationService.GoToAsync("//movimientos");

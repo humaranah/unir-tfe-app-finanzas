@@ -17,5 +17,9 @@ public static partial class UpdateMovimientoMapper
     [MapperIgnoreTarget(nameof(UpdateMovimientoCommand.Email))]
     [MapperIgnoreTarget(nameof(UpdateMovimientoCommand.IdCuenta))]
     [MapperIgnoreTarget(nameof(UpdateMovimientoCommand.IdMovimiento))]
+    [MapperIgnoreTarget(nameof(UpdateMovimientoCommand.ComprobanteStream))]
+    [MapperIgnoreTarget(nameof(UpdateMovimientoCommand.ComprobanteFileName))]
+    [MapperIgnoreTarget(nameof(UpdateMovimientoCommand.ComprobanteContentType))]
+    [MapperIgnoreSource(nameof(UpdateMovimientoRequest.Comprobante))]
     private static partial UpdateMovimientoCommand ToCommandInternal(UpdateMovimientoRequest request);
 }

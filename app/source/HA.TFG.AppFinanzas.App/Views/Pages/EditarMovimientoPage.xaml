@@ -172,6 +172,44 @@
                             HorizontalOptions="Fill" />
                 </VerticalStackLayout>
 
+                <!-- Comprobante -->
+                <VerticalStackLayout Spacing="4" Margin="0,0,0,16">
+                    <Label Text="Comprobante" FontAttributes="Bold" />
+
+                    <Button Text="Adjuntar comprobante"
+                            ContentLayout="Left,8"
+                            Command="{Binding OpenComprobanteOptionsCommand}"
+                            Style="{DynamicResource OutlinedButton}"
+                            HorizontalOptions="Fill"
+                            IsVisible="{Binding NoTieneComprobante}">
+                        <Button.ImageSource>
+                            <FontImageSource FontFamily="FluentIcons"
+                                             Glyph="&#xF157;"
+                                             Size="18"
+                                             Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
+                        </Button.ImageSource>
+                    </Button>
+
+                    <Grid ColumnDefinitions="*,auto" ColumnSpacing="8"
+                          IsVisible="{Binding TieneComprobante}">
+                        <Label Grid.Column="0"
+                               Text="{Binding Comprobante.NombreArchivo}"
+                               VerticalOptions="Center"
+                               LineBreakMode="MiddleTruncation"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}" />
+                        <Button Grid.Column="1"
+                                Text="Quitar"
+                                Command="{Binding RemoveComprobanteCommand}"
+                                Style="{DynamicResource OutlinedButton}"
+                                TextColor="OrangeRed"
+                                HorizontalOptions="End" />
+                    </Grid>
+
+                    <Label Text="Imagen o PDF, máximo 1 MB"
+                           FontSize="11"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}" />
+                </VerticalStackLayout>
+
             </VerticalStackLayout>
 
             <!-- Error -->

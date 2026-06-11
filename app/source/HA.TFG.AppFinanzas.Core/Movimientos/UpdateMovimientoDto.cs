@@ -12,4 +12,7 @@ public sealed record UpdateMovimientoDto(
     DateTime FechaHora,
     Guid IdCuentaCategoria,
     string? Establecimiento = null,
-    string? Nota = null);
+    string? Nota = null,
+    byte[]? ComprobanteBytes = null,
+    string? ComprobanteNombre = null,
+    string? ComprobanteContentType = null);

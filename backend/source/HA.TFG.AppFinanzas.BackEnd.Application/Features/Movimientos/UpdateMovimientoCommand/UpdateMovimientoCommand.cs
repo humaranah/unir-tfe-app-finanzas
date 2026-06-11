@@ -17,4 +17,9 @@ public record UpdateMovimientoCommand : IRequest<UpdateMovimientoResult>
     public decimal? TipoCambio { get; init; }
     public string Nota { get; init; } = string.Empty;
     public DateTime FechaMovimiento { get; init; }
+
+    // Datos opcionales del comprobante adjunto
+    public Stream? ComprobanteStream { get; init; }
+    public string? ComprobanteFileName { get; init; }
+    public string? ComprobanteContentType { get; init; }
 }

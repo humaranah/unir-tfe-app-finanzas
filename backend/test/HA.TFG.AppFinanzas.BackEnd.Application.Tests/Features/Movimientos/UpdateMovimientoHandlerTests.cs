@@ -3,6 +3,7 @@ using HA.TFG.AppFinanzas.BackEnd.Application.Contracts;
 using HA.TFG.AppFinanzas.BackEnd.Application.Features.Movimientos.UpdateMovimientoCommand;
 using HA.TFG.AppFinanzas.BackEnd.Domain.Models;
 using HA.TFG.AppFinanzas.BackEnd.Domain.ValueObjects;
+using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 
 namespace HA.TFG.AppFinanzas.BackEnd.Application.Tests.Features.Movimientos;
@@ -12,6 +13,7 @@ public class UpdateMovimientoCommandHandlerTests
     private readonly IUsuarioRepository _usuarioRepository = Substitute.For<IUsuarioRepository>();
     private readonly ICuentaRepository _cuentaRepository = Substitute.For<ICuentaRepository>();
     private readonly IMovimientoRepository _movimientoRepository = Substitute.For<IMovimientoRepository>();
+    private readonly IComprobanteStorageService _comprobanteStorage = Substitute.For<IComprobanteStorageService>();
     private readonly UpdateMovimientoCommandHandler _sut;
 
     private static readonly Guid IdUsuario = Guid.Parse("00000000-0000-7000-8000-000000000001");
@@ -25,7 +27,12 @@ public class UpdateMovimientoCommandHandlerTests
 
     public UpdateMovimientoCommandHandlerTests()
     {
-        _sut = new UpdateMovimientoCommandHandler(_usuarioRepository, _cuentaRepository, _movimientoRepository);
+        _sut = new UpdateMovimientoCommandHandler(
+            _usuarioRepository,
+            _cuentaRepository,
+            _movimientoRepository,
+            _comprobanteStorage,
+            NullLogger<UpdateMovimientoCommandHandler>.Instance);
 
         _usuarioRepository.GetByEmailAsync(_usuario.Email, Arg.Any<CancellationToken>()).Returns(_usuario);
         _cuentaRepository.GetCuentaByIdAsync(IdUsuario, IdCuenta, Arg.Any<CancellationToken>()).Returns(_cuenta);
