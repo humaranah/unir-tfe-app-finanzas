@@ -51,10 +51,4 @@
         ContentTemplate="{DataTemplate pages:RecomendacionesPage}"
         Route="recomendaciones" />
 
-    <ShellContent
-        Title="Nuevo movimiento"
-        ContentTemplate="{DataTemplate pages:CrearMovimientoPage}"
-        Route="crear-movimiento"
-        Shell.FlyoutItemIsVisible="False" />
-
-</Shell>
+    </Shell>

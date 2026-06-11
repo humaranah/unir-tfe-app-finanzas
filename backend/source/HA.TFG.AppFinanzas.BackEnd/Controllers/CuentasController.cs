@@ -135,12 +135,33 @@ public sealed class CuentasController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> UpdateMovimiento(
         [FromRoute] Guid idCuenta,
         [FromRoute] Guid idMovimiento,
-        [FromBody] UpdateMovimientoRequest request,
+        [FromForm] UpdateMovimientoRequest request,
         CancellationToken cancellationToken)
     {
         var email = User.Identity?.Name ?? string.Empty;
         var command = request.ToCommand(email, idCuenta, idMovimiento);
-        var result = await _mediator.Send(command, cancellationToken);
-        return Ok(result);
+
+        if (request.Comprobante is { Length: > 0 } archivo)
+        {
+            command = command with
+            {
+                ComprobanteStream = archivo.OpenReadStream(),
+                ComprobanteFileName = archivo.FileName,
+                ComprobanteContentType = archivo.ContentType
+            };
+        }
+
+        try
+        {
+            var result = await _mediator.Send(command, cancellationToken);
+            return Ok(result);
+        }
+        finally
+        {
+            if (command.ComprobanteStream != null)
+            {
+                await command.ComprobanteStream.DisposeAsync();
+            }
+        }
     }
 }

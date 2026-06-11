@@ -7,8 +7,17 @@ public interface IMovimientosService
         GetMovimientosFilters? filters = null,
         CancellationToken cancellationToken = default);
 
+    Task<MovimientoDetalleItem> GetMovimientoDetalleAsync(
+        Guid idCuenta,
+        Guid idMovimiento,
+        CancellationToken cancellationToken = default);
+
     Task CreateMovimientoAsync(
         CreateMovimientoDto dto,
+        CancellationToken cancellationToken = default);
+
+    Task UpdateMovimientoAsync(
+        UpdateMovimientoDto dto,
         CancellationToken cancellationToken = default);
 
     Task<ComprobanteExtraidoDto> EscanearComprobanteAsync(

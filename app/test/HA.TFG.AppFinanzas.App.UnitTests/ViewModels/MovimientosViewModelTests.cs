@@ -378,7 +378,7 @@ public class MovimientosViewModelTests
         await sut.NuevoMovimientoCommand.ExecuteAsync(null);
 
         await _navigationService.Received(1).GoToAsync(
-            Arg.Is<string>(s => s.StartsWith("//crear-movimiento") && s.Contains(IdCuenta.ToString())));
+            Arg.Is<string>(s => s.StartsWith("crear-movimiento") && s.Contains(IdCuenta.ToString())));
     }
 
     [Fact]
@@ -403,6 +403,6 @@ public class MovimientosViewModelTests
         await sut.NuevoMovimientoCommand.ExecuteAsync(null);
 
         await _navigationService.Received(1).GoToAsync(
-            $"//crear-movimiento?idCuenta={IdCuenta}");
+            $"crear-movimiento?idCuenta={IdCuenta}");
     }
 }

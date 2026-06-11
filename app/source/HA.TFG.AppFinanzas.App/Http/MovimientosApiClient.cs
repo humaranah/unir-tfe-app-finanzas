@@ -18,6 +18,19 @@ internal sealed record MovimientoResponse(
     string Moneda,
     DateOnly FechaMovimiento);
 
+internal sealed record MovimientoDetalleResponse(
+    Guid IdMovimiento,
+    Guid IdCuenta,
+    Guid IdCuentaCategoria,
+    string? NombreCategoria,
+    TipoMovimiento TipoMovimiento,
+    string Concepto,
+    string? Establecimiento,
+    decimal Importe,
+    string Moneda,
+    string Nota,
+    DateTime FechaMovimiento);
+
 internal sealed class MovimientosApiClient(IHttpClientFactory httpClientFactory) : IMovimientosService
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)
@@ -88,6 +101,82 @@ internal sealed class MovimientosApiClient(IHttpClientFactory httpClientFactory)
             throw new HttpRequestException(
                 $"Error al crear movimiento. Status={(int)response.StatusCode}. Body={responseBody}");
         }
+    }
+
+    public async Task UpdateMovimientoAsync(
+        UpdateMovimientoDto dto,
+        CancellationToken cancellationToken = default)
+    {
+        var client = httpClientFactory.CreateClient("Backend");
+
+        using var content = new MultipartFormDataContent
+        {
+            { new StringContent(dto.Concepto), "Concepto" },
+            { new StringContent(dto.Importe.ToString(System.Globalization.CultureInfo.InvariantCulture)), "Importe" },
+            { new StringContent(dto.Moneda), "Moneda" },
+            { new StringContent(dto.Tipo.ToString()), "TipoMovimiento" },
+            { new StringContent(dto.FechaHora.ToString("yyyy-MM-ddTHH:mm:ss")), "FechaMovimiento" },
+            { new StringContent(dto.IdCuentaCategoria.ToString()), "IdCuentaCategoria" }
+        };
+
+        if (dto.Establecimiento is not null)
+            content.Add(new StringContent(dto.Establecimiento), "Establecimiento");
+
+        if (dto.Nota is not null)
+            content.Add(new StringContent(dto.Nota), "Nota");
+
+        if (dto.ComprobanteBytes is not null && dto.ComprobanteNombre is not null)
+        {
+            var fileContent = new ByteArrayContent(dto.ComprobanteBytes);
+            fileContent.Headers.ContentType =
+                new System.Net.Http.Headers.MediaTypeHeaderValue(dto.ComprobanteContentType ?? "application/octet-stream");
+            content.Add(fileContent, "Comprobante", dto.ComprobanteNombre);
+        }
+
+        using var response = await client.PutAsync(
+            $"api/cuentas/{dto.IdCuenta}/movimientos/{dto.IdMovimiento}", content, cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
+            throw new HttpRequestException(
+                $"Error al actualizar movimiento. Status={(int)response.StatusCode}. Body={responseBody}");
+        }
+    }
+
+    public async Task<MovimientoDetalleItem> GetMovimientoDetalleAsync(
+        Guid idCuenta,
+        Guid idMovimiento,
+        CancellationToken cancellationToken = default)
+    {
+        var client = httpClientFactory.CreateClient("Backend");
+
+        using var response = await client.GetAsync(
+            $"api/cuentas/{idCuenta}/movimientos/{idMovimiento}", cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var body = await response.Content.ReadAsStringAsync(cancellationToken);
+            throw new HttpRequestException(
+                $"Error al obtener detalle del movimiento. Status={(int)response.StatusCode}. Body={body}");
+        }
+
+        var detalle = await response.Content.ReadFromJsonAsync<MovimientoDetalleResponse>(JsonOptions, cancellationToken)
+            ?? throw new HttpRequestException("No se pudo deserializar el detalle del movimiento.");
+
+        return new MovimientoDetalleItem
+        {
+            IdMovimiento = detalle.IdMovimiento,
+            IdCuenta = detalle.IdCuenta,
+            IdCuentaCategoria = detalle.IdCuentaCategoria,
+            TipoMovimiento = detalle.TipoMovimiento,
+            Concepto = detalle.Concepto,
+            Establecimiento = detalle.Establecimiento,
+            Importe = detalle.Importe,
+            Moneda = detalle.Moneda,
+            Nota = detalle.Nota,
+            FechaMovimiento = detalle.FechaMovimiento
+        };
     }
 
     public async Task<ComprobanteExtraidoDto> EscanearComprobanteAsync(
