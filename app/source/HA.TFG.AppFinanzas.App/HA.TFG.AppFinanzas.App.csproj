@@ -94,10 +94,7 @@
 	  <MauiXaml Update="Views\Pages\CrearCuentaPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Views\Pages\CrearMovimientoPage.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\Pages\EditarMovimientoPage.xaml">
+	  <MauiXaml Update="Views\Pages\MovimientoFormPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 		<MauiXaml Update="Views\Pages\MovimientosPage.xaml">

@@ -21,6 +21,8 @@ public partial class MovimientoViewModel(
     internal Task CargandoCategoriasTask { get; private set; } = Task.CompletedTask;
 
     public bool ModoEdicion => _idMovimiento != Guid.Empty;
+    public string TituloFormulario => ModoEdicion ? "Editar movimiento" : "Nuevo movimiento";
+    public string GuardarMovimientoText => ModoEdicion ? "Guardar cambios" : "Guardar movimiento";
 
     public Guid IdCuenta
     {
@@ -33,8 +35,7 @@ public partial class MovimientoViewModel(
     }
 
     [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(CrearMovimientoCommand))]
-    [NotifyCanExecuteChangedFor(nameof(ActualizarMovimientoCommand))]
+    [NotifyCanExecuteChangedFor("GuardarMovimientoCommand")]
     public partial string Concepto { get; set; } = string.Empty;
 
     [ObservableProperty]
@@ -55,8 +56,7 @@ public partial class MovimientoViewModel(
     public partial bool MostrarOpcionales { get; set; } = false;
 
     [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(CrearMovimientoCommand))]
-    [NotifyCanExecuteChangedFor(nameof(ActualizarMovimientoCommand))]
+    [NotifyCanExecuteChangedFor("GuardarMovimientoCommand")]
     public partial string ImporteTexto { get; set; } = string.Empty;
 
     [ObservableProperty]
@@ -64,23 +64,20 @@ public partial class MovimientoViewModel(
         = MonedasHelper.DefaultMoneda;
 
     [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(CrearMovimientoCommand))]
-    [NotifyCanExecuteChangedFor(nameof(ActualizarMovimientoCommand))]
+    [NotifyCanExecuteChangedFor("GuardarMovimientoCommand")]
     [NotifyPropertyChangedFor(nameof(CategoriasFiltradas))]
     [NotifyPropertyChangedFor(nameof(SinCategorias))]
     public partial TipoMovimiento TipoSeleccionado { get; set; } = TipoMovimiento.Gasto;
 
     [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(CrearMovimientoCommand))]
-    [NotifyCanExecuteChangedFor(nameof(ActualizarMovimientoCommand))]
+    [NotifyCanExecuteChangedFor("GuardarMovimientoCommand")]
     public partial DateTime Fecha { get; set; } = DateTime.Today;
 
     [ObservableProperty]
     public partial TimeSpan Hora { get; set; } = TimeSpan.Zero;
 
     [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(CrearMovimientoCommand))]
-    [NotifyCanExecuteChangedFor(nameof(ActualizarMovimientoCommand))]
+    [NotifyCanExecuteChangedFor("GuardarMovimientoCommand")]
     public partial CategoriaItem? CategoriaSeleccionada { get; set; }
 
     [ObservableProperty]
@@ -109,7 +106,7 @@ public partial class MovimientoViewModel(
         CategoriaSeleccionada = null;
     }
 
-    private bool PuedeCrear =>
+    private bool PuedeGuardar =>
         !string.IsNullOrWhiteSpace(Concepto) &&
         decimal.TryParse(ImporteTexto, out var v) && v > 0 &&
         CategoriaSeleccionada is not null &&
@@ -132,6 +129,8 @@ public partial class MovimientoViewModel(
         CategoriaSeleccionada = null;
         Error = string.Empty;
         OnPropertyChanged(nameof(ModoEdicion));
+        OnPropertyChanged(nameof(TituloFormulario));
+        OnPropertyChanged(nameof(GuardarMovimientoText));
     }
 
     public async Task CargarMovimientoAsync(Guid idCuenta, Guid idMovimiento, CancellationToken cancellationToken = default)
@@ -168,6 +167,8 @@ public partial class MovimientoViewModel(
             CategoriaSeleccionada = categoria;
 
             OnPropertyChanged(nameof(ModoEdicion));
+            OnPropertyChanged(nameof(TituloFormulario));
+            OnPropertyChanged(nameof(GuardarMovimientoText));
         }
         catch (Exception ex)
         {
@@ -195,8 +196,8 @@ public partial class MovimientoViewModel(
         }
     }
 
-    [RelayCommand(CanExecute = nameof(PuedeCrear))]
-    private async Task ActualizarMovimientoAsync(CancellationToken cancellationToken)
+    [RelayCommand(CanExecute = nameof(PuedeGuardar))]
+    private async Task GuardarMovimientoAsync(CancellationToken cancellationToken)
     {
         if (!decimal.TryParse(ImporteTexto, out var importe) || importe <= 0)
         {
@@ -208,71 +209,54 @@ public partial class MovimientoViewModel(
         IsBusy = true;
         try
         {
-            await movimientosService.UpdateMovimientoAsync(
-                new UpdateMovimientoDto(
-                    _idCuenta,
-                    _idMovimiento,
-                    Concepto.Trim(),
-                    importe,
-                    MonedaSeleccionada.Key,
-                    TipoSeleccionado,
-                    Fecha.Date + Hora,
-                    CategoriaSeleccionada!.IdCuentaCategoria,
-                    string.IsNullOrWhiteSpace(Establecimiento) ? null : Establecimiento.Trim(),
-                    string.IsNullOrWhiteSpace(Nota) ? null : Nota.Trim(),
-                    Comprobante?.Bytes,
-                    Comprobante?.NombreArchivo,
-                    Comprobante?.ContentType),
-                cancellationToken);
+            if (ModoEdicion)
+            {
+                await movimientosService.UpdateMovimientoAsync(
+                    new UpdateMovimientoDto(
+                        _idCuenta,
+                        _idMovimiento,
+                        Concepto.Trim(),
+                        importe,
+                        MonedaSeleccionada.Key,
+                        TipoSeleccionado,
+                        Fecha.Date + Hora,
+                        CategoriaSeleccionada!.IdCuentaCategoria,
+                        string.IsNullOrWhiteSpace(Establecimiento) ? null : Establecimiento.Trim(),
+                        string.IsNullOrWhiteSpace(Nota) ? null : Nota.Trim(),
+                        Comprobante?.Bytes,
+                        Comprobante?.NombreArchivo,
+                        Comprobante?.ContentType),
+                    cancellationToken);
 
-            await navigationService.GoBackAsync();
+                await navigationService.GoBackAsync();
+            }
+            else
+            {
+                await movimientosService.CreateMovimientoAsync(
+                    new CreateMovimientoDto(
+                        IdCuenta,
+                        Concepto.Trim(),
+                        importe,
+                        MonedaSeleccionada.Key,
+                        TipoSeleccionado,
+                        Fecha.Date + Hora,
+                        CategoriaSeleccionada!.IdCuentaCategoria,
+                        string.IsNullOrWhiteSpace(Establecimiento) ? null : Establecimiento.Trim(),
+                        string.IsNullOrWhiteSpace(Nota) ? null : Nota.Trim(),
+                        Comprobante?.Bytes,
+                        Comprobante?.NombreArchivo,
+                        Comprobante?.ContentType),
+                    cancellationToken);
+
+                await navigationService.GoToAsync("//movimientos");
+            }
         }
         catch (Exception ex)
         {
-            Error = "No se pudo actualizar el movimiento. Inténtalo de nuevo.";
-            System.Diagnostics.Debug.WriteLine($"Error al actualizar movimiento: {ex}");
-        }
-        finally
-        {
-            IsBusy = false;
-        }
-    }
-
-    [RelayCommand(CanExecute = nameof(PuedeCrear))]
-    private async Task CrearMovimientoAsync(CancellationToken cancellationToken)
-    {
-        if (!decimal.TryParse(ImporteTexto, out var importe) || importe <= 0)
-        {
-            Error = "El importe debe ser un número mayor que cero.";
-            return;
-        }
-
-        Error = string.Empty;
-        IsBusy = true;
-        try
-        {
-            await movimientosService.CreateMovimientoAsync(
-                new CreateMovimientoDto(
-                    IdCuenta,
-                    Concepto.Trim(),
-                    importe,
-                    MonedaSeleccionada.Key,
-                    TipoSeleccionado,
-                    Fecha.Date + Hora,
-                    CategoriaSeleccionada!.IdCuentaCategoria,
-                    string.IsNullOrWhiteSpace(Establecimiento) ? null : Establecimiento.Trim(),
-                    string.IsNullOrWhiteSpace(Nota) ? null : Nota.Trim(),
-                    Comprobante?.Bytes,
-                    Comprobante?.NombreArchivo,
-                    Comprobante?.ContentType),
-                cancellationToken);
-
-            await navigationService.GoToAsync("//movimientos");
-        }
-        catch (Exception ex)
-        {
-            Error = "No se pudo registrar el movimiento. Inténtalo de nuevo.";
-            System.Diagnostics.Debug.WriteLine($"Error al crear movimiento: {ex}");
+            Error = ModoEdicion
+                ? "No se pudo actualizar el movimiento. Inténtalo de nuevo."
+                : "No se pudo registrar el movimiento. Inténtalo de nuevo.";
+            System.Diagnostics.Debug.WriteLine($"Error al guardar movimiento: {ex}");
         }
         finally
         {

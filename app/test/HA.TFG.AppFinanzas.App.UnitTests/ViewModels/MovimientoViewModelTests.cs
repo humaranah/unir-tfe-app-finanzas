@@ -156,7 +156,7 @@ public class MovimientoViewModelTests
         Assert.Equal("Nómina", sut.CategoriasFiltradas[0].Nombre);
     }
 
-    // ── CrearMovimientoCommand ────────────────────────────────────────────────
+    // ── GuardarMovimientoCommand ────────────────────────────────────────────────
 
     [Fact]
     public async Task CrearMovimientoAsync_WhenSuccessful_CallsServiceWithCorrectParameters()
@@ -170,7 +170,7 @@ public class MovimientoViewModelTests
         sut.Hora = new TimeSpan(14, 30, 0);
         sut.CategoriaSeleccionada = CategoriaDefault;
 
-        await sut.CrearMovimientoCommand.ExecuteAsync(null);
+        await sut.GuardarMovimientoCommand.ExecuteAsync(null);
 
         await _movimientosService.Received(1).CreateMovimientoAsync(
             new CreateMovimientoDto(
@@ -193,7 +193,7 @@ public class MovimientoViewModelTests
         sut.ImporteTexto = "42.50";
         sut.CategoriaSeleccionada = CategoriaDefault;
 
-        await sut.CrearMovimientoCommand.ExecuteAsync(null);
+        await sut.GuardarMovimientoCommand.ExecuteAsync(null);
 
         await _navigationService.Received(1).GoToAsync("//movimientos");
     }
@@ -207,7 +207,7 @@ public class MovimientoViewModelTests
         sut.ImporteTexto = "42.50";
         sut.CategoriaSeleccionada = CategoriaDefault;
 
-        await sut.CrearMovimientoCommand.ExecuteAsync(null);
+        await sut.GuardarMovimientoCommand.ExecuteAsync(null);
 
         Assert.False(sut.IsBusy);
     }
@@ -221,7 +221,7 @@ public class MovimientoViewModelTests
         sut.ImporteTexto = "42.50";
         sut.CategoriaSeleccionada = CategoriaDefault;
 
-        await sut.CrearMovimientoCommand.ExecuteAsync(null);
+        await sut.GuardarMovimientoCommand.ExecuteAsync(null);
 
         Assert.Equal(string.Empty, sut.Error);
     }
@@ -242,7 +242,7 @@ public class MovimientoViewModelTests
         sut.ImporteTexto = "30";
         sut.CategoriaSeleccionada = categoria;
 
-        await sut.CrearMovimientoCommand.ExecuteAsync(null);
+        await sut.GuardarMovimientoCommand.ExecuteAsync(null);
 
         await _movimientosService.Received(1).CreateMovimientoAsync(
             Arg.Is<CreateMovimientoDto>(d => d.IdCuentaCategoria == categoria.IdCuentaCategoria),
@@ -262,7 +262,7 @@ public class MovimientoViewModelTests
         sut.ImporteTexto = "42.50";
         sut.CategoriaSeleccionada = CategoriaDefault;
 
-        await sut.CrearMovimientoCommand.ExecuteAsync(null);
+        await sut.GuardarMovimientoCommand.ExecuteAsync(null);
 
         Assert.True(sut.HasError);
         Assert.NotEmpty(sut.Error);
@@ -281,7 +281,7 @@ public class MovimientoViewModelTests
         sut.ImporteTexto = "42.50";
         sut.CategoriaSeleccionada = CategoriaDefault;
 
-        await sut.CrearMovimientoCommand.ExecuteAsync(null);
+        await sut.GuardarMovimientoCommand.ExecuteAsync(null);
 
         Assert.False(sut.IsBusy);
     }
@@ -299,7 +299,7 @@ public class MovimientoViewModelTests
         sut.ImporteTexto = "42.50";
         sut.CategoriaSeleccionada = CategoriaDefault;
 
-        await sut.CrearMovimientoCommand.ExecuteAsync(null);
+        await sut.GuardarMovimientoCommand.ExecuteAsync(null);
 
         await _navigationService.DidNotReceive().GoToAsync(Arg.Any<string>());
     }
@@ -317,14 +317,14 @@ public class MovimientoViewModelTests
         sut.ImporteTexto = "42.50";
         sut.CategoriaSeleccionada = CategoriaDefault;
 
-        await sut.CrearMovimientoCommand.ExecuteAsync(null); // primer intento fallido
+        await sut.GuardarMovimientoCommand.ExecuteAsync(null); // primer intento fallido
 
         _movimientosService.ClearReceivedCalls();
         _movimientosService
             .CreateMovimientoAsync(Arg.Any<CreateMovimientoDto>())
             .ReturnsForAnyArgs(Task.CompletedTask);
 
-        await sut.CrearMovimientoCommand.ExecuteAsync(null); // segundo intento exitoso
+        await sut.GuardarMovimientoCommand.ExecuteAsync(null); // segundo intento exitoso
 
         Assert.Equal(string.Empty, sut.Error);
     }

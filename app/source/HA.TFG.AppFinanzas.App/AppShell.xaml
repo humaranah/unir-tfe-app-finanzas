@@ -53,7 +53,7 @@
 
     <ShellContent
         Title="Nuevo movimiento"
-        ContentTemplate="{DataTemplate pages:CrearMovimientoPage}"
+        ContentTemplate="{DataTemplate pages:MovimientoFormPage}"
         Route="crear-movimiento"
         Shell.FlyoutItemIsVisible="False" />
 
