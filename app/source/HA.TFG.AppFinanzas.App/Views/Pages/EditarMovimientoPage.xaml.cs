@@ -1,34 +1,43 @@
-using HA.TFG.AppFinanzas.Core.Movimientos;
 using HA.TFG.AppFinanzas.Core.ViewModels;
-using System.Text.Json;
 
 namespace HA.TFG.AppFinanzas.App.Views.Pages;
 
-[QueryProperty(nameof(MovimientoParam), "movimiento")]
+[QueryProperty(nameof(IdCuentaParam), "idCuenta")]
+[QueryProperty(nameof(IdMovimientoParam), "idMovimiento")]
 public partial class EditarMovimientoPage : ContentPage
 {
     private readonly MovimientoViewModel _viewModel;
+    private Guid? _idCuenta;
+    private Guid? _idMovimiento;
 
-    public string? MovimientoParam
+    public string? IdCuentaParam
     {
         set
         {
-            if (string.IsNullOrWhiteSpace(value))
-                return;
-
-            var movimiento = JsonSerializer.Deserialize<MovimientoItem>(
-                Uri.UnescapeDataString(value),
-                new JsonSerializerOptions(JsonSerializerDefaults.Web)
-                {
-                    Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() }
-                });
-
-            if (movimiento is null)
-                return;
-
-            _viewModel.IdCuenta = movimiento.IdCuenta;
-            _ = _viewModel.CargarMovimientoAsync(movimiento);
+            if (Guid.TryParse(value, out var id))
+            {
+                _idCuenta = id;
+                TryCargar();
+            }
         }
+    }
+
+    public string? IdMovimientoParam
+    {
+        set
+        {
+            if (Guid.TryParse(value, out var id))
+            {
+                _idMovimiento = id;
+                TryCargar();
+            }
+        }
+    }
+
+    private void TryCargar()
+    {
+        if (_idCuenta.HasValue && _idMovimiento.HasValue)
+            _ = _viewModel.CargarMovimientoAsync(_idCuenta.Value, _idMovimiento.Value);
     }
 
     public EditarMovimientoPage(MovimientoViewModel viewModel)

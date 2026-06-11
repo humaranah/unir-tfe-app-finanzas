@@ -134,40 +134,51 @@ public partial class MovimientoViewModel(
         OnPropertyChanged(nameof(ModoEdicion));
     }
 
-    public async Task CargarMovimientoAsync(MovimientoItem movimiento)
+    public async Task CargarMovimientoAsync(Guid idCuenta, Guid idMovimiento, CancellationToken cancellationToken = default)
     {
-        _idMovimiento = movimiento.IdMovimiento;
-        _idCuenta = movimiento.IdCuenta;
+        _idMovimiento = idMovimiento;
+        IdCuenta = idCuenta;
 
-        await CargandoCategoriasTask;
-
-        Concepto = movimiento.Concepto;
-        ImporteTexto = movimiento.Importe.ToString(System.Globalization.CultureInfo.InvariantCulture);
-        TipoSeleccionado = movimiento.TipoMovimiento;
-        Fecha = movimiento.FechaMovimiento.ToDateTime(TimeOnly.MinValue);
-        Hora = TimeSpan.Zero;
-        MostrarOpcionales = false;
-        Comprobante = null;
+        IsBusy = true;
         Error = string.Empty;
-
-        var moneda = Monedas.FirstOrDefault(m =>
-            string.Equals(m.Key, movimiento.Moneda, StringComparison.OrdinalIgnoreCase));
-        MonedaSeleccionada = moneda.Equals(default(KeyValuePair<string, string>))
-            ? MonedasHelper.DefaultMoneda
-            : moneda;
-
-        if (movimiento.IdCategoria.HasValue)
+        try
         {
+            await CargandoCategoriasTask;
+
+            var detalle = await movimientosService.GetMovimientoDetalleAsync(idCuenta, idMovimiento, cancellationToken);
+
+            Concepto = detalle.Concepto;
+            Establecimiento = detalle.Establecimiento ?? string.Empty;
+            Nota = detalle.Nota ?? string.Empty;
+            ImporteTexto = detalle.Importe.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            TipoSeleccionado = detalle.TipoMovimiento;
+            Fecha = detalle.FechaMovimiento.Date;
+            Hora = detalle.FechaMovimiento.TimeOfDay;
+            MostrarOpcionales = !string.IsNullOrWhiteSpace(detalle.Establecimiento)
+                             || !string.IsNullOrWhiteSpace(detalle.Nota);
+            Comprobante = null;
+
+            var moneda = Monedas.FirstOrDefault(m =>
+                string.Equals(m.Key, detalle.Moneda, StringComparison.OrdinalIgnoreCase));
+            MonedaSeleccionada = moneda.Equals(default(KeyValuePair<string, string>))
+                ? MonedasHelper.DefaultMoneda
+                : moneda;
+
             var categoria = _todasLasCategorias.FirstOrDefault(
-                c => c.IdCuentaCategoria == movimiento.IdCategoria.Value);
+                c => c.IdCuentaCategoria == detalle.IdCuentaCategoria);
             CategoriaSeleccionada = categoria;
-        }
-        else
-        {
-            CategoriaSeleccionada = null;
-        }
 
-        OnPropertyChanged(nameof(ModoEdicion));
+            OnPropertyChanged(nameof(ModoEdicion));
+        }
+        catch (Exception ex)
+        {
+            Error = "No se pudo cargar el movimiento. Inténtalo de nuevo.";
+            System.Diagnostics.Debug.WriteLine($"Error al cargar movimiento: {ex}");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     private async Task CargarCategoriasAsync()

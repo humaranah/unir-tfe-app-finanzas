@@ -18,6 +18,19 @@ internal sealed record MovimientoResponse(
     string Moneda,
     DateOnly FechaMovimiento);
 
+internal sealed record MovimientoDetalleResponse(
+    Guid IdMovimiento,
+    Guid IdCuenta,
+    Guid IdCuentaCategoria,
+    string? NombreCategoria,
+    TipoMovimiento TipoMovimiento,
+    string Concepto,
+    string? Establecimiento,
+    decimal Importe,
+    string Moneda,
+    string Nota,
+    DateTime FechaMovimiento);
+
 internal sealed class MovimientosApiClient(IHttpClientFactory httpClientFactory) : IMovimientosService
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)
@@ -121,6 +134,41 @@ internal sealed class MovimientosApiClient(IHttpClientFactory httpClientFactory)
             throw new HttpRequestException(
                 $"Error al actualizar movimiento. Status={(int)response.StatusCode}. Body={responseBody}");
         }
+    }
+
+    public async Task<MovimientoDetalleItem> GetMovimientoDetalleAsync(
+        Guid idCuenta,
+        Guid idMovimiento,
+        CancellationToken cancellationToken = default)
+    {
+        var client = httpClientFactory.CreateClient("Backend");
+
+        using var response = await client.GetAsync(
+            $"api/cuentas/{idCuenta}/movimientos/{idMovimiento}", cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var body = await response.Content.ReadAsStringAsync(cancellationToken);
+            throw new HttpRequestException(
+                $"Error al obtener detalle del movimiento. Status={(int)response.StatusCode}. Body={body}");
+        }
+
+        var detalle = await response.Content.ReadFromJsonAsync<MovimientoDetalleResponse>(JsonOptions, cancellationToken)
+            ?? throw new HttpRequestException("No se pudo deserializar el detalle del movimiento.");
+
+        return new MovimientoDetalleItem
+        {
+            IdMovimiento = detalle.IdMovimiento,
+            IdCuenta = detalle.IdCuenta,
+            IdCuentaCategoria = detalle.IdCuentaCategoria,
+            TipoMovimiento = detalle.TipoMovimiento,
+            Concepto = detalle.Concepto,
+            Establecimiento = detalle.Establecimiento,
+            Importe = detalle.Importe,
+            Moneda = detalle.Moneda,
+            Nota = detalle.Nota,
+            FechaMovimiento = detalle.FechaMovimiento
+        };
     }
 
     public async Task<ComprobanteExtraidoDto> EscanearComprobanteAsync(
