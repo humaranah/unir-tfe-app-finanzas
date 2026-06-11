@@ -195,7 +195,7 @@ public class MovimientoViewModelTests
 
         await sut.GuardarMovimientoCommand.ExecuteAsync(null);
 
-        await _navigationService.Received(1).GoToAsync("//movimientos");
+        await _navigationService.Received(1).GoBackAsync();
     }
 
     [Fact]
@@ -338,6 +338,6 @@ public class MovimientoViewModelTests
 
         await sut.CancelCommand.ExecuteAsync(null);
 
-        await _navigationService.Received(1).GoToAsync("//movimientos");
+        await _navigationService.Received(1).GoBackAsync();
     }
 }

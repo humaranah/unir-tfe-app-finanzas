@@ -248,7 +248,7 @@ public partial class MovimientoViewModel(
                         Comprobante?.ContentType),
                     cancellationToken);
 
-                await navigationService.GoToAsync("//movimientos");
+                await navigationService.GoBackAsync();
             }
         }
         catch (Exception ex)
@@ -398,8 +398,5 @@ public partial class MovimientoViewModel(
         || Hora != TimeSpan.Zero;
 
     [RelayCommand]
-    private Task CancelAsync() =>
-        ModoEdicion
-            ? navigationService.GoBackAsync()
-            : navigationService.GoToAsync("//movimientos");
+    private Task CancelAsync() => navigationService.GoBackAsync();
 }

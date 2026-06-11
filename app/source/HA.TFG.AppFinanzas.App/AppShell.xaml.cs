@@ -14,6 +14,7 @@ namespace HA.TFG.AppFinanzas.App
         public AppShell(UsuarioViewModel usuarioViewModel, ICuentasService cuentasService, CrearCuentaViewModel crearCuentaViewModel)
         {
             InitializeComponent();
+            Routing.RegisterRoute("crear-movimiento", typeof(MovimientoFormPage));
             Routing.RegisterRoute("editar-movimiento", typeof(MovimientoFormPage));
             _usuarioViewModel = usuarioViewModel;
             _cuentasService = cuentasService;

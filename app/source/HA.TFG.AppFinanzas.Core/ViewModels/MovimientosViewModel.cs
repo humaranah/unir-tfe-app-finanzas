@@ -61,7 +61,7 @@ public partial class MovimientosViewModel(
     private async Task NuevoMovimientoAsync()
     {
         if (_idCuenta is not null)
-            await navigationService.GoToAsync($"//crear-movimiento?idCuenta={_idCuenta.Value}");
+            await navigationService.GoToAsync($"crear-movimiento?idCuenta={_idCuenta.Value}");
     }
 
     [RelayCommand]
