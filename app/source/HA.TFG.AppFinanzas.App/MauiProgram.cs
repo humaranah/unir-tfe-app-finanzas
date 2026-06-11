@@ -49,6 +49,7 @@ public static class MauiProgram
         builder.Services.AddTransient<Views.Pages.CrearCuentaPage>();
         builder.Services.AddSingleton<Views.Pages.MovimientosPage>();
         builder.Services.AddTransient<Views.Pages.CrearMovimientoPage>();
+        builder.Services.AddTransient<Views.Pages.EditarMovimientoPage>();
         builder.Services.AddSingleton<Views.Pages.RecomendacionesPage>();
         builder.Services.AddSingleton<AppShell>();
         builder.Services.AddSingleton<App>();

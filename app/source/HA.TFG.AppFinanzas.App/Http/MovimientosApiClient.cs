@@ -90,6 +90,39 @@ internal sealed class MovimientosApiClient(IHttpClientFactory httpClientFactory)
         }
     }
 
+    public async Task UpdateMovimientoAsync(
+        UpdateMovimientoDto dto,
+        CancellationToken cancellationToken = default)
+    {
+        var client = httpClientFactory.CreateClient("Backend");
+
+        using var content = new MultipartFormDataContent
+        {
+            { new StringContent(dto.Concepto), "Concepto" },
+            { new StringContent(dto.Importe.ToString(System.Globalization.CultureInfo.InvariantCulture)), "Importe" },
+            { new StringContent(dto.Moneda), "Moneda" },
+            { new StringContent(dto.Tipo.ToString()), "TipoMovimiento" },
+            { new StringContent(dto.FechaHora.ToString("yyyy-MM-ddTHH:mm:ss")), "FechaMovimiento" },
+            { new StringContent(dto.IdCuentaCategoria.ToString()), "IdCuentaCategoria" }
+        };
+
+        if (dto.Establecimiento is not null)
+            content.Add(new StringContent(dto.Establecimiento), "Establecimiento");
+
+        if (dto.Nota is not null)
+            content.Add(new StringContent(dto.Nota), "Nota");
+
+        using var response = await client.PutAsync(
+            $"api/cuentas/{dto.IdCuenta}/movimientos/{dto.IdMovimiento}", content, cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
+            throw new HttpRequestException(
+                $"Error al actualizar movimiento. Status={(int)response.StatusCode}. Body={responseBody}");
+        }
+    }
+
     public async Task<ComprobanteExtraidoDto> EscanearComprobanteAsync(
         Guid idCuenta,
         ComprobanteResult comprobante,

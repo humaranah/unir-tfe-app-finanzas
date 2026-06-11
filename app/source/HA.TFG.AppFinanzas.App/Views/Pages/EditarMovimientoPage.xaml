@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="clr-namespace:HA.TFG.AppFinanzas.Core.ViewModels;assembly=HA.TFG.AppFinanzas.Core"
+             x:Class="HA.TFG.AppFinanzas.App.Views.Pages.EditarMovimientoPage"
+             x:DataType="viewModels:MovimientoViewModel"
+             Title="Editar movimiento">
+
+    <Shell.TitleView>
+        <Grid HorizontalOptions="Fill">
+            <Label Text="Editar movimiento"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
+        </Grid>
+    </Shell.TitleView>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="40" Spacing="0" MaximumWidthRequest="600"
+                             IsEnabled="{Binding IsNotBusy}">
+
+            <!-- Ver campos opcionales -->
+            <Grid ColumnDefinitions="auto,*" ColumnSpacing="8" Margin="0,0,0,16">
+                <HorizontalStackLayout Grid.Column="0"
+                                       VerticalOptions="Center"
+                                       Spacing="4">
+                    <CheckBox IsChecked="{Binding MostrarOpcionales}"
+                              VerticalOptions="Center" />
+                    <Label Text="Ver campos opcionales"
+                           VerticalOptions="Center"
+                           TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}" />
+                </HorizontalStackLayout>
+            </Grid>
+
+            <BoxView HeightRequest="1" Color="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}" Margin="0,0,0,16" />
+
+            <!-- Tipo de movimiento -->
+            <VerticalStackLayout Spacing="4" Margin="0,0,0,16">
+                <Label FontAttributes="Bold">
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text="Tipo de movimiento" />
+                            <Span Text=" *" TextColor="OrangeRed" />
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+                <Picker ItemsSource="{Binding Tipos}"
+                        SelectedItem="{Binding TipoSeleccionado}"
+                        HorizontalOptions="Fill" />
+            </VerticalStackLayout>
+
+            <!-- Categoría -->
+            <VerticalStackLayout Spacing="4" Margin="0,0,0,16">
+                <Label FontAttributes="Bold">
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text="Categoría" />
+                            <Span Text=" *" TextColor="OrangeRed" />
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+                <Picker ItemsSource="{Binding CategoriasFiltradas}"
+                        SelectedItem="{Binding CategoriaSeleccionada}"
+                        ItemDisplayBinding="{Binding Nombre}"
+                        HorizontalOptions="Fill" />
+                <Label Text="No hay categorías disponibles para este tipo"
+                       FontSize="12"
+                       TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}"
+                       IsVisible="{Binding SinCategorias}" />
+            </VerticalStackLayout>
+
+            <!-- Importe y moneda -->
+            <VerticalStackLayout Spacing="4" Margin="0,0,0,16">
+                <Label FontAttributes="Bold">
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text="Importe" />
+                            <Span Text=" *" TextColor="OrangeRed" />
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+                <Grid ColumnDefinitions="*, auto" RowDefinitions="auto">
+                    <Entry Placeholder="0.00"
+                           Text="{Binding ImporteTexto}"
+                           Keyboard="Numeric"
+                           ReturnType="Next"
+                           ClearButtonVisibility="WhileEditing"
+                           MinimumHeightRequest="44"
+                           VerticalOptions="Center"
+                           HorizontalOptions="Fill" />
+                    <Picker Grid.Column="1"
+                            IsEnabled="False"
+                            ItemsSource="{Binding Monedas}"
+                            SelectedItem="{Binding MonedaSeleccionada}"
+                            ItemDisplayBinding="{Binding Value}"
+                            HorizontalOptions="Fill"
+                            Margin="8,0,0,0"/>
+                </Grid>
+            </VerticalStackLayout>
+
+            <!-- Concepto -->
+            <VerticalStackLayout Spacing="4" Margin="0,0,0,16">
+                <Label FontAttributes="Bold">
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text="Concepto" />
+                            <Span Text=" *" TextColor="OrangeRed" />
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+                <Entry Placeholder="Ej. Supermercado, Nómina…"
+                       Text="{Binding Concepto}"
+                       ReturnType="Next"
+                       ClearButtonVisibility="WhileEditing"
+                       IsSpellCheckEnabled="False"
+                       MinimumHeightRequest="44"
+                       VerticalOptions="Center"
+                       HorizontalOptions="Fill" />
+            </VerticalStackLayout>
+
+            <!-- Fecha -->
+            <VerticalStackLayout Spacing="4" Margin="0,0,0,16">
+                <Label FontAttributes="Bold">
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text="Fecha" />
+                            <Span Text=" *" TextColor="OrangeRed" />
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+                <DatePicker Date="{Binding Fecha}"
+                            Format="dd/MM/yyyy"
+                            MinimumHeightRequest="44"
+                            HorizontalOptions="Fill" />
+            </VerticalStackLayout>
+
+            <!-- Campos opcionales -->
+            <VerticalStackLayout IsVisible="{Binding MostrarOpcionales}" Spacing="0">
+                <BoxView HeightRequest="1" Color="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}" Margin="0,0,0,16" />
+
+                <!-- Hora -->
+                <VerticalStackLayout Spacing="4" Margin="0,0,0,16">
+                    <Label Text="Hora" FontAttributes="Bold" />
+                    <TimePicker Time="{Binding Hora}"
+                                Format="HH:mm"
+                                MinimumHeightRequest="44"
+                                HorizontalOptions="Fill" />
+                </VerticalStackLayout>
+
+                <!-- Establecimiento -->
+                <VerticalStackLayout Spacing="4" Margin="0,0,0,16">
+                    <Label Text="Establecimiento" FontAttributes="Bold" />
+                    <Entry Placeholder="Ej. Mercadona, Amazon…"
+                           Text="{Binding Establecimiento}"
+                           ReturnType="Next"
+                           ClearButtonVisibility="WhileEditing"
+                           IsSpellCheckEnabled="False"
+                           MinimumHeightRequest="44"
+                           VerticalOptions="Center"
+                           HorizontalOptions="Fill" />
+                </VerticalStackLayout>
+
+                <!-- Notas -->
+                <VerticalStackLayout Spacing="4" Margin="0,0,0,16">
+                    <Label Text="Notas" FontAttributes="Bold" />
+                    <Editor Placeholder="Añade notas adicionales…"
+                            Text="{Binding Nota}"
+                            AutoSize="TextChanges"
+                            MinimumHeightRequest="80"
+                            HorizontalOptions="Fill" />
+                </VerticalStackLayout>
+
+            </VerticalStackLayout>
+
+            <!-- Error -->
+            <Label Text="{Binding Error}"
+                   TextColor="OrangeRed"
+                   HorizontalOptions="Center"
+                   IsVisible="{Binding HasError}"
+                   Margin="0,0,0,8" />
+
+            <!-- Actividad -->
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                               IsVisible="{Binding IsBusy}"
+                               HorizontalOptions="Center"
+                               Margin="0,0,0,8" />
+
+            <!-- Hint campos obligatorios -->
+            <Label Text="* Campos obligatorios"
+                   FontSize="12"
+                   TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}"
+                   HorizontalOptions="End"
+                   Margin="0,0,0,16" />
+
+            <!-- Acciones -->
+            <Button Text="Guardar cambios"
+                    Command="{Binding ActualizarMovimientoCommand}"
+                    HorizontalOptions="Fill"
+                    Margin="0,0,0,8" />
+
+            <Button Text="Cancelar"
+                    Command="{Binding CancelCommand}"
+                    Style="{DynamicResource OutlinedButton}"
+                    HorizontalOptions="Fill" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

@@ -56,20 +56,35 @@
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="model:MovimientoItem">
                     <Border Stroke="LightGray" Padding="10" Margin="0,0,0,10">
-                        <StackLayout>
-                            <Label Text="{Binding Concepto}" FontSize="16" FontAttributes="Bold" />
-                            <Label Text="{Binding FechaMovimiento, StringFormat='Fecha: {0:dd/MM/yyyy}'}" FontSize="14" TextColor="Gray" />
-                            <Label FontSize="14" TextColor="Green">
-                                <Label.FormattedText>
-                                    <FormattedString>
-                                        <Span Text="Monto: " />
-                                        <Span Text="{Binding Importe, StringFormat='{0:N2}'}" />
-                                        <Span Text=" " />
-                                        <Span Text="{Binding Moneda}" />
-                                    </FormattedString>
-                                </Label.FormattedText>
-                            </Label>
-                        </StackLayout>
+                        <Grid ColumnDefinitions="*,auto">
+                            <StackLayout Grid.Column="0">
+                                <Label Text="{Binding Concepto}" FontSize="16" FontAttributes="Bold" />
+                                <Label Text="{Binding FechaMovimiento, StringFormat='Fecha: {0:dd/MM/yyyy}'}" FontSize="14" TextColor="Gray" />
+                                <Label FontSize="14" TextColor="Green">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="Monto: " />
+                                            <Span Text="{Binding Importe, StringFormat='{0:N2}'}" />
+                                            <Span Text=" " />
+                                            <Span Text="{Binding Moneda}" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                            </StackLayout>
+                            <Button Grid.Column="1"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MovimientosViewModel}}, Path=EditarMovimientoCommand}"
+                                    CommandParameter="{Binding .}"
+                                    Style="{DynamicResource OutlinedButton}"
+                                    VerticalOptions="Center"
+                                    Padding="8,4">
+                                <Button.ImageSource>
+                                    <FontImageSource FontFamily="FluentIcons"
+                                                     Glyph="&#xE2C5;"
+                                                     Size="18"
+                                                     Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
+                                </Button.ImageSource>
+                            </Button>
+                        </Grid>
                     </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>

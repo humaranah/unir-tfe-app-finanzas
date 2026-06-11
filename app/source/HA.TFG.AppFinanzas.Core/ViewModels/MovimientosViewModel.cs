@@ -4,6 +4,8 @@ using HA.TFG.AppFinanzas.Core.Cuentas;
 using HA.TFG.AppFinanzas.Core.Movimientos;
 using HA.TFG.AppFinanzas.Core.Navigation;
 using System.Collections.ObjectModel;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace HA.TFG.AppFinanzas.Core.ViewModels;
 
@@ -12,6 +14,11 @@ public partial class MovimientosViewModel(
     IMovimientosService movimientosService,
     INavigationService navigationService) : ObservableObject
 {
+    private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)
+    {
+        Converters = { new JsonStringEnumConverter() }
+    };
+
     private Guid? _idCuenta;
 
     [ObservableProperty]
@@ -62,6 +69,13 @@ public partial class MovimientosViewModel(
     {
         if (_idCuenta is not null)
             await navigationService.GoToAsync($"//crear-movimiento?idCuenta={_idCuenta.Value}");
+    }
+
+    [RelayCommand]
+    private async Task EditarMovimientoAsync(MovimientoItem movimiento)
+    {
+        var json = Uri.EscapeDataString(JsonSerializer.Serialize(movimiento, JsonOptions));
+        await navigationService.GoToAsync($"//editar-movimiento?movimiento={json}");
     }
 
     [RelayCommand]

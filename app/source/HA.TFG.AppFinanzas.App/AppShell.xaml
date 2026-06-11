@@ -57,4 +57,10 @@
         Route="crear-movimiento"
         Shell.FlyoutItemIsVisible="False" />
 
+    <ShellContent
+        Title="Editar movimiento"
+        ContentTemplate="{DataTemplate pages:EditarMovimientoPage}"
+        Route="editar-movimiento"
+        Shell.FlyoutItemIsVisible="False" />
+
 </Shell>

@@ -15,9 +15,12 @@ public partial class MovimientoViewModel(
     IComprobantePickerService comprobantePickerService) : ObservableObject
 {
     private Guid _idCuenta;
+    private Guid _idMovimiento;
     private IReadOnlyList<CategoriaItem> _todasLasCategorias = [];
 
     internal Task CargandoCategoriasTask { get; private set; } = Task.CompletedTask;
+
+    public bool ModoEdicion => _idMovimiento != Guid.Empty;
 
     public Guid IdCuenta
     {
@@ -31,6 +34,7 @@ public partial class MovimientoViewModel(
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(CrearMovimientoCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ActualizarMovimientoCommand))]
     public partial string Concepto { get; set; } = string.Empty;
 
     [ObservableProperty]
@@ -52,6 +56,7 @@ public partial class MovimientoViewModel(
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(CrearMovimientoCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ActualizarMovimientoCommand))]
     public partial string ImporteTexto { get; set; } = string.Empty;
 
     [ObservableProperty]
@@ -60,12 +65,14 @@ public partial class MovimientoViewModel(
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(CrearMovimientoCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ActualizarMovimientoCommand))]
     [NotifyPropertyChangedFor(nameof(CategoriasFiltradas))]
     [NotifyPropertyChangedFor(nameof(SinCategorias))]
     public partial TipoMovimiento TipoSeleccionado { get; set; } = TipoMovimiento.Gasto;
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(CrearMovimientoCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ActualizarMovimientoCommand))]
     public partial DateTime Fecha { get; set; } = DateTime.Today;
 
     [ObservableProperty]
@@ -73,6 +80,7 @@ public partial class MovimientoViewModel(
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(CrearMovimientoCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ActualizarMovimientoCommand))]
     public partial CategoriaItem? CategoriaSeleccionada { get; set; }
 
     [ObservableProperty]
@@ -110,6 +118,7 @@ public partial class MovimientoViewModel(
 
     public void Reset()
     {
+        _idMovimiento = Guid.Empty;
         Concepto = string.Empty;
         Establecimiento = string.Empty;
         Nota = string.Empty;
@@ -122,6 +131,43 @@ public partial class MovimientoViewModel(
         Hora = TimeSpan.Zero;
         CategoriaSeleccionada = null;
         Error = string.Empty;
+        OnPropertyChanged(nameof(ModoEdicion));
+    }
+
+    public async Task CargarMovimientoAsync(MovimientoItem movimiento)
+    {
+        _idMovimiento = movimiento.IdMovimiento;
+        _idCuenta = movimiento.IdCuenta;
+
+        await CargandoCategoriasTask;
+
+        Concepto = movimiento.Concepto;
+        ImporteTexto = movimiento.Importe.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        TipoSeleccionado = movimiento.TipoMovimiento;
+        Fecha = movimiento.FechaMovimiento.ToDateTime(TimeOnly.MinValue);
+        Hora = TimeSpan.Zero;
+        MostrarOpcionales = false;
+        Comprobante = null;
+        Error = string.Empty;
+
+        var moneda = Monedas.FirstOrDefault(m =>
+            string.Equals(m.Key, movimiento.Moneda, StringComparison.OrdinalIgnoreCase));
+        MonedaSeleccionada = moneda.Equals(default(KeyValuePair<string, string>))
+            ? MonedasHelper.DefaultMoneda
+            : moneda;
+
+        if (movimiento.IdCategoria.HasValue)
+        {
+            var categoria = _todasLasCategorias.FirstOrDefault(
+                c => c.IdCuentaCategoria == movimiento.IdCategoria.Value);
+            CategoriaSeleccionada = categoria;
+        }
+        else
+        {
+            CategoriaSeleccionada = null;
+        }
+
+        OnPropertyChanged(nameof(ModoEdicion));
     }
 
     private async Task CargarCategoriasAsync()
@@ -136,6 +182,46 @@ public partial class MovimientoViewModel(
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Error al cargar categorias: {ex}");
+        }
+    }
+
+    [RelayCommand(CanExecute = nameof(PuedeCrear))]
+    private async Task ActualizarMovimientoAsync(CancellationToken cancellationToken)
+    {
+        if (!decimal.TryParse(ImporteTexto, out var importe) || importe <= 0)
+        {
+            Error = "El importe debe ser un número mayor que cero.";
+            return;
+        }
+
+        Error = string.Empty;
+        IsBusy = true;
+        try
+        {
+            await movimientosService.UpdateMovimientoAsync(
+                new UpdateMovimientoDto(
+                    _idCuenta,
+                    _idMovimiento,
+                    Concepto.Trim(),
+                    importe,
+                    MonedaSeleccionada.Key,
+                    TipoSeleccionado,
+                    Fecha.Date + Hora,
+                    CategoriaSeleccionada!.IdCuentaCategoria,
+                    string.IsNullOrWhiteSpace(Establecimiento) ? null : Establecimiento.Trim(),
+                    string.IsNullOrWhiteSpace(Nota) ? null : Nota.Trim()),
+                cancellationToken);
+
+            await navigationService.GoToAsync("//movimientos");
+        }
+        catch (Exception ex)
+        {
+            Error = "No se pudo actualizar el movimiento. Inténtalo de nuevo.";
+            System.Diagnostics.Debug.WriteLine($"Error al actualizar movimiento: {ex}");
+        }
+        finally
+        {
+            IsBusy = false;
         }
     }
 
