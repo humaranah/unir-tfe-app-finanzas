@@ -1,4 +1,5 @@
-﻿using HA.TFG.AppFinanzas.Core.Cuentas;
+﻿using HA.TFG.AppFinanzas.App.Views.Pages;
+using HA.TFG.AppFinanzas.Core.Cuentas;
 using HA.TFG.AppFinanzas.Core.ViewModels;
 using System.Diagnostics;
 
@@ -13,6 +14,7 @@ namespace HA.TFG.AppFinanzas.App
         public AppShell(UsuarioViewModel usuarioViewModel, ICuentasService cuentasService, CrearCuentaViewModel crearCuentaViewModel)
         {
             InitializeComponent();
+            Routing.RegisterRoute("editar-movimiento", typeof(EditarMovimientoPage));
             _usuarioViewModel = usuarioViewModel;
             _cuentasService = cuentasService;
             _usuarioViewModel.LoginSucceeded += OnLoginSucceeded;

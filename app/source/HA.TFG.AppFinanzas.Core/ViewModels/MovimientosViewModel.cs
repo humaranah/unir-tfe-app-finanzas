@@ -68,7 +68,7 @@ public partial class MovimientosViewModel(
     private async Task EditarMovimientoAsync(MovimientoItem movimiento)
     {
         await navigationService.GoToAsync(
-            $"//editar-movimiento?idCuenta={movimiento.IdCuenta}&idMovimiento={movimiento.IdMovimiento}");
+            $"editar-movimiento?idCuenta={movimiento.IdCuenta}&idMovimiento={movimiento.IdMovimiento}");
     }
 
     [RelayCommand]
