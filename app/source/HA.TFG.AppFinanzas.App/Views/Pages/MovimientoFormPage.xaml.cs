@@ -32,14 +32,19 @@ public partial class MovimientoFormPage : ContentPage
         base.OnNavigatedTo(args);
 
         if (!_idCuenta.HasValue)
+        {
             return;
-
-        _viewModel.IdCuenta = _idCuenta.Value;
+        }
 
         if (_idMovimiento.HasValue)
+        {
             _ = _viewModel.CargarMovimientoAsync(_idCuenta.Value, _idMovimiento.Value);
+        }
         else
+        {
+            _viewModel.IdCuenta = _idCuenta.Value;
             _viewModel.Reset();
+        }
 
         _idCuenta = null;
         _idMovimiento = null;

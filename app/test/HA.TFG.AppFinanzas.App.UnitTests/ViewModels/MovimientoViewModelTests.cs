@@ -28,47 +28,34 @@ public class MovimientoViewModelTests
     private MovimientoViewModel CreateSut() =>
         new(_cuentasService, _movimientosService, _navigationService, _comprobantePickerService);
 
+    private MovimientoViewModel CreateSutWithValidForm()
+    {
+        var sut = CreateSut();
+        sut.IdCuenta = IdCuenta;
+        sut.Concepto = "Supermercado";
+        sut.ImporteTexto = "42.50";
+        sut.CategoriaSeleccionada = CategoriaDefault;
+        return sut;
+    }
+
     // ── Estado inicial ────────────────────────────────────────────────────────
 
     [Fact]
-    public void Constructor_ConceptoIsEmpty()
-        => Assert.Equal(string.Empty, CreateSut().Concepto);
-
-    [Fact]
-    public void Constructor_ImporteTextoIsEmpty()
-        => Assert.Equal(string.Empty, CreateSut().ImporteTexto);
-
-    [Fact]
-    public void Constructor_TipoSeleccionadoIsGasto()
-        => Assert.Equal(TipoMovimiento.Gasto, CreateSut().TipoSeleccionado);
-
-    [Fact]
-    public void Constructor_FechaIsToday()
-        => Assert.Equal(DateTime.Today, CreateSut().Fecha);
-
-    [Fact]
-    public void Constructor_ErrorIsEmpty()
-        => Assert.Equal(string.Empty, CreateSut().Error);
-
-    [Fact]
-    public void Constructor_IsBusyIsFalse()
-        => Assert.False(CreateSut().IsBusy);
-
-    [Fact]
-    public void Constructor_CategoriaSeleccionadaIsNull()
-        => Assert.Null(CreateSut().CategoriaSeleccionada);
-
-    [Fact]
-    public void Constructor_MonedaSeleccionadaIsDefault()
-        => Assert.Equal(MonedasHelper.DefaultMoneda, CreateSut().MonedaSeleccionada);
-
-    [Fact]
-    public void Constructor_TiposContainsExpectedValues()
+    public void Constructor_InitialState_MatchesExpectedSnapshot()
     {
         var sut = CreateSut();
-        Assert.Contains(TipoMovimiento.Gasto, sut.Tipos);
-        Assert.Contains(TipoMovimiento.Ingreso, sut.Tipos);
-        Assert.Contains(TipoMovimiento.Transferencia, sut.Tipos);
+
+        Assert.Multiple(
+            () => Assert.Equal(string.Empty, sut.Concepto),
+            () => Assert.Equal(string.Empty, sut.ImporteTexto),
+            () => Assert.Equal(TipoMovimiento.Gasto, sut.TipoSeleccionado),
+            () => Assert.Equal(DateTime.Today, sut.Fecha),
+            () => Assert.Equal(string.Empty, sut.Error),
+            () => Assert.False(sut.IsBusy),
+            () => Assert.Null(sut.CategoriaSeleccionada),
+            () => Assert.Equal(MonedasHelper.DefaultMoneda, sut.MonedaSeleccionada),
+            () => Assert.Equal([TipoMovimiento.Gasto, TipoMovimiento.Ingreso, TipoMovimiento.Transferencia], sut.Tipos)
+        );
     }
 
     // ── Reset ─────────────────────────────────────────────────────────────────
@@ -82,16 +69,19 @@ public class MovimientoViewModelTests
         sut.TipoSeleccionado = TipoMovimiento.Ingreso;
         sut.Fecha = DateTime.Today.AddDays(-3);
         sut.Error = "Algún error";
+        sut.CategoriaSeleccionada = CategoriaDefault;
 
         sut.Reset();
 
-        Assert.Equal(string.Empty, sut.Concepto);
-        Assert.Equal(string.Empty, sut.ImporteTexto);
-        Assert.Equal(TipoMovimiento.Gasto, sut.TipoSeleccionado);
-        Assert.Equal(DateTime.Today, sut.Fecha);
-        Assert.Equal(string.Empty, sut.Error);
-        Assert.Null(sut.CategoriaSeleccionada);
-        Assert.Equal(MonedasHelper.DefaultMoneda, sut.MonedaSeleccionada);
+        Assert.Multiple(
+            () => Assert.Equal(string.Empty, sut.Concepto),
+            () => Assert.Equal(string.Empty, sut.ImporteTexto),
+            () => Assert.Equal(TipoMovimiento.Gasto, sut.TipoSeleccionado),
+            () => Assert.Equal(DateTime.Today, sut.Fecha),
+            () => Assert.Equal(string.Empty, sut.Error),
+            () => Assert.Null(sut.CategoriaSeleccionada),
+            () => Assert.Equal(MonedasHelper.DefaultMoneda, sut.MonedaSeleccionada)
+        );
     }
 
     // ── CategoriasFiltradas ───────────────────────────────────────────────────
@@ -99,16 +89,10 @@ public class MovimientoViewModelTests
     [Fact]
     public async Task IdCuenta_WhenSet_CargaCategoriasDesdeServicio()
     {
-        var categorias = new List<CategoriaItem>
-        {
-            new() { IdCuentaCategoria = Guid.NewGuid(), Nombre = "Alimentación", TipoMovimiento = TipoMovimiento.Gasto },
-            new() { IdCuentaCategoria = Guid.NewGuid(), Nombre = "Nómina",       TipoMovimiento = TipoMovimiento.Ingreso }
-        };
-        _cuentasService.GetCategoriasAsync(IdCuenta).Returns(categorias);
+        _cuentasService.GetCategoriasAsync(IdCuenta).Returns([]);
 
         var sut = CreateSut();
         sut.IdCuenta = IdCuenta;
-
         await sut.CargandoCategoriasTask;
 
         await _cuentasService.Received(1).GetCategoriasAsync(IdCuenta);
@@ -118,33 +102,29 @@ public class MovimientoViewModelTests
     public async Task CategoriasFiltradas_FiltraPorTipoSeleccionado()
     {
         var gastoId = Guid.NewGuid();
-        var categorias = new List<CategoriaItem>
-        {
-            new() { IdCuentaCategoria = gastoId,       Nombre = "Alimentación", TipoMovimiento = TipoMovimiento.Gasto },
+        _cuentasService.GetCategoriasAsync(IdCuenta).Returns(
+        [
+            new() { IdCuentaCategoria = gastoId,        Nombre = "Alimentación", TipoMovimiento = TipoMovimiento.Gasto },
             new() { IdCuentaCategoria = Guid.NewGuid(), Nombre = "Nómina",       TipoMovimiento = TipoMovimiento.Ingreso }
-        };
-        _cuentasService.GetCategoriasAsync(IdCuenta).Returns(categorias);
+        ]);
 
         var sut = CreateSut();
         sut.IdCuenta = IdCuenta;
         await sut.CargandoCategoriasTask;
 
         sut.TipoSeleccionado = TipoMovimiento.Gasto;
-        var filtradas = sut.CategoriasFiltradas;
 
-        Assert.Single(filtradas);
-        Assert.Equal(gastoId, filtradas[0].IdCuentaCategoria);
+        Assert.Equal([gastoId], sut.CategoriasFiltradas.Select(c => c.IdCuentaCategoria));
     }
 
     [Fact]
     public async Task CategoriasFiltradas_WhenTipoCambia_ActualizaLista()
     {
-        var categorias = new List<CategoriaItem>
-        {
+        _cuentasService.GetCategoriasAsync(IdCuenta).Returns(
+        [
             new() { IdCuentaCategoria = Guid.NewGuid(), Nombre = "Alimentación", TipoMovimiento = TipoMovimiento.Gasto },
             new() { IdCuentaCategoria = Guid.NewGuid(), Nombre = "Nómina",       TipoMovimiento = TipoMovimiento.Ingreso }
-        };
-        _cuentasService.GetCategoriasAsync(IdCuenta).Returns(categorias);
+        ]);
 
         var sut = CreateSut();
         sut.IdCuenta = IdCuenta;
@@ -152,14 +132,73 @@ public class MovimientoViewModelTests
 
         sut.TipoSeleccionado = TipoMovimiento.Ingreso;
 
-        Assert.Single(sut.CategoriasFiltradas);
-        Assert.Equal("Nómina", sut.CategoriasFiltradas[0].Nombre);
+        Assert.Equal(["Nómina"], sut.CategoriasFiltradas.Select(c => c.Nombre));
     }
 
-    // ── GuardarMovimientoCommand ────────────────────────────────────────────────
+    // ── CargarMovimientoAsync ─────────────────────────────────────────────────
 
     [Fact]
-    public async Task CrearMovimientoAsync_WhenSuccessful_CallsServiceWithCorrectParameters()
+    public async Task CargarMovimientoAsync_WhenSuccessful_EntersEditModeAndPopulatesFields()
+    {
+        var categoriaId = Guid.NewGuid();
+        var fechaMovimiento = new DateTime(2025, 6, 15, 14, 30, 0);
+
+        _cuentasService.GetCategoriasAsync(IdCuenta).Returns(
+        [
+            new() { IdCuentaCategoria = categoriaId, Nombre = "Alimentación", TipoMovimiento = TipoMovimiento.Gasto }
+        ]);
+        _movimientosService.GetMovimientoDetalleAsync(IdCuenta, Arg.Any<Guid>()).Returns(new MovimientoDetalleItem
+        {
+            IdCuenta = IdCuenta,
+            IdCuentaCategoria = categoriaId,
+            TipoMovimiento = TipoMovimiento.Gasto,
+            Concepto = "Supermercado",
+            Establecimiento = "Mercadona",
+            Importe = 42.50m,
+            Moneda = "EUR",
+            Nota = "Compra semanal",
+            FechaMovimiento = fechaMovimiento
+        });
+
+        var sut = CreateSut();
+        await sut.CargarMovimientoAsync(IdCuenta, Guid.NewGuid());
+
+        Assert.Multiple(
+            () => Assert.True(sut.ModoEdicion),
+            () => Assert.Equal("Editar movimiento", sut.TituloFormulario),
+            () => Assert.Equal("Guardar cambios", sut.GuardarMovimientoText),
+            () => Assert.Equal("Supermercado", sut.Concepto),
+            () => Assert.Equal("Mercadona", sut.Establecimiento),
+            () => Assert.Equal("Compra semanal", sut.Nota),
+            () => Assert.Equal("42.50", sut.ImporteTexto),
+            () => Assert.Equal(TipoMovimiento.Gasto, sut.TipoSeleccionado),
+            () => Assert.Equal(fechaMovimiento.Date, sut.Fecha),
+            () => Assert.Equal(fechaMovimiento.TimeOfDay, sut.Hora),
+            () => Assert.Equal(categoriaId, sut.CategoriaSeleccionada?.IdCuentaCategoria),
+            () => Assert.Null(sut.Comprobante)
+        );
+    }
+
+    [Fact]
+    public async Task CargarMovimientoAsync_WhenServiceThrows_SetsErrorAndStopsLoading()
+    {
+        _cuentasService.GetCategoriasAsync(IdCuenta).Returns([]);
+        _movimientosService.GetMovimientoDetalleAsync(IdCuenta, Arg.Any<Guid>())
+            .ThrowsAsyncForAnyArgs(new HttpRequestException("Error de red"));
+
+        var sut = CreateSut();
+        await sut.CargarMovimientoAsync(IdCuenta, Guid.NewGuid());
+
+        Assert.Multiple(
+            () => Assert.Equal("No se pudo cargar el movimiento. Inténtalo de nuevo.", sut.Error),
+            () => Assert.False(sut.IsBusy)
+        );
+    }
+
+    // ── GuardarMovimientoCommand (crear) ──────────────────────────────────────
+
+    [Fact]
+    public async Task GuardarMovimientoAsync_WhenSuccessful_CallsServiceAndNavigatesBack()
     {
         var sut = CreateSut();
         sut.IdCuenta = IdCuenta;
@@ -174,61 +213,71 @@ public class MovimientoViewModelTests
 
         await _movimientosService.Received(1).CreateMovimientoAsync(
             new CreateMovimientoDto(
-                IdCuenta,
-                "Supermercado",
-                42.50m,
-                sut.MonedaSeleccionada.Key,
-                TipoMovimiento.Gasto,
+                IdCuenta, "Supermercado", 42.50m,
+                sut.MonedaSeleccionada.Key, TipoMovimiento.Gasto,
                 new DateTime(2025, 6, 15, 14, 30, 0),
                 CategoriaDefault.IdCuentaCategoria),
             Arg.Any<CancellationToken>());
-    }
-
-    [Fact]
-    public async Task CrearMovimientoAsync_WhenSuccessful_NavigatesToMovimientos()
-    {
-        var sut = CreateSut();
-        sut.IdCuenta = IdCuenta;
-        sut.Concepto = "Supermercado";
-        sut.ImporteTexto = "42.50";
-        sut.CategoriaSeleccionada = CategoriaDefault;
-
-        await sut.GuardarMovimientoCommand.ExecuteAsync(null);
-
         await _navigationService.Received(1).GoBackAsync();
     }
 
     [Fact]
-    public async Task CrearMovimientoAsync_WhenSuccessful_IsBusyIsFalseAfterCompletion()
+    public async Task GuardarMovimientoAsync_WhenImporteIsInvalid_SetsErrorAndDoesNotCallService()
     {
         var sut = CreateSut();
         sut.IdCuenta = IdCuenta;
         sut.Concepto = "Supermercado";
-        sut.ImporteTexto = "42.50";
+        sut.ImporteTexto = "abc";
         sut.CategoriaSeleccionada = CategoriaDefault;
 
         await sut.GuardarMovimientoCommand.ExecuteAsync(null);
 
-        Assert.False(sut.IsBusy);
+        Assert.Equal("El importe debe ser un número mayor que cero.", sut.Error);
+        await _movimientosService.DidNotReceiveWithAnyArgs().CreateMovimientoAsync(default!);
+        await _movimientosService.DidNotReceiveWithAnyArgs().UpdateMovimientoAsync(default!);
     }
 
     [Fact]
-    public async Task CrearMovimientoAsync_WhenSuccessful_ErrorRemainsEmpty()
+    public async Task GuardarMovimientoAsync_WhenServiceThrows_SetsErrorAndDoesNotNavigate()
     {
-        var sut = CreateSut();
-        sut.IdCuenta = IdCuenta;
-        sut.Concepto = "Supermercado";
-        sut.ImporteTexto = "42.50";
-        sut.CategoriaSeleccionada = CategoriaDefault;
+        _movimientosService
+            .CreateMovimientoAsync(Arg.Any<CreateMovimientoDto>())
+            .ThrowsAsyncForAnyArgs(new HttpRequestException("Error de red"));
 
+        var sut = CreateSutWithValidForm();
         await sut.GuardarMovimientoCommand.ExecuteAsync(null);
+
+        Assert.Multiple(
+            () => Assert.NotEmpty(sut.Error),
+            () => Assert.False(sut.IsBusy)
+        );
+        await _navigationService.DidNotReceive().GoBackAsync();
+    }
+
+    [Fact]
+    public async Task GuardarMovimientoAsync_WhenCalledAfterError_ClearsErrorBeforeAttempt()
+    {
+        _movimientosService
+            .CreateMovimientoAsync(Arg.Any<CreateMovimientoDto>())
+            .ThrowsAsyncForAnyArgs(new HttpRequestException("Error"));
+
+        var sut = CreateSutWithValidForm();
+        await sut.GuardarMovimientoCommand.ExecuteAsync(null); // primer intento fallido
+
+        _movimientosService
+            .CreateMovimientoAsync(Arg.Any<CreateMovimientoDto>())
+            .ReturnsForAnyArgs(Task.CompletedTask);
+        await sut.GuardarMovimientoCommand.ExecuteAsync(null); // segundo intento exitoso
 
         Assert.Equal(string.Empty, sut.Error);
     }
 
+    // ── GuardarMovimientoCommand (editar) ─────────────────────────────────────
+
     [Fact]
-    public async Task CrearMovimientoAsync_WhenSuccessful_PassesCategoriaIdWhenSelected()
+    public async Task GuardarMovimientoAsync_WhenEditSuccessful_CallsUpdateAndNavigatesBack()
     {
+        var idMovimiento = Guid.NewGuid();
         var categoria = new CategoriaItem
         {
             IdCuentaCategoria = Guid.NewGuid(),
@@ -236,103 +285,133 @@ public class MovimientoViewModelTests
             TipoMovimiento = TipoMovimiento.Gasto
         };
 
+        _cuentasService.GetCategoriasAsync(IdCuenta).Returns([categoria]);
+        _movimientosService.GetMovimientoDetalleAsync(IdCuenta, idMovimiento).Returns(new MovimientoDetalleItem
+        {
+            IdCuenta = IdCuenta,
+            IdCuentaCategoria = categoria.IdCuentaCategoria,
+            TipoMovimiento = TipoMovimiento.Gasto,
+            Concepto = "Anterior",
+            Importe = 10m,
+            Moneda = "EUR",
+            FechaMovimiento = DateTime.Today
+        });
+
         var sut = CreateSut();
-        sut.IdCuenta = IdCuenta;
-        sut.Concepto = "Mercadona";
-        sut.ImporteTexto = "30";
+        await sut.CargarMovimientoAsync(IdCuenta, idMovimiento);
+        sut.Concepto = "Supermercado";
+        sut.ImporteTexto = "42.50";
         sut.CategoriaSeleccionada = categoria;
 
         await sut.GuardarMovimientoCommand.ExecuteAsync(null);
 
-        await _movimientosService.Received(1).CreateMovimientoAsync(
-            Arg.Is<CreateMovimientoDto>(d => d.IdCuentaCategoria == categoria.IdCuentaCategoria),
+        await _movimientosService.Received(1).UpdateMovimientoAsync(
+            Arg.Is<UpdateMovimientoDto>(d => d.IdCuenta == IdCuenta && d.IdMovimiento == idMovimiento),
             Arg.Any<CancellationToken>());
+        await _navigationService.Received(1).GoBackAsync();
+    }
+
+    // ── Comprobante ───────────────────────────────────────────────────────────
+
+    [Fact]
+    public async Task OpenComprobanteOptionsCommand_WhenUserSelectsFile_SetsComprobante()
+    {
+        var comprobante = new ComprobanteResult([1, 2, 3], "ticket.jpg", "image/jpeg");
+        _navigationService
+            .DisplayActionSheetAsync("Adjuntar comprobante", "Cancelar", null, "Seleccionar archivo", "Tomar foto")
+            .Returns("Seleccionar archivo");
+        _comprobantePickerService.SeleccionarArchivoAsync(Arg.Any<CancellationToken>()).Returns(comprobante);
+
+        var sut = CreateSut();
+        await sut.OpenComprobanteOptionsCommand.ExecuteAsync(null);
+
+        Assert.Equal(comprobante, sut.Comprobante);
     }
 
     [Fact]
-    public async Task CrearMovimientoAsync_WhenServiceThrows_SetsError()
+    public async Task AttachFileCommand_WhenSuccessful_SetsComprobante()
     {
-        _movimientosService
-            .CreateMovimientoAsync(Arg.Any<CreateMovimientoDto>())
-            .ThrowsAsyncForAnyArgs(new HttpRequestException("Error de red"));
+        var comprobante = new ComprobanteResult([1, 2, 3], "ticket.jpg", "image/jpeg");
+        _comprobantePickerService.SeleccionarArchivoAsync(Arg.Any<CancellationToken>()).Returns(comprobante);
+
+        var sut = CreateSut();
+        await sut.AttachFileCommand.ExecuteAsync(null);
+
+        Assert.Equal(comprobante, sut.Comprobante);
+    }
+
+    [Fact]
+    public async Task TakePhotoCommand_WhenSuccessful_SetsComprobante()
+    {
+        var comprobante = new ComprobanteResult([1, 2, 3], "foto.jpg", "image/jpeg");
+        _comprobantePickerService.TomarFotoAsync(Arg.Any<CancellationToken>()).Returns(comprobante);
+
+        var sut = CreateSut();
+        await sut.TakePhotoCommand.ExecuteAsync(null);
+
+        Assert.Equal(comprobante, sut.Comprobante);
+    }
+
+    [Fact]
+    public void RemoveComprobanteCommand_ClearsComprobante()
+    {
+        var sut = CreateSut();
+        sut.Comprobante = new ComprobanteResult([1], "ticket.jpg", "image/jpeg");
+
+        sut.RemoveComprobanteCommand.Execute(null);
+
+        Assert.Null(sut.Comprobante);
+    }
+
+    [Fact]
+    public async Task ScanComprobanteCommand_WhenSuccessful_FillsFieldsAndSetsComprobante()
+    {
+        var comprobante = new ComprobanteResult([1, 2, 3], "ticket.jpg", "image/jpeg");
+        var categoriaId = Guid.NewGuid();
+
+        _cuentasService.GetCategoriasAsync(IdCuenta).Returns(
+        [
+            new() { IdCuentaCategoria = categoriaId, Nombre = "Alimentación", TipoMovimiento = TipoMovimiento.Gasto }
+        ]);
+        _navigationService
+            .DisplayActionSheetAsync("Adjuntar comprobante", "Cancelar", null, "Seleccionar archivo", "Tomar foto")
+            .Returns("Seleccionar archivo");
+        _comprobantePickerService.SeleccionarArchivoAsync(Arg.Any<CancellationToken>()).Returns(comprobante);
+        _movimientosService.EscanearComprobanteAsync(IdCuenta, comprobante, Arg.Any<CancellationToken>())
+            .Returns(new ComprobanteExtraidoDto
+            {
+                Concepto = "Cafetería",
+                Establecimiento = "Starbucks",
+                Importe = 12.30m,
+                Moneda = "EUR",
+                FechaMovimiento = new DateTimeOffset(2025, 6, 15, 10, 15, 0, TimeSpan.Zero),
+                TipoMovimiento = "Gasto",
+                IdCuentaCategoria = categoriaId,
+                Nota = "Desayuno"
+            });
 
         var sut = CreateSut();
         sut.IdCuenta = IdCuenta;
-        sut.Concepto = "Supermercado";
-        sut.ImporteTexto = "42.50";
-        sut.CategoriaSeleccionada = CategoriaDefault;
+        await sut.CargandoCategoriasTask;
 
-        await sut.GuardarMovimientoCommand.ExecuteAsync(null);
+        await sut.ScanComprobanteCommand.ExecuteAsync(null);
 
-        Assert.True(sut.HasError);
-        Assert.NotEmpty(sut.Error);
+        Assert.Multiple(
+            () => Assert.Equal(comprobante, sut.Comprobante),
+            () => Assert.Equal("Cafetería", sut.Concepto),
+            () => Assert.Equal("Starbucks", sut.Establecimiento),
+            () => Assert.Equal("Desayuno", sut.Nota),
+            () => Assert.Equal("12.30", sut.ImporteTexto),
+            () => Assert.Equal(TipoMovimiento.Gasto, sut.TipoSeleccionado),
+            () => Assert.Equal(categoriaId, sut.CategoriaSeleccionada?.IdCuentaCategoria),
+            () => Assert.False(sut.IsBusy)
+        );
     }
 
-    [Fact]
-    public async Task CrearMovimientoAsync_WhenServiceThrows_IsBusyIsFalseAfterCompletion()
-    {
-        _movimientosService
-            .CreateMovimientoAsync(Arg.Any<CreateMovimientoDto>())
-            .ThrowsAsyncForAnyArgs(new HttpRequestException("Error de red"));
-
-        var sut = CreateSut();
-        sut.IdCuenta = IdCuenta;
-        sut.Concepto = "Supermercado";
-        sut.ImporteTexto = "42.50";
-        sut.CategoriaSeleccionada = CategoriaDefault;
-
-        await sut.GuardarMovimientoCommand.ExecuteAsync(null);
-
-        Assert.False(sut.IsBusy);
-    }
+    // ── CancelCommand ─────────────────────────────────────────────────────────
 
     [Fact]
-    public async Task CrearMovimientoAsync_WhenServiceThrows_DoesNotNavigate()
-    {
-        _movimientosService
-            .CreateMovimientoAsync(Arg.Any<CreateMovimientoDto>())
-            .ThrowsAsyncForAnyArgs(new HttpRequestException("Error de red"));
-
-        var sut = CreateSut();
-        sut.IdCuenta = IdCuenta;
-        sut.Concepto = "Supermercado";
-        sut.ImporteTexto = "42.50";
-        sut.CategoriaSeleccionada = CategoriaDefault;
-
-        await sut.GuardarMovimientoCommand.ExecuteAsync(null);
-
-        await _navigationService.DidNotReceive().GoToAsync(Arg.Any<string>());
-    }
-
-    [Fact]
-    public async Task CrearMovimientoAsync_WhenCalledAfterError_ClearsErrorBeforeAttempt()
-    {
-        _movimientosService
-            .CreateMovimientoAsync(Arg.Any<CreateMovimientoDto>())
-            .ThrowsAsyncForAnyArgs(new HttpRequestException("Error"));
-
-        var sut = CreateSut();
-        sut.IdCuenta = IdCuenta;
-        sut.Concepto = "Supermercado";
-        sut.ImporteTexto = "42.50";
-        sut.CategoriaSeleccionada = CategoriaDefault;
-
-        await sut.GuardarMovimientoCommand.ExecuteAsync(null); // primer intento fallido
-
-        _movimientosService.ClearReceivedCalls();
-        _movimientosService
-            .CreateMovimientoAsync(Arg.Any<CreateMovimientoDto>())
-            .ReturnsForAnyArgs(Task.CompletedTask);
-
-        await sut.GuardarMovimientoCommand.ExecuteAsync(null); // segundo intento exitoso
-
-        Assert.Equal(string.Empty, sut.Error);
-    }
-
-    // ── CancelarCommand ───────────────────────────────────────────────────────
-
-    [Fact]
-    public async Task CancelCommand_NavigatesToMovimientos()
+    public async Task CancelCommand_NavigatesBack()
     {
         var sut = CreateSut();
 
