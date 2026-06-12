@@ -14,4 +14,5 @@ public sealed record MovimientoDetalleItem
     public string Moneda { get; init; } = string.Empty;
     public string Nota { get; init; } = string.Empty;
     public DateTime FechaMovimiento { get; init; }
+    public bool TieneComprobante { get; init; }
 }

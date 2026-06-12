@@ -12,6 +12,11 @@ public interface IMovimientosService
         Guid idMovimiento,
         CancellationToken cancellationToken = default);
 
+    Task<ComprobanteResult?> GetComprobanteAsync(
+        Guid idCuenta,
+        Guid idMovimiento,
+        CancellationToken cancellationToken = default);
+
     Task CreateMovimientoAsync(
         CreateMovimientoDto dto,
         CancellationToken cancellationToken = default);

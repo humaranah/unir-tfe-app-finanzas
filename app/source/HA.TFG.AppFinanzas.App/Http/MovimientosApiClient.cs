@@ -28,6 +28,7 @@ internal sealed record MovimientoDetalleResponse(
     string? Establecimiento,
     decimal Importe,
     string Moneda,
+    string? IdComprobante,
     string Nota,
     DateTime FechaMovimiento);
 
@@ -175,8 +176,39 @@ internal sealed class MovimientosApiClient(IHttpClientFactory httpClientFactory)
             Importe = detalle.Importe,
             Moneda = detalle.Moneda,
             Nota = detalle.Nota,
-            FechaMovimiento = detalle.FechaMovimiento
+            FechaMovimiento = detalle.FechaMovimiento,
+            TieneComprobante = !string.IsNullOrEmpty(detalle.IdComprobante)
         };
+    }
+
+    public async Task<ComprobanteResult?> GetComprobanteAsync(
+        Guid idCuenta,
+        Guid idMovimiento,
+        CancellationToken cancellationToken = default)
+    {
+        var client = httpClientFactory.CreateClient("Backend");
+
+        using var response = await client.GetAsync(
+            $"api/cuentas/{idCuenta}/movimientos/{idMovimiento}/comprobante", cancellationToken);
+
+        if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            return null;
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var body = await response.Content.ReadAsStringAsync(cancellationToken);
+            throw new HttpRequestException(
+                $"Error al obtener comprobante. Status={(int)response.StatusCode}. Body={body}");
+        }
+
+        var bytes = await response.Content.ReadAsByteArrayAsync(cancellationToken);
+        var contentType = response.Content.Headers.ContentType?.MediaType ?? "application/octet-stream";
+        var contentDisposition = response.Content.Headers.ContentDisposition;
+        var fileName = contentDisposition?.FileName?.Trim('"')
+            ?? contentDisposition?.FileNameStar?.Trim('"')
+            ?? "comprobante";
+
+        return new ComprobanteResult(bytes, fileName, contentType);
     }
 
     public async Task<ComprobanteExtraidoDto> EscanearComprobanteAsync(

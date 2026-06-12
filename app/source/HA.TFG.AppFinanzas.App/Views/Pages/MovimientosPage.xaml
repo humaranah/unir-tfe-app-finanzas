@@ -58,6 +58,11 @@
                     <Border Stroke="LightGray" Padding="10" Margin="0,0,0,10">
                         <Grid ColumnDefinitions="*,auto">
                             <StackLayout Grid.Column="0">
+                                <StackLayout.GestureRecognizers>
+                                    <TapGestureRecognizer
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MovimientosViewModel}}, Path=VerDetalleMovimientoCommand}"
+                                        CommandParameter="{Binding .}" />
+                                </StackLayout.GestureRecognizers>
                                 <Label Text="{Binding Concepto}" FontSize="16" FontAttributes="Bold" />
                                 <Label Text="{Binding FechaMovimiento, StringFormat='Fecha: {0:dd/MM/yyyy}'}" FontSize="14" TextColor="Gray" />
                                 <Label FontSize="14" TextColor="Green">
