@@ -48,6 +48,17 @@ public sealed class MovimientoRepository(AppDbContext context) : IMovimientoRepo
         return movimiento;
     }
 
+    public async Task<Movimiento> DeleteMovimientoAsync(Movimiento movimiento, CancellationToken cancellationToken)
+    {
+        var fechaEliminacion = DateTime.UtcNow;
+
+        await context.Movimientos
+            .Where(m => m.IdMovimiento == movimiento.IdMovimiento)
+            .ExecuteUpdateAsync(s => s.SetProperty(m => m.FechaEliminacion, fechaEliminacion), cancellationToken);
+
+        return movimiento with { FechaEliminacion = fechaEliminacion };
+    }
+
     public Task<Movimiento?> GetMovimientoByIdAsync(Guid idCuenta, Guid idMovimiento, CancellationToken cancellationToken) =>
         context.Movimientos
             .AsNoTracking()

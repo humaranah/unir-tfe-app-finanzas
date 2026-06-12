@@ -14,6 +14,7 @@ public interface IMovimientoRepository
 
     Task<Movimiento> AddMovimientoAsync(Movimiento movimiento, CancellationToken cancellationToken);
     Task<Movimiento> UpdateMovimientoAsync(Movimiento movimiento, CancellationToken cancellationToken);
+    Task<Movimiento> DeleteMovimientoAsync(Movimiento movimiento, CancellationToken cancellationToken);
     Task<Movimiento?> GetMovimientoByIdAsync(Guid idCuenta, Guid idMovimiento, CancellationToken cancellationToken);
 
     /// <summary>
