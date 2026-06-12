@@ -5,6 +5,7 @@ using HA.TFG.AppFinanzas.Core.Navigation;
 using HA.TFG.AppFinanzas.Core.ViewModels;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
+using System.Globalization;
 
 namespace HA.TFG.AppFinanzas.App.UnitTests.ViewModels;
 
@@ -68,7 +69,7 @@ public class MovimientoDetalleViewModelTests
             () => Assert.False(sut.IsBusy),
             () => Assert.False(sut.HasError),
             () => Assert.True(sut.IsNotBusy),
-            () => Assert.True(sut.HasDetalle),
+            () => Assert.False(sut.HasDetalle),
             () => Assert.False(sut.TieneEstablecimiento),
             () => Assert.False(sut.TieneNota),
             () => Assert.False(sut.TieneComprobante),
@@ -197,13 +198,20 @@ public class MovimientoDetalleViewModelTests
     // ── ImporteFormateado ─────────────────────────────────────────────────────
 
     [Theory]
-    [InlineData(TipoMovimiento.Gasto, 10.0, "EUR", "-10.00 EUR")]
-    [InlineData(TipoMovimiento.Ingreso, 100.0, "USD", "+100.00 USD")]
-    [InlineData(TipoMovimiento.Transferencia, 50.0, "EUR", "50.00 EUR")]
+    [InlineData(TipoMovimiento.Gasto, 10.0, "EUR")]
+    [InlineData(TipoMovimiento.Ingreso, 100.0, "USD")]
+    [InlineData(TipoMovimiento.Transferencia, 50.0, "EUR")]
     public async Task ImporteFormateado_SegunTipo_MuestraSignoCorrecto(
-        TipoMovimiento tipo, double importeDouble, string moneda, string esperado)
+        TipoMovimiento tipo, double importeDouble, string moneda)
     {
         var importe = (decimal)importeDouble;
+        var importeFormateado = importe.ToString("N2", CultureInfo.InvariantCulture);
+        var esperado = tipo switch
+        {
+            TipoMovimiento.Gasto => $"-{importeFormateado} {moneda}",
+            TipoMovimiento.Ingreso => $"+{importeFormateado} {moneda}",
+            _ => $"{importeFormateado} {moneda}"
+        };
         var detalle = new MovimientoDetalleItem
         {
             IdMovimiento = IdMovimiento,
@@ -225,7 +233,7 @@ public class MovimientoDetalleViewModelTests
         var sut = CreateSut();
         await sut.CargarDetalleAsync(IdCuenta, IdMovimiento);
 
-        Assert.Equal(esperado, sut.ImporteFormateado);
+        Assert.Equal(esperado, sut.ImporteFormateado, StringComparer.InvariantCulture);
     }
 
     // ── MostrarHora ───────────────────────────────────────────────────────────

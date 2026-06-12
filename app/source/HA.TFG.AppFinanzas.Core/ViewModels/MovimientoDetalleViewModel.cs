@@ -15,6 +15,7 @@ public partial class MovimientoDetalleViewModel(
 {
     private Guid _idCuenta;
     private Guid _idMovimiento;
+    private bool _isLoaded;
 
     [ObservableProperty]
     public partial string Concepto { get; set; } = string.Empty;
@@ -74,7 +75,7 @@ public partial class MovimientoDetalleViewModel(
 
     public bool HasError => !string.IsNullOrEmpty(Error);
     public bool IsNotBusy => !IsBusy;
-    public bool HasDetalle => !IsBusy && !HasError;
+    public bool HasDetalle => !IsBusy && !HasError && _isLoaded;
 
     public string FechaFormateada => FechaMovimiento.ToString("dd/MM/yyyy");
     public string HoraFormateada => FechaMovimiento.ToString("HH:mm");
@@ -91,6 +92,7 @@ public partial class MovimientoDetalleViewModel(
     {
         _idCuenta = idCuenta;
         _idMovimiento = idMovimiento;
+        _isLoaded = false;
         Error = string.Empty;
         IsBusy = true;
         try
@@ -111,6 +113,7 @@ public partial class MovimientoDetalleViewModel(
 
             var categoria = categorias.FirstOrDefault(c => c.IdCuentaCategoria == detalle.IdCuentaCategoria);
             NombreCategoria = categoria?.Nombre ?? string.Empty;
+            _isLoaded = true;
         }
         catch (Exception ex)
         {
