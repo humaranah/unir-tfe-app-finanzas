@@ -50,14 +50,13 @@ public sealed class MovimientoRepository(AppDbContext context) : IMovimientoRepo
 
     public async Task<Movimiento> DeleteMovimientoAsync(Movimiento movimiento, CancellationToken cancellationToken)
     {
-        var movimientoEliminado = movimiento with
-        {
-            FechaEliminacion = DateTime.UtcNow
-        };
+        var fechaEliminacion = DateTime.UtcNow;
 
-        context.Movimientos.Update(movimientoEliminado);
-        await context.SaveChangesAsync(cancellationToken);
-        return movimientoEliminado;
+        await context.Movimientos
+            .Where(m => m.IdMovimiento == movimiento.IdMovimiento)
+            .ExecuteUpdateAsync(s => s.SetProperty(m => m.FechaEliminacion, fechaEliminacion), cancellationToken);
+
+        return movimiento with { FechaEliminacion = fechaEliminacion };
     }
 
     public Task<Movimiento?> GetMovimientoByIdAsync(Guid idCuenta, Guid idMovimiento, CancellationToken cancellationToken) =>
