@@ -2,6 +2,7 @@
 using HA.TFG.AppFinanzas.BackEnd.Application.Features.Cuentas.GetCuentaCategoriasQuery;
 using HA.TFG.AppFinanzas.BackEnd.Application.Features.Cuentas.GetCuentasQuery;
 using HA.TFG.AppFinanzas.BackEnd.Application.Features.Movimientos.CreateMovimientoCommand;
+using HA.TFG.AppFinanzas.BackEnd.Application.Features.Movimientos.DeleteMovimientoCommand;
 using HA.TFG.AppFinanzas.BackEnd.Application.Features.Movimientos.GetComprobanteMovimientoQuery;
 using HA.TFG.AppFinanzas.BackEnd.Application.Features.Movimientos.GetMovimientoDetalleQuery;
 using HA.TFG.AppFinanzas.BackEnd.Application.Features.Movimientos.GetMovimientosQuery;
@@ -163,5 +164,25 @@ public sealed class CuentasController(IMediator mediator) : ControllerBase
                 await command.ComprobanteStream.DisposeAsync();
             }
         }
+    }
+
+    [HttpDelete("{idCuenta:guid}/movimientos/{idMovimiento:guid}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteMovimiento(
+        [FromRoute] Guid idCuenta,
+        [FromRoute] Guid idMovimiento,
+        CancellationToken cancellationToken)
+    {
+        var email = User.Identity?.Name ?? string.Empty;
+        var command = new DeleteMovimientoCommand
+        {
+            Email = email,
+            IdCuenta = idCuenta,
+            IdMovimiento = idMovimiento
+        };
+
+        await _mediator.Send(command, cancellationToken);
+        return NoContent();
     }
 }
