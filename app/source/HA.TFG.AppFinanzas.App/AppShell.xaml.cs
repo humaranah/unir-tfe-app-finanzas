@@ -16,6 +16,7 @@ namespace HA.TFG.AppFinanzas.App
             InitializeComponent();
             Routing.RegisterRoute("crear-movimiento", typeof(MovimientoFormPage));
             Routing.RegisterRoute("editar-movimiento", typeof(MovimientoFormPage));
+            Routing.RegisterRoute("detalle-movimiento", typeof(MovimientoDetallePage));
             _usuarioViewModel = usuarioViewModel;
             _cuentasService = cuentasService;
             _usuarioViewModel.LoginSucceeded += OnLoginSucceeded;
