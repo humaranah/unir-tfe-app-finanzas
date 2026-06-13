@@ -2,6 +2,7 @@ using HA.TFG.AppFinanzas.Core.Cuentas;
 using HA.TFG.AppFinanzas.Core.Models.Enums;
 using HA.TFG.AppFinanzas.Core.Movimientos;
 using HA.TFG.AppFinanzas.Core.Navigation;
+using HA.TFG.AppFinanzas.Core.Services;
 using HA.TFG.AppFinanzas.Core.ViewModels;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
@@ -15,6 +16,7 @@ public class MovimientoDetalleViewModelTests
     private readonly ICuentasService _cuentasService = Substitute.For<ICuentasService>();
     private readonly INavigationService _navigationService = Substitute.For<INavigationService>();
     private readonly IComprobanteViewerService _comprobanteViewerService = Substitute.For<IComprobanteViewerService>();
+    private readonly IConfirmationService _confirmationService = Substitute.For<IConfirmationService>();
 
     private static readonly Guid IdCuenta = Guid.NewGuid();
     private static readonly Guid IdMovimiento = Guid.NewGuid();
@@ -42,7 +44,7 @@ public class MovimientoDetalleViewModelTests
     };
 
     private MovimientoDetalleViewModel CreateSut() =>
-        new(_movimientosService, _cuentasService, _navigationService, _comprobanteViewerService);
+        new(_movimientosService, _cuentasService, _navigationService, _comprobanteViewerService, _confirmationService);
 
     private void ConfigurarServiciosOk(MovimientoDetalleItem? detalle = null)
     {
@@ -349,4 +351,63 @@ public class MovimientoDetalleViewModelTests
 
         await _navigationService.Received(1).GoBackAsync();
     }
+
+    // ── Eliminar movimiento ────────────────────────────────────────────────
+
+    [Fact]
+    public async Task EliminarMovimientoCommand_WhenExecuted_CallsDeleteService()
+    {
+        ConfigurarServiciosOk();
+        _confirmationService.ConfirmAsync(Arg.Any<string>(), Arg.Any<string>()).Returns(true);
+        var sut = CreateSut();
+        await sut.CargarDetalleAsync(IdCuenta, IdMovimiento);
+
+        await sut.EliminarMovimientoCommand.ExecuteAsync(null);
+
+        await _movimientosService.Received(1).DeleteMovimientoAsync(IdCuenta, IdMovimiento);
+    }
+
+    [Fact]
+    public async Task EliminarMovimientoCommand_WhenSuccessful_NavegaAtras()
+    {
+        ConfigurarServiciosOk();
+        _confirmationService.ConfirmAsync(Arg.Any<string>(), Arg.Any<string>()).Returns(true);
+        var sut = CreateSut();
+        await sut.CargarDetalleAsync(IdCuenta, IdMovimiento);
+
+        await sut.EliminarMovimientoCommand.ExecuteAsync(null);
+
+        await _navigationService.Received(1).GoBackAsync();
+    }
+
+    [Fact]
+    public async Task EliminarMovimientoCommand_WhenFails_SetsError()
+    {
+        ConfigurarServiciosOk();
+        _confirmationService.ConfirmAsync(Arg.Any<string>(), Arg.Any<string>()).Returns(true);
+        _movimientosService.DeleteMovimientoAsync(Arg.Any<Guid>(), Arg.Any<Guid>())
+            .Throws<Exception>();
+
+        var sut = CreateSut();
+        await sut.CargarDetalleAsync(IdCuenta, IdMovimiento);
+        await sut.EliminarMovimientoCommand.ExecuteAsync(null);
+
+        Assert.Equal("No se pudo eliminar el movimiento. Inténtalo de nuevo.", sut.Error);
+    }
+
+    [Fact]
+    public async Task EliminarMovimientoCommand_WhenFails_SetsBusyFalse()
+    {
+        ConfigurarServiciosOk();
+        _confirmationService.ConfirmAsync(Arg.Any<string>(), Arg.Any<string>()).Returns(true);
+        _movimientosService.DeleteMovimientoAsync(Arg.Any<Guid>(), Arg.Any<Guid>())
+            .Throws<Exception>();
+
+        var sut = CreateSut();
+        await sut.CargarDetalleAsync(IdCuenta, IdMovimiento);
+        await sut.EliminarMovimientoCommand.ExecuteAsync(null);
+
+        Assert.False(sut.IsBusy);
+    }
 }
+

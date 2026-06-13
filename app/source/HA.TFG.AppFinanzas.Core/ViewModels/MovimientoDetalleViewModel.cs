@@ -4,6 +4,7 @@ using HA.TFG.AppFinanzas.Core.Cuentas;
 using HA.TFG.AppFinanzas.Core.Models.Enums;
 using HA.TFG.AppFinanzas.Core.Movimientos;
 using HA.TFG.AppFinanzas.Core.Navigation;
+using HA.TFG.AppFinanzas.Core.Services;
 
 namespace HA.TFG.AppFinanzas.Core.ViewModels;
 
@@ -11,7 +12,8 @@ public partial class MovimientoDetalleViewModel(
     IMovimientosService movimientosService,
     ICuentasService cuentasService,
     INavigationService navigationService,
-    IComprobanteViewerService comprobanteViewerService) : ObservableObject
+    IComprobanteViewerService comprobanteViewerService,
+    IConfirmationService confirmationService) : ObservableObject
 {
     private Guid _idCuenta;
     private Guid _idMovimiento;
@@ -152,6 +154,30 @@ public partial class MovimientoDetalleViewModel(
     {
         await navigationService.GoToAsync(
             $"editar-movimiento?idCuenta={_idCuenta}&idMovimiento={_idMovimiento}");
+    }
+
+    [RelayCommand]
+    private async Task EliminarMovimientoAsync()
+    {
+        var respuesta = await confirmationService.ConfirmAsync(
+            "Eliminar movimiento",
+            "¿Estás seguro de que deseas eliminar este movimiento?");
+
+        if (!respuesta)
+            return;
+
+        IsBusy = true;
+        try
+        {
+            await movimientosService.DeleteMovimientoAsync(_idCuenta, _idMovimiento);
+            await navigationService.GoBackAsync();
+        }
+        catch (Exception ex)
+        {
+            Error = "No se pudo eliminar el movimiento. Inténtalo de nuevo.";
+            System.Diagnostics.Debug.WriteLine($"Error al eliminar movimiento: {ex}");
+            IsBusy = false;
+        }
     }
 
     [RelayCommand]

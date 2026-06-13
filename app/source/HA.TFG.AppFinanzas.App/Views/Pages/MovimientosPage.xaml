@@ -49,14 +49,13 @@
                 <DataTemplate x:DataType="model:MovimientosPorFecha">
                     <Label Text="{Binding Fecha, StringFormat='{0:dd/MM/yyyy}'}"
                            FontAttributes="Bold"
-                           BackgroundColor="LightGray"
                            Padding="10,5" />
                 </DataTemplate>
             </CollectionView.GroupHeaderTemplate>
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="model:MovimientoItem">
                     <Border Stroke="LightGray" Padding="10" Margin="0,0,0,10">
-                        <Grid ColumnDefinitions="*,auto">
+                        <Grid ColumnDefinitions="*,auto,auto">
                             <StackLayout Grid.Column="0">
                                 <StackLayout.GestureRecognizers>
                                     <TapGestureRecognizer
@@ -82,12 +81,30 @@
                                     AutomationProperties.Name="Editar movimiento"
                                     Style="{DynamicResource OutlinedButton}"
                                     VerticalOptions="Center"
+                                    BorderWidth="1"
                                     Padding="8,4">
                                 <Button.ImageSource>
                                     <FontImageSource FontFamily="FluentIcons"
-                                                     Glyph="&#xE2C5;"
-                                                     Size="18"
+                                                     Glyph="&#xE5B2;"
+                                                     Size="24"
                                                      Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
+                                </Button.ImageSource>
+                            </Button>
+                            <Button Grid.Column="2"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MovimientosViewModel}}, Path=EliminarMovimientoCommand}"
+                                    CommandParameter="{Binding .}"
+                                    AutomationProperties.Name="Eliminar movimiento"
+                                    Style="{DynamicResource OutlinedButton}"
+                                    VerticalOptions="Center"
+                                    BorderWidth="1"
+                                    BorderColor="{AppThemeBinding Light=#D32F2F, Dark=#FF6B6B}"
+                                    Margin="4,0,0,0"
+                                    Padding="8,4">
+                                <Button.ImageSource>
+                                    <FontImageSource FontFamily="FluentIcons"
+                                                     Glyph="&#xE47B;"
+                                                     Size="24"
+                                                     Color="{AppThemeBinding Light=#D32F2F, Dark=#FF6B6B}" />
                                 </Button.ImageSource>
                             </Button>
                         </Grid>
