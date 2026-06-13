@@ -145,6 +145,24 @@ internal sealed class MovimientosApiClient(IHttpClientFactory httpClientFactory)
         }
     }
 
+    public async Task DeleteMovimientoAsync(
+        Guid idCuenta,
+        Guid idMovimiento,
+        CancellationToken cancellationToken = default)
+    {
+        var client = httpClientFactory.CreateClient("Backend");
+
+        using var response = await client.DeleteAsync(
+            $"api/cuentas/{idCuenta}/movimientos/{idMovimiento}", cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
+            throw new HttpRequestException(
+                $"Error al eliminar movimiento. Status={(int)response.StatusCode}. Body={responseBody}");
+        }
+    }
+
     public async Task<MovimientoDetalleItem> GetMovimientoDetalleAsync(
         Guid idCuenta,
         Guid idMovimiento,

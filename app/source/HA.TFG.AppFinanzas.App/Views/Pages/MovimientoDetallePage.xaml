@@ -168,9 +168,27 @@
                         HorizontalOptions="Fill">
                     <Button.ImageSource>
                         <FontImageSource FontFamily="FluentIcons"
-                                         Glyph="&#xE2C5;"
+                                         Glyph="&#xE5B2;"
                                          Size="20"
                                          Color="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource PrimaryDarkText}}" />
+                    </Button.ImageSource>
+                </Button>
+
+                <!-- Eliminar -->
+                <Button Text="Eliminar movimiento"
+                        Command="{Binding EliminarMovimientoCommand}"
+                        ContentLayout="Left,8"
+                        HorizontalOptions="Fill"
+                        Style="{DynamicResource OutlinedButton}"
+                        Margin="0,8,0,0"
+                        BorderWidth="1"
+                        BorderColor="{AppThemeBinding Light=#D32F2F, Dark=#FF6B6B}"
+                        TextColor="{AppThemeBinding Light=#D32F2F, Dark=#FF6B6B}">
+                    <Button.ImageSource>
+                        <FontImageSource FontFamily="FluentIcons"
+                                         Glyph="&#xE47B;"
+                                         Size="20"
+                                         Color="{AppThemeBinding Light=#D32F2F, Dark=#FF6B6B}" />
                     </Button.ImageSource>
                 </Button>
 

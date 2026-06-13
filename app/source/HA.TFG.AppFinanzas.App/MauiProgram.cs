@@ -3,6 +3,7 @@ using HA.TFG.AppFinanzas.App.Navigation;
 using HA.TFG.AppFinanzas.App.Services;
 using HA.TFG.AppFinanzas.Core.Movimientos;
 using HA.TFG.AppFinanzas.Core.Navigation;
+using HA.TFG.AppFinanzas.Core.Services;
 using HA.TFG.AppFinanzas.Core.ViewModels;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -42,6 +43,7 @@ public static class MauiProgram
 
         builder.Services.AddSingleton<INavigationService, ShellNavigationService>();
         builder.Services.AddSingleton<IComprobanteViewerService, ComprobanteViewerService>();
+        builder.Services.AddSingleton<IConfirmationService, ConfirmationService>();
         builder.Services.AddSingleton<UsuarioViewModel>();
         builder.Services.AddSingleton<CrearCuentaViewModel>();
         builder.Services.AddSingleton<MovimientosViewModel>();

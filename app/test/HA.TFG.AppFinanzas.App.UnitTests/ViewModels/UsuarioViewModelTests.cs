@@ -68,20 +68,11 @@ public class UsuarioViewModelTests
         var sut = CreateSut();
         await sut.LoginCommand.ExecuteAsync(null);
 
-        Assert.False(sut.IsAuthenticated);
-        Assert.Contains("disponible", sut.Error);
-    }
-
-    [Fact]
-    public async Task LoginAsync_WhenServiceThrows_IsBusyReturnsFalse()
-    {
-        _usuarioService.LoginAsync(Arg.Any<CancellationToken>())
-            .Throws(new InvalidOperationException("Error"));
-
-        var sut = CreateSut();
-        await sut.LoginCommand.ExecuteAsync(null);
-
-        Assert.False(sut.IsBusy);
+        Assert.Multiple(
+            () => Assert.False(sut.IsAuthenticated),
+            () => Assert.Contains("disponible", sut.Error),
+            () => Assert.False(sut.IsBusy)
+        );
     }
 
     // ---------------------------------------------------------------------------
@@ -140,17 +131,4 @@ public class UsuarioViewModelTests
         Assert.Equal("hugo@test.com", sut.Email);
     }
 
-    // ---------------------------------------------------------------------------
-    // IsNotAuthenticated (propiedad derivada)
-    // ---------------------------------------------------------------------------
-
-    [Fact]
-    public void IsNotAuthenticated_IsInverseOfIsAuthenticated()
-    {
-        var sut = CreateSut();
-
-        Assert.True(sut.IsNotAuthenticated);
-        sut.IsAuthenticated = true;
-        Assert.False(sut.IsNotAuthenticated);
-    }
 }

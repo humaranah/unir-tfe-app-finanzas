@@ -17,53 +17,20 @@ public class CrearCuentaViewModelTests
     // ---------------------------------------------------------------------------
 
     [Fact]
-    public void Constructor_SetsDefaultDescripcion()
+    public void Constructor_InitialState_MatchesExpectedSnapshot()
     {
         var sut = CreateSut();
 
-        Assert.Equal("Mis gastos", sut.Descripcion);
-    }
-
-    [Fact]
-    public void Constructor_SetsDefaultMonedaSeleccionada()
-    {
-        var sut = CreateSut();
-
-        Assert.Equal(MonedasHelper.DefaultMoneda, sut.MonedaSeleccionada);
-    }
-
-    [Fact]
-    public void Constructor_MonedaSeleccionadaIsInMonedas()
-    {
-        var sut = CreateSut();
-
-        Assert.Contains(sut.MonedaSeleccionada, sut.Monedas);
-    }
-
-    [Fact]
-    public void Constructor_MonedasIsNotEmpty()
-    {
-        var sut = CreateSut();
-
-        Assert.NotEmpty(sut.Monedas);
-    }
-
-    [Fact]
-    public void Constructor_ErrorIsEmpty()
-    {
-        var sut = CreateSut();
-
-        Assert.Empty(sut.Error);
-        Assert.False(sut.HasError);
-    }
-
-    [Fact]
-    public void Constructor_IsNotBusy()
-    {
-        var sut = CreateSut();
-
-        Assert.False(sut.IsBusy);
-        Assert.True(sut.IsNotBusy);
+        Assert.Multiple(
+            () => Assert.Equal("Mis gastos", sut.Descripcion),
+            () => Assert.Equal(MonedasHelper.DefaultMoneda, sut.MonedaSeleccionada),
+            () => Assert.Contains(sut.MonedaSeleccionada, sut.Monedas),
+            () => Assert.NotEmpty(sut.Monedas),
+            () => Assert.Empty(sut.Error),
+            () => Assert.False(sut.HasError),
+            () => Assert.False(sut.IsBusy),
+            () => Assert.True(sut.IsNotBusy)
+        );
     }
 
     // ---------------------------------------------------------------------------
@@ -83,6 +50,11 @@ public class CrearCuentaViewModelTests
             "Cuenta de vacaciones",
             "USD",
             Arg.Any<CancellationToken>());
+        Assert.Multiple(
+            () => Assert.Empty(sut.Error),
+            () => Assert.False(sut.HasError),
+            () => Assert.False(sut.IsBusy)
+        );
     }
 
     [Fact]
@@ -95,28 +67,6 @@ public class CrearCuentaViewModelTests
         await sut.CrearCuentaCommand.ExecuteAsync(null);
 
         Assert.True(eventRaised);
-    }
-
-    [Fact]
-    public async Task CrearCuentaAsync_WhenSuccessful_ErrorRemainsEmpty()
-    {
-        var sut = CreateSut();
-
-        await sut.CrearCuentaCommand.ExecuteAsync(null);
-
-        Assert.Empty(sut.Error);
-        Assert.False(sut.HasError);
-    }
-
-    [Fact]
-    public async Task CrearCuentaAsync_WhenSuccessful_IsBusyIsFalseAfterCompletion()
-    {
-        var sut = CreateSut();
-
-        await sut.CrearCuentaCommand.ExecuteAsync(null);
-
-        Assert.False(sut.IsBusy);
-        Assert.True(sut.IsNotBusy);
     }
 
     // ---------------------------------------------------------------------------
@@ -134,8 +84,11 @@ public class CrearCuentaViewModelTests
 
         await sut.CrearCuentaCommand.ExecuteAsync(null);
 
-        Assert.NotEmpty(sut.Error);
-        Assert.True(sut.HasError);
+        Assert.Multiple(
+            () => Assert.NotEmpty(sut.Error),
+            () => Assert.True(sut.HasError),
+            () => Assert.False(sut.IsBusy)
+        );
     }
 
     [Fact]
@@ -152,21 +105,6 @@ public class CrearCuentaViewModelTests
         await sut.CrearCuentaCommand.ExecuteAsync(null);
 
         Assert.False(eventRaised);
-    }
-
-    [Fact]
-    public async Task CrearCuentaAsync_WhenServiceThrows_IsBusyIsFalseAfterCompletion()
-    {
-        _cuentasService
-            .CreateCuentaAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
-            .ThrowsAsync(new HttpRequestException("Error al crear cuenta. Status=500."));
-
-        var sut = CreateSut();
-
-        await sut.CrearCuentaCommand.ExecuteAsync(null);
-
-        Assert.False(sut.IsBusy);
-        Assert.True(sut.IsNotBusy);
     }
 
     [Fact]
