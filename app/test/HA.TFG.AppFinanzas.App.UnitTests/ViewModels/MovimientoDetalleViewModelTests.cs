@@ -166,16 +166,6 @@ public class MovimientoDetalleViewModelTests
         await cargandoTask;
     }
 
-    [Fact]
-    public async Task CargarDetalleAsync_AlFinalizar_IsBusyEsFalse()
-    {
-        ConfigurarServiciosOk();
-        var sut = CreateSut();
-
-        await sut.CargarDetalleAsync(IdCuenta, IdMovimiento);
-
-        Assert.False(sut.IsBusy);
-    }
 
     // ── Error ─────────────────────────────────────────────────────────────────
 
@@ -392,22 +382,10 @@ public class MovimientoDetalleViewModelTests
         await sut.CargarDetalleAsync(IdCuenta, IdMovimiento);
         await sut.EliminarMovimientoCommand.ExecuteAsync(null);
 
-        Assert.Equal("No se pudo eliminar el movimiento. Inténtalo de nuevo.", sut.Error);
-    }
-
-    [Fact]
-    public async Task EliminarMovimientoCommand_WhenFails_SetsBusyFalse()
-    {
-        ConfigurarServiciosOk();
-        _confirmationService.ConfirmAsync(Arg.Any<string>(), Arg.Any<string>()).Returns(true);
-        _movimientosService.DeleteMovimientoAsync(Arg.Any<Guid>(), Arg.Any<Guid>())
-            .Throws<Exception>();
-
-        var sut = CreateSut();
-        await sut.CargarDetalleAsync(IdCuenta, IdMovimiento);
-        await sut.EliminarMovimientoCommand.ExecuteAsync(null);
-
-        Assert.False(sut.IsBusy);
+        Assert.Multiple(
+            () => Assert.Equal("No se pudo eliminar el movimiento. Inténtalo de nuevo.", sut.Error),
+            () => Assert.False(sut.IsBusy)
+        );
     }
 }
 

@@ -176,6 +176,9 @@ public partial class MovimientoDetalleViewModel(
         {
             Error = "No se pudo eliminar el movimiento. Inténtalo de nuevo.";
             System.Diagnostics.Debug.WriteLine($"Error al eliminar movimiento: {ex}");
+        }
+        finally
+        {
             IsBusy = false;
         }
     }

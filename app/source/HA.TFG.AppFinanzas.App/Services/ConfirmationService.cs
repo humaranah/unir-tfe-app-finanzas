@@ -6,6 +6,13 @@ public class ConfirmationService : IConfirmationService
 {
     public async Task<bool> ConfirmAsync(string title, string message)
     {
-        return await App.Current!.MainPage!.DisplayAlert(title, message, "Sí", "No");
+        return await MainThread.InvokeOnMainThreadAsync(async () =>
+        {
+            var window = App.Current?.Windows?[0];
+            if (window?.Page == null)
+                return false;
+
+            return await window.Page.DisplayAlertAsync(title, message, "Sí", "No");
+        });
     }
 }
