@@ -3,9 +3,16 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:HA.TFG.AppFinanzas.Core.ViewModels;assembly=HA.TFG.AppFinanzas.Core"
              xmlns:markdown="clr-namespace:Indiko.Maui.Controls.Markdown;assembly=Indiko.Maui.Controls.Markdown"
+             xmlns:controls="clr-namespace:HA.TFG.AppFinanzas.App.Views.Controls"
              x:DataType="vm:RecomendacionesViewModel"
              x:Class="HA.TFG.AppFinanzas.App.Views.Pages.RecomendacionesPage"
              Title="Recomendaciones">
+
+    <Shell.TitleView>
+        <Grid HorizontalOptions="Fill">
+            <Label Text="Recomendaciones" Style="{StaticResource PageTitleLabel}" />
+        </Grid>
+    </Shell.TitleView>
 
     <Grid MaximumWidthRequest="800" RowSpacing="12" Padding="20">
         <Grid.RowDefinitions>
@@ -21,20 +28,11 @@
                                        UseAppTheme="True"
                                        IsVisible="{Binding HasContent}" />
 
-                <VerticalStackLayout IsVisible="{Binding HasError}"
-                                     HorizontalOptions="Center"
-                                     VerticalOptions="Center"
-                                     Spacing="12">
-                    <Label Text="Algo salió mal"
-                           FontSize="18"
-                           FontAttributes="Bold"
-                           HorizontalOptions="Center" />
-                    <Label Text="No pudimos obtener tus recomendaciones. Comprueba tu conexión e intenta de nuevo."
-                           FontSize="14"
-                           TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}"
-                           HorizontalOptions="Center"
-                           HorizontalTextAlignment="Center" />
-                </VerticalStackLayout>
+                <controls:EmptyStateView IsVisible="{Binding HasError}"
+                                         HorizontalOptions="Center"
+                                         VerticalOptions="Center"
+                                         Titulo="Algo salió mal"
+                                         Descripcion="No pudimos obtener tus recomendaciones. Comprueba tu conexión e intenta de nuevo." />
 
             </VerticalStackLayout>
         </ScrollView>

@@ -8,12 +8,7 @@
 
     <Shell.TitleView>
         <Grid HorizontalOptions="Fill">
-            <Label Text="{Binding TituloFormulario}"
-                   HorizontalOptions="Center"
-                   VerticalOptions="Center"
-                   FontSize="18"
-                   FontAttributes="Bold"
-                   TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
+            <Label Text="{Binding TituloFormulario}" Style="{StaticResource PageTitleLabel}" />
         </Grid>
     </Shell.TitleView>
 
@@ -47,9 +42,7 @@
                 </Button>
             </Grid>
 
-            <BoxView HeightRequest="1" Color="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}" Margin="0,0,0,16" />
-
-            <!-- Tipo de movimiento -->
+            <BoxView Style="{StaticResource SectionSeparator}" Margin="0,0,0,16" />
             <VerticalStackLayout Spacing="4" Margin="0,0,0,16">
                 <Label FontAttributes="Bold">
                     <Label.FormattedText>
@@ -151,7 +144,7 @@
 
             <!-- Campos opcionales -->
             <VerticalStackLayout IsVisible="{Binding MostrarOpcionales}" Spacing="0">
-                <BoxView HeightRequest="1" Color="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}" Margin="0,0,0,16" />
+                <BoxView Style="{StaticResource SectionSeparator}" Margin="0,0,0,16" />
 
                 <!-- Hora -->
                 <VerticalStackLayout Spacing="4" Margin="0,0,0,16">
