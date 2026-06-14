@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:HA.TFG.AppFinanzas.Core.ViewModels;assembly=HA.TFG.AppFinanzas.Core"
+             xmlns:converters="clr-namespace:HA.TFG.AppFinanzas.App.Converters"
+             xmlns:controls="clr-namespace:HA.TFG.AppFinanzas.App.Views.Controls"
+             x:DataType="vm:CategoriasViewModel"
+             x:Class="HA.TFG.AppFinanzas.App.Views.Pages.CategoriasPage"
+             Title="Categorías">
+
+    <ContentPage.Resources>
+        <converters:TipoMovimientoColorConverter x:Key="TipoMovimientoColor" />
+        <converters:FilaParColorConverter x:Key="FilaParColor" />
+    </ContentPage.Resources>
+
+    <Shell.TitleView>
+        <Grid HorizontalOptions="Fill">
+            <Label Text="{Binding NombreCuenta}" Style="{StaticResource PageTitleLabel}" />
+        </Grid>
+    </Shell.TitleView>
+
+    <Grid MaximumWidthRequest="800">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Cabecera de tabla -->
+        <Grid ColumnDefinitions="*,120"
+              Padding="20,16,20,4"
+              IsVisible="{Binding HasCategorias}">
+            <Label Grid.Column="0"
+                   Text="Nombre"
+                   FontAttributes="Bold"
+                   FontSize="13"
+                   TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}" />
+            <Label Grid.Column="1"
+                   Text="Tipo"
+                   FontAttributes="Bold"
+                   FontSize="13"
+                   TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}" />
+        </Grid>
+
+        <!-- Lista de categorías -->
+        <CollectionView Grid.Row="1"
+                        ItemsSource="{Binding Categorias}"
+                        IsVisible="{Binding HasCategorias}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:CategoriaFilaItem">
+                    <Grid ColumnDefinitions="*,120"
+                          Padding="20,10"
+                          BackgroundColor="{Binding IsEven, Converter={StaticResource FilaParColor}}">
+                        <Label Grid.Column="0"
+                               Text="{Binding Nombre}"
+                               FontSize="15"
+                               VerticalOptions="Center" />
+                        <Label Grid.Column="1"
+                               Text="{Binding TipoMovimiento}"
+                               FontSize="14"
+                               FontAttributes="Bold"
+                               TextColor="{Binding TipoMovimiento, Converter={StaticResource TipoMovimientoColor}}"
+                               VerticalOptions="Center" />
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Indicador de carga -->
+        <ActivityIndicator Grid.Row="1"
+                           IsRunning="{Binding IsBusy}"
+                           IsVisible="{Binding IsBusy}"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+
+        <!-- Estado de error -->
+        <controls:EmptyStateView Grid.Row="1"
+                                 IsVisible="{Binding HasError}"
+                                 HorizontalOptions="Center"
+                                 VerticalOptions="Center"
+                                 Titulo="Algo salió mal"
+                                 Descripcion="No pudimos obtener las categorías. Comprueba tu conexión e intenta de nuevo." />
+
+        <!-- Sin categorías -->
+        <controls:EmptyStateView Grid.Row="1"
+                                 IsVisible="{Binding SinCategorias}"
+                                 HorizontalOptions="Center"
+                                 VerticalOptions="Center"
+                                 Titulo="Sin categorías"
+                                 Descripcion="Esta cuenta aún no tiene categorías configuradas." />
+    </Grid>
+</ContentPage>
