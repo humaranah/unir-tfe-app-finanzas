@@ -48,6 +48,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<CrearCuentaViewModel>();
         builder.Services.AddSingleton<MovimientosViewModel>();
         builder.Services.AddSingleton<CategoriasViewModel>();
+        builder.Services.AddTransient<CrearCategoriaViewModel>();
         builder.Services.AddTransient<MovimientoViewModel>();
         builder.Services.AddTransient<MovimientoDetalleViewModel>();
         builder.Services.AddSingleton<RecomendacionesViewModel>();
@@ -56,6 +57,7 @@ public static class MauiProgram
         builder.Services.AddTransient<Views.Pages.CrearCuentaPage>();
         builder.Services.AddSingleton<Views.Pages.MovimientosPage>();
         builder.Services.AddSingleton<Views.Pages.CategoriasPage>();
+        builder.Services.AddTransient<Views.Pages.CrearCategoriaPage>();
         builder.Services.AddTransient<Views.Pages.MovimientoFormPage>();
         builder.Services.AddTransient<Views.Pages.MovimientoDetallePage>();
         builder.Services.AddSingleton<Views.Pages.RecomendacionesPage>();

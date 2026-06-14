@@ -87,5 +87,19 @@
                                  VerticalOptions="Center"
                                  Titulo="Sin categorías"
                                  Descripcion="Esta cuenta aún no tiene categorías configuradas." />
+
+        <!-- FAB: nueva categoría -->
+        <Button Grid.Row="1"
+                Text="+"
+                Command="{Binding NuevaCategoriaCommand}"
+                AutomationProperties.Name="Nueva categoría"
+                FontSize="24"
+                FontAttributes="Bold"
+                WidthRequest="56"
+                HeightRequest="56"
+                CornerRadius="28"
+                HorizontalOptions="End"
+                VerticalOptions="End"
+                Margin="24" />
     </Grid>
 </ContentPage>

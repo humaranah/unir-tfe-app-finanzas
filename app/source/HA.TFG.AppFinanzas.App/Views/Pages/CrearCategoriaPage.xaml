@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="clr-namespace:HA.TFG.AppFinanzas.Core.ViewModels;assembly=HA.TFG.AppFinanzas.Core"
+             x:Class="HA.TFG.AppFinanzas.App.Views.Pages.CrearCategoriaPage"
+             x:DataType="viewModels:CrearCategoriaViewModel"
+             Title="Nueva categoría">
+
+    <VerticalStackLayout Padding="40" Spacing="24" VerticalOptions="Center" MaximumWidthRequest="600">
+
+        <Label Text="Nueva categoría"
+               FontSize="32"
+               FontAttributes="Bold"
+               HorizontalOptions="Center" />
+
+        <Entry Placeholder="Nombre"
+               Text="{Binding Nombre}"
+               HorizontalOptions="Fill" />
+
+        <Picker Title="Tipo"
+                ItemsSource="{Binding Tipos}"
+                SelectedItem="{Binding TipoSeleccionado}"
+                HorizontalOptions="Fill" />
+
+        <Label Text="{Binding Error}"
+               TextColor="OrangeRed"
+               HorizontalOptions="Center"
+               IsVisible="{Binding HasError}" />
+
+        <ActivityIndicator IsRunning="{Binding IsBusy}"
+                           IsVisible="{Binding IsBusy}"
+                           HorizontalOptions="Center" />
+
+        <Button Text="Guardar"
+                Command="{Binding CrearCategoriaCommand}"
+                IsEnabled="{Binding IsNotBusy}"
+                HorizontalOptions="Fill" />
+
+    </VerticalStackLayout>
+
+</ContentPage>

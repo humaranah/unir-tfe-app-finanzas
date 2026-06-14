@@ -2,11 +2,14 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using HA.TFG.AppFinanzas.Core.Cuentas;
 using HA.TFG.AppFinanzas.Core.Models.Enums;
+using HA.TFG.AppFinanzas.Core.Navigation;
 using System.Collections.ObjectModel;
 
 namespace HA.TFG.AppFinanzas.Core.ViewModels;
 
-public partial class CategoriasViewModel(ICuentasService cuentasService) : ObservableObject
+public partial class CategoriasViewModel(
+    ICuentasService cuentasService,
+    INavigationService navigationService) : ObservableObject
 {
     private Guid? _idCuenta;
 
@@ -34,6 +37,13 @@ public partial class CategoriasViewModel(ICuentasService cuentasService) : Obser
     public bool IsNotBusy => !IsBusy;
     public bool SinCategorias => !IsBusy && !HasError && Categorias.Count == 0;
     public bool HasCategorias => !IsBusy && !HasError && Categorias.Count > 0;
+
+    [RelayCommand]
+    private async Task NuevaCategoriaAsync()
+    {
+        if (_idCuenta is not null)
+            await navigationService.GoToAsync($"crear-categoria?idCuenta={_idCuenta.Value}");
+    }
 
     [RelayCommand]
     public async Task CargarCategoriasAsync(CancellationToken cancellationToken = default)

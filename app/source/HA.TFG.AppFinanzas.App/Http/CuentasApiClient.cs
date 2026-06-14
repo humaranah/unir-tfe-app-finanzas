@@ -14,6 +14,7 @@ internal sealed class CuentasApiClient(IHttpClientFactory httpClientFactory) : I
     };
 
     private record CreateCuentaRequest(string Moneda, string Descripcion);
+    private record CreateCategoriaRequest(string Nombre, TipoMovimiento TipoMovimiento);
     private record CuentaResponse(Guid Id, string Moneda, string Descripcion);
     private record CategoriaResponse(Guid IdCuentaCategoria, string Nombre, TipoMovimiento TipoMovimiento);
 
@@ -83,5 +84,23 @@ internal sealed class CuentasApiClient(IHttpClientFactory httpClientFactory) : I
             Nombre = c.Nombre,
             TipoMovimiento = c.TipoMovimiento
         })];
+    }
+
+    public async Task CreateCategoriaAsync(Guid idCuenta, string nombre, TipoMovimiento tipoMovimiento, CancellationToken cancellationToken = default)
+    {
+        var client = httpClientFactory.CreateClient(HttpClientNames.Backend);
+
+        using var response = await client.PostAsJsonAsync(
+            $"api/cuentas/{idCuenta}/categorias",
+            new CreateCategoriaRequest(nombre, tipoMovimiento),
+            JsonOptions,
+            cancellationToken);
+
+        if (response.IsSuccessStatusCode)
+            return;
+
+        var body = await response.Content.ReadAsStringAsync(cancellationToken);
+        throw new HttpRequestException(
+            $"Error al crear categoría. Status={(int)response.StatusCode}. Body={body}");
     }
 }
