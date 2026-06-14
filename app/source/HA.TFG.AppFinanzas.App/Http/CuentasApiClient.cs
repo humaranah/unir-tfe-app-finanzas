@@ -31,7 +31,7 @@ internal sealed class CuentasApiClient(IHttpClientFactory httpClientFactory) : I
 
     private async Task<List<CuentaResponse>> GetCuentasAsync(CancellationToken cancellationToken)
     {
-        var client = httpClientFactory.CreateClient("Backend");
+        var client = httpClientFactory.CreateClient(HttpClientNames.Backend);
 
         using var response = await client.GetAsync("api/cuentas", cancellationToken);
 
@@ -47,7 +47,7 @@ internal sealed class CuentasApiClient(IHttpClientFactory httpClientFactory) : I
 
     public async Task CreateCuentaAsync(string descripcion, string moneda, CancellationToken cancellationToken = default)
     {
-        var client = httpClientFactory.CreateClient("Backend");
+        var client = httpClientFactory.CreateClient(HttpClientNames.Backend);
 
         using var response = await client.PostAsJsonAsync(
             "api/cuentas",
@@ -64,7 +64,7 @@ internal sealed class CuentasApiClient(IHttpClientFactory httpClientFactory) : I
 
     public async Task<IReadOnlyList<CategoriaItem>> GetCategoriasAsync(Guid idCuenta, CancellationToken cancellationToken = default)
     {
-        var client = httpClientFactory.CreateClient("Backend");
+        var client = httpClientFactory.CreateClient(HttpClientNames.Backend);
 
         using var response = await client.GetAsync($"api/cuentas/{idCuenta}/categorias", cancellationToken);
 

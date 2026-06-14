@@ -6,7 +6,7 @@ internal sealed class UsuariosApiClient(IHttpClientFactory httpClientFactory) : 
 {
     public async Task EnsureUsuarioAsync(CancellationToken cancellationToken = default)
     {
-        var client = httpClientFactory.CreateClient("Backend");
+        var client = httpClientFactory.CreateClient(HttpClientNames.Backend);
 
         using var response = await client.PostAsync("api/usuarios/ensure", null, cancellationToken);
 

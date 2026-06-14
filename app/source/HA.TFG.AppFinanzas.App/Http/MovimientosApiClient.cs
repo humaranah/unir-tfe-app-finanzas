@@ -44,7 +44,7 @@ internal sealed class MovimientosApiClient(IHttpClientFactory httpClientFactory)
         GetMovimientosFilters? filters = null,
         CancellationToken cancellationToken = default)
     {
-        var client = httpClientFactory.CreateClient("Backend");
+        var client = httpClientFactory.CreateClient(HttpClientNames.Backend);
 
         var url = $"api/cuentas/{idCuenta}/movimientos{filters?.ToQueryString()}";
 
@@ -67,7 +67,7 @@ internal sealed class MovimientosApiClient(IHttpClientFactory httpClientFactory)
         CreateMovimientoDto dto,
         CancellationToken cancellationToken = default)
     {
-        var client = httpClientFactory.CreateClient("Backend");
+        var client = httpClientFactory.CreateClient(HttpClientNames.Backend);
 
         using var content = new MultipartFormDataContent
         {
@@ -108,7 +108,7 @@ internal sealed class MovimientosApiClient(IHttpClientFactory httpClientFactory)
         UpdateMovimientoDto dto,
         CancellationToken cancellationToken = default)
     {
-        var client = httpClientFactory.CreateClient("Backend");
+        var client = httpClientFactory.CreateClient(HttpClientNames.Backend);
 
         using var content = new MultipartFormDataContent
         {
@@ -150,7 +150,7 @@ internal sealed class MovimientosApiClient(IHttpClientFactory httpClientFactory)
         Guid idMovimiento,
         CancellationToken cancellationToken = default)
     {
-        var client = httpClientFactory.CreateClient("Backend");
+        var client = httpClientFactory.CreateClient(HttpClientNames.Backend);
 
         using var response = await client.DeleteAsync(
             $"api/cuentas/{idCuenta}/movimientos/{idMovimiento}", cancellationToken);
@@ -168,7 +168,7 @@ internal sealed class MovimientosApiClient(IHttpClientFactory httpClientFactory)
         Guid idMovimiento,
         CancellationToken cancellationToken = default)
     {
-        var client = httpClientFactory.CreateClient("Backend");
+        var client = httpClientFactory.CreateClient(HttpClientNames.Backend);
 
         using var response = await client.GetAsync(
             $"api/cuentas/{idCuenta}/movimientos/{idMovimiento}", cancellationToken);
@@ -204,7 +204,7 @@ internal sealed class MovimientosApiClient(IHttpClientFactory httpClientFactory)
         Guid idMovimiento,
         CancellationToken cancellationToken = default)
     {
-        var client = httpClientFactory.CreateClient("Backend");
+        var client = httpClientFactory.CreateClient(HttpClientNames.Backend);
 
         using var response = await client.GetAsync(
             $"api/cuentas/{idCuenta}/movimientos/{idMovimiento}/comprobante", cancellationToken);
@@ -234,7 +234,7 @@ internal sealed class MovimientosApiClient(IHttpClientFactory httpClientFactory)
         ComprobanteResult comprobante,
         CancellationToken cancellationToken = default)
     {
-        var client = httpClientFactory.CreateClient("Backend");
+        var client = httpClientFactory.CreateClient(HttpClientNames.Backend);
 
         using var content = new MultipartFormDataContent();
         var fileContent = new ByteArrayContent(comprobante.Bytes);
