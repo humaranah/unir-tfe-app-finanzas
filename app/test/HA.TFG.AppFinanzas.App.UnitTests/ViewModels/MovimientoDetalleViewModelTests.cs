@@ -200,9 +200,8 @@ public class MovimientoDetalleViewModelTests
         var importeFormateado = importe.ToString("N2", CultureInfo.InvariantCulture);
         var esperado = tipo switch
         {
-            TipoMovimiento.Gasto => $"-{importeFormateado} {moneda}",
-            TipoMovimiento.Ingreso => $"+{importeFormateado} {moneda}",
-            _ => $"{importeFormateado} {moneda}"
+            TipoMovimiento.Ingreso => $"{importeFormateado} {moneda}",
+            _ => $"-{importeFormateado} {moneda}"
         };
         var detalle = new MovimientoDetalleItem
         {

@@ -3,6 +3,21 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
+    <!-- ── Título de página en Shell.TitleView ──────────────────────────── -->
+    <Style x:Key="PageTitleLabel" TargetType="Label">
+        <Setter Property="HorizontalOptions" Value="Center" />
+        <Setter Property="VerticalOptions" Value="Center" />
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
+    </Style>
+
+    <!-- ── Separador de sección ─────────────────────────────────────────── -->
+    <Style x:Key="SectionSeparator" TargetType="BoxView">
+        <Setter Property="HeightRequest" Value="1" />
+        <Setter Property="Color" Value="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}" />
+    </Style>
+
     <Style TargetType="ActivityIndicator">
         <Setter Property="Color" Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
     </Style>
@@ -81,6 +96,12 @@
                 </VisualStateGroup>
             </VisualStateGroupList>
         </Setter>
+    </Style>
+
+    <!-- ── Botón destructivo outlined ───────────────────────────────────── -->
+    <Style x:Key="DangerOutlinedButton" TargetType="Button" BasedOn="{StaticResource OutlinedButton}">
+        <Setter Property="TextColor" Value="{AppThemeBinding Light=#D32F2F, Dark=#FF6B6B}" />
+        <Setter Property="BorderColor" Value="{AppThemeBinding Light=#D32F2F, Dark=#FF6B6B}" />
     </Style>
 
     <Style TargetType="CheckBox">

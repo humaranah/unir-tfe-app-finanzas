@@ -85,8 +85,9 @@ public partial class MovimientoDetalleViewModel(
 
     public string ImporteFormateado => Tipo switch
     {
-        TipoMovimiento.Ingreso => $"+{Importe:N2} {Moneda}",
-        TipoMovimiento.Gasto => $"-{Importe:N2} {Moneda}",
+        TipoMovimiento.Ingreso => $"{Importe:N2} {Moneda}",
+        TipoMovimiento.Gasto or
+        TipoMovimiento.Transferencia => $"-{Importe:N2} {Moneda}",
         _ => $"{Importe:N2} {Moneda}"
     };
 
