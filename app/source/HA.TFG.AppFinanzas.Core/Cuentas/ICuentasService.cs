@@ -8,5 +8,7 @@ public interface ICuentasService
     Task<(Guid? Id, string? Descripcion)> GetDefaultCuentaAsync(CancellationToken cancellationToken = default);
     Task<IReadOnlyList<CategoriaItem>> GetCategoriasAsync(Guid idCuenta, CancellationToken cancellationToken = default);
     Task CreateCategoriaAsync(Guid idCuenta, string nombre, TipoMovimiento tipoMovimiento, CancellationToken cancellationToken = default);
+    Task UpdateCategoriaAsync(Guid idCuenta, Guid idCuentaCategoria, string nombre, TipoMovimiento tipoMovimiento, CancellationToken cancellationToken = default);
+    Task DeleteCategoriaAsync(Guid idCuenta, Guid idCuentaCategoria, CancellationToken cancellationToken = default);
     Task CreateCuentaAsync(string descripcion, string moneda, CancellationToken cancellationToken = default);
 }

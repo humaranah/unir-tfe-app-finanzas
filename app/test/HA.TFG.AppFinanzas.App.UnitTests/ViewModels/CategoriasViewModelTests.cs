@@ -1,6 +1,7 @@
 using HA.TFG.AppFinanzas.Core.Cuentas;
 using HA.TFG.AppFinanzas.Core.Models.Enums;
 using HA.TFG.AppFinanzas.Core.Navigation;
+using HA.TFG.AppFinanzas.Core.Services;
 using HA.TFG.AppFinanzas.Core.ViewModels;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
@@ -14,7 +15,7 @@ public class CategoriasViewModelTests
 
     private static readonly Guid IdCuenta = Guid.NewGuid();
 
-    private CategoriasViewModel CreateSut() => new(_cuentasService, _navigationService);
+    private CategoriasViewModel CreateSut() => new(_cuentasService, _navigationService, Substitute.For<IConfirmationService>());
 
     private void ConfigurarCuenta(string descripcion = "Mi cuenta")
         => _cuentasService.GetDefaultCuentaAsync().Returns((IdCuenta, (string?)descripcion));

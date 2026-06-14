@@ -103,4 +103,38 @@ internal sealed class CuentasApiClient(IHttpClientFactory httpClientFactory) : I
         throw new HttpRequestException(
             $"Error al crear categoría. Status={(int)response.StatusCode}. Body={body}");
     }
+
+    public async Task UpdateCategoriaAsync(Guid idCuenta, Guid idCuentaCategoria, string nombre, TipoMovimiento tipoMovimiento, CancellationToken cancellationToken = default)
+    {
+        var client = httpClientFactory.CreateClient(HttpClientNames.Backend);
+
+        using var response = await client.PutAsJsonAsync(
+            $"api/cuentas/{idCuenta}/categorias/{idCuentaCategoria}",
+            new CreateCategoriaRequest(nombre, tipoMovimiento),
+            JsonOptions,
+            cancellationToken);
+
+        if (response.IsSuccessStatusCode)
+            return;
+
+        var body = await response.Content.ReadAsStringAsync(cancellationToken);
+        throw new HttpRequestException(
+            $"Error al actualizar categoría. Status={(int)response.StatusCode}. Body={body}");
+    }
+
+    public async Task DeleteCategoriaAsync(Guid idCuenta, Guid idCuentaCategoria, CancellationToken cancellationToken = default)
+    {
+        var client = httpClientFactory.CreateClient(HttpClientNames.Backend);
+
+        using var response = await client.DeleteAsync(
+            $"api/cuentas/{idCuenta}/categorias/{idCuentaCategoria}",
+            cancellationToken);
+
+        if (response.IsSuccessStatusCode)
+            return;
+
+        var body = await response.Content.ReadAsStringAsync(cancellationToken);
+        throw new HttpRequestException(
+            $"Error al eliminar categoría. Status={(int)response.StatusCode}. Body={body}");
+    }
 }

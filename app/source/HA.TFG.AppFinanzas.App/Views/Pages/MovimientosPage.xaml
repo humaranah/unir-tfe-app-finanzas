@@ -46,6 +46,9 @@
                         ItemsSource="{Binding Movimientos}"
                         IsGrouped="True"
                         IsVisible="{Binding HasMovimientos}">
+            <CollectionView.Footer>
+                <BoxView HeightRequest="88" Color="Transparent" />
+            </CollectionView.Footer>
             <CollectionView.GroupHeaderTemplate>
                 <DataTemplate x:DataType="vm:MovimientosPorFechaDisplay">
                     <Label Text="{Binding Fecha, StringFormat='{0:dd/MM/yyyy}'}"

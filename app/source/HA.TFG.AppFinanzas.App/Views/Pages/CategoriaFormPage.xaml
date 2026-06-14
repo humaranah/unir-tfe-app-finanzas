@@ -2,13 +2,13 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewModels="clr-namespace:HA.TFG.AppFinanzas.Core.ViewModels;assembly=HA.TFG.AppFinanzas.Core"
-             x:Class="HA.TFG.AppFinanzas.App.Views.Pages.CrearCategoriaPage"
-             x:DataType="viewModels:CrearCategoriaViewModel"
-             Title="Nueva categoría">
+             x:Class="HA.TFG.AppFinanzas.App.Views.Pages.CategoriaFormPage"
+             x:DataType="viewModels:CategoriaFormViewModel"
+             Title="{Binding Titulo}">
 
     <VerticalStackLayout Padding="40" Spacing="24" VerticalOptions="Center" MaximumWidthRequest="600">
 
-        <Label Text="Nueva categoría"
+        <Label Text="{Binding Titulo}"
                FontSize="32"
                FontAttributes="Bold"
                HorizontalOptions="Center" />
@@ -32,7 +32,7 @@
                            HorizontalOptions="Center" />
 
         <Button Text="Guardar"
-                Command="{Binding CrearCategoriaCommand}"
+                Command="{Binding GuardarCommand}"
                 IsEnabled="{Binding IsNotBusy}"
                 HorizontalOptions="Fill" />
 
