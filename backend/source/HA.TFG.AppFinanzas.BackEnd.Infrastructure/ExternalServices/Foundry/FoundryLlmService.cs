@@ -31,6 +31,14 @@ internal sealed class FoundryLlmService(
                 instructions: instructions ?? _config.Instructions);
 
             var response = await agent.RunAsync(prompt, cancellationToken: cancellationToken);
+
+            if (response?.Usage is { } usage)
+            {
+                logger.LogInformation(
+                    "Uso de tokens — Entrada: {InputTokens}, Salida: {OutputTokens}, Total: {TotalTokens}",
+                    usage.InputTokenCount, usage.OutputTokenCount, usage.TotalTokenCount);
+            }
+
             return response?.ToString();
         }
         catch (Exception ex)
