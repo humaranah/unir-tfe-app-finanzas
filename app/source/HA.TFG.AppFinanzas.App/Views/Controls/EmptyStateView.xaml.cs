@@ -10,13 +10,13 @@ public partial class EmptyStateView : ContentView
 
     public string Titulo
     {
-        get => (string)GetValue(TituloProperty);
+        get => GetValue(TituloProperty) as string ?? string.Empty;
         set => SetValue(TituloProperty, value);
     }
 
     public string Descripcion
     {
-        get => (string)GetValue(DescripcionProperty);
+        get => GetValue(DescripcionProperty) as string ?? string.Empty;
         set => SetValue(DescripcionProperty, value);
     }
 

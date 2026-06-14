@@ -10,7 +10,7 @@ public class TipoMovimientoColorConverter : IValueConverter
         if (value is not TipoMovimiento tipo)
             return Colors.Transparent;
 
-        var isDark = Application.Current?.RequestedTheme == AppTheme.Dark;
+        bool isDark = Application.Current?.RequestedTheme == AppTheme.Dark;
 
         return tipo switch
         {

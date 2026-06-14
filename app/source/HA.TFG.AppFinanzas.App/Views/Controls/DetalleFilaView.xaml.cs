@@ -10,13 +10,13 @@ public partial class DetalleFilaView : ContentView
 
     public string Etiqueta
     {
-        get => (string)GetValue(EtiquetaProperty);
+        get => GetValue(EtiquetaProperty) as string ?? string.Empty;
         set => SetValue(EtiquetaProperty, value);
     }
 
     public string Valor
     {
-        get => (string)GetValue(ValorProperty);
+        get => GetValue(ValorProperty) as string ?? string.Empty;
         set => SetValue(ValorProperty, value);
     }
 
