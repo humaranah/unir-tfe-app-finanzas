@@ -6,6 +6,15 @@
              x:DataType="viewModels:CategoriaFormViewModel"
              Title="{Binding Titulo}">
 
+    <Shell.TitleView>
+        <Grid HorizontalOptions="Fill">
+            <Label Text="{Binding Titulo}"
+                   Style="{StaticResource PageTitleLabel}"
+                   HorizontalOptions="Center"
+                   HorizontalTextAlignment="Center" />
+        </Grid>
+    </Shell.TitleView>
+
     <VerticalStackLayout Padding="40" Spacing="24" VerticalOptions="Center" MaximumWidthRequest="600">
 
         <Label Text="{Binding Titulo}"
@@ -33,7 +42,6 @@
 
         <Button Text="Guardar"
                 Command="{Binding GuardarCommand}"
-                IsEnabled="{Binding IsNotBusy}"
                 HorizontalOptions="Fill" />
 
     </VerticalStackLayout>

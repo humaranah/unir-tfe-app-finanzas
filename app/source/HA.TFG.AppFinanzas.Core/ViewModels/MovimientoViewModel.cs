@@ -287,7 +287,7 @@ public partial class MovimientoViewModel(
                 _ => null
             };
         }
-        catch (InvalidOperationException ex)
+        catch (Exception ex)
         {
             Error = ex.Message;
             return null;
@@ -303,7 +303,7 @@ public partial class MovimientoViewModel(
             if (result is not null)
                 Comprobante = result;
         }
-        catch (InvalidOperationException ex)
+        catch (Exception ex)
         {
             Error = ex.Message;
         }
@@ -318,7 +318,7 @@ public partial class MovimientoViewModel(
             if (result is not null)
                 Comprobante = result;
         }
-        catch (InvalidOperationException ex)
+        catch (Exception ex)
         {
             Error = ex.Message;
         }

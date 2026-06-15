@@ -5,7 +5,20 @@
 
     <!-- ── Título de página en Shell.TitleView ──────────────────────────── -->
     <Style x:Key="PageTitleLabel" TargetType="Label">
-        <Setter Property="HorizontalOptions" Value="Center" />
+        <Setter Property="HorizontalOptions">
+            <OnPlatform x:TypeArguments="LayoutOptions">
+                <On Platform="Android" Value="Start" />
+                <On Platform="WinUI" Value="Center" />
+                <On Platform="iOS,MacCatalyst" Value="Center" />
+            </OnPlatform>
+        </Setter>
+        <Setter Property="HorizontalTextAlignment">
+            <OnPlatform x:TypeArguments="TextAlignment">
+                <On Platform="Android" Value="Start" />
+                <On Platform="WinUI" Value="Center" />
+                <On Platform="iOS,MacCatalyst" Value="Center" />
+            </OnPlatform>
+        </Setter>
         <Setter Property="VerticalOptions" Value="Center" />
         <Setter Property="FontSize" Value="18" />
         <Setter Property="FontAttributes" Value="Bold" />
@@ -457,7 +470,7 @@
     -->
 
     <Style TargetType="Page" ApplyToDerivedTypes="True">
-        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Padding" Value="0,5,0,0"/>
         <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource OffBlack}}" />
     </Style>
 
