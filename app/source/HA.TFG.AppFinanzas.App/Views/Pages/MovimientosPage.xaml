@@ -89,32 +89,24 @@
                                 CommandParameter="{Binding Movimiento}"
                                 AutomationProperties.Name="Editar movimiento"
                                 Style="{DynamicResource OutlinedButton}"
+                                Text="&#xE5B2;"
+                                FontFamily="FluentIcons"
+                                FontSize="20"
                                 VerticalOptions="Center"
                                 BorderWidth="1"
-                                Padding="8,4">
-                            <Button.ImageSource>
-                                <FontImageSource FontFamily="FluentIcons"
-                                                 Glyph="&#xE5B2;"
-                                                 Size="24"
-                                                 Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
-                            </Button.ImageSource>
-                        </Button>
+                                Padding="8,4" />
                         <Button Grid.Column="2"
                                 Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MovimientosViewModel}}, Path=EliminarMovimientoCommand}"
                                 CommandParameter="{Binding Movimiento}"
                                 SemanticProperties.Description="Eliminar movimiento"
                                 Style="{StaticResource DangerOutlinedButton}"
+                                Text="&#xE47B;"
+                                FontFamily="FluentIcons"
+                                FontSize="20"
                                 VerticalOptions="Center"
                                 BorderWidth="1"
                                 Margin="4,0,0,0"
-                                Padding="8,4">
-                            <Button.ImageSource>
-                                <FontImageSource FontFamily="FluentIcons"
-                                                 Glyph="&#xE47B;"
-                                                 Size="24"
-                                                 Color="{AppThemeBinding Light=#D32F2F, Dark=#FF6B6B}" />
-                            </Button.ImageSource>
-                        </Button>
+                                Padding="8,4" />
                     </Grid>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
