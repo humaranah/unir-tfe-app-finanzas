@@ -13,7 +13,7 @@ public class ProcesarComprobanteQueryHandler(
     IComprobanteAnalysisService analysisService,
     ILlmService extraccionService,
     IUsuarioRepository usuarioRepository,
-    ICuentaRepository cuentaRepository)
+    ICuentaCategoriaRepository cuentaCategoriaRepository)
     : IRequestHandler<ProcesarComprobanteQuery, ComprobanteExtraidoDto>
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)
@@ -46,7 +46,7 @@ public class ProcesarComprobanteQueryHandler(
         IReadOnlyList<CuentaCategoria> categorias;
         try
         {
-            categorias = await cuentaRepository.GetCategoriasByCuentaAsync(
+            categorias = await cuentaCategoriaRepository.GetCategoriasByCuentaAsync(
                 usuario.IdUsuario, request.IdCuenta, cancellationToken);
         }
         catch (NotFoundException)

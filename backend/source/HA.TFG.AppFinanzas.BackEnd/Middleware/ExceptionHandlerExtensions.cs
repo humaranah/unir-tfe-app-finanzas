@@ -18,6 +18,7 @@ public static class ExceptionHandlerExtensions
             var (statusCode, problem) = exception switch
             {
                 ValidationException ve => HandleValidation(ve, logger),
+                ConflictException ce => HandleConflict(ce, logger),
                 NotFoundException nfe => HandleNotFound(nfe, logger),
                 FileNotFoundException fnfe => HandleFileNotFound(fnfe, logger),
                 RequestFailedException rfe => HandleRequestFailed(rfe, logger),
@@ -46,6 +47,20 @@ public static class ExceptionHandlerExtensions
         };
 
         return (StatusCodes.Status400BadRequest, problem);
+    }
+
+    private static (int, ProblemDetails) HandleConflict(ConflictException ex, ILogger logger)
+    {
+        logger.LogWarning(ex, "Conflicto: {EntityName} con valor '{SafeKey}'", ex.EntityName, ex.SafeKey);
+
+        var problem = new ProblemDetails
+        {
+            Title = "Conflicto",
+            Detail = ex.Message,
+            Status = StatusCodes.Status409Conflict
+        };
+
+        return (StatusCodes.Status409Conflict, problem);
     }
 
     private static (int, ProblemDetails) HandleNotFound(NotFoundException ex, ILogger logger)

@@ -9,6 +9,7 @@ namespace HA.TFG.AppFinanzas.BackEnd.Application.Features.Movimientos.UpdateMovi
 public class UpdateMovimientoCommandHandler(
     IUsuarioRepository usuarioRepository,
     ICuentaRepository cuentaRepository,
+    ICuentaCategoriaRepository cuentaCategoriaRepository,
     IMovimientoRepository movimientoRepository,
     IComprobanteStorageService comprobanteStorage,
     ILogger<UpdateMovimientoCommandHandler> logger)
@@ -23,7 +24,7 @@ public class UpdateMovimientoCommandHandler(
         var movimiento = await movimientoRepository.GetMovimientoByIdAsync(request.IdCuenta, request.IdMovimiento, cancellationToken)
             ?? throw new NotFoundException(nameof(Movimiento), request.IdMovimiento.ToString());
 
-        _ = await cuentaRepository.GetCategoriaByIdAsync(request.IdCuenta, request.IdCuentaCategoria, cancellationToken)
+        _ = await cuentaCategoriaRepository.GetCategoriaByIdAsync(request.IdCuenta, request.IdCuentaCategoria, cancellationToken)
             ?? throw new NotFoundException(nameof(CuentaCategoria), request.IdCuentaCategoria.ToString());
 
         var newComprobanteId = await UploadComprobanteAsync(cuenta.IdCuenta, request, cancellationToken);
