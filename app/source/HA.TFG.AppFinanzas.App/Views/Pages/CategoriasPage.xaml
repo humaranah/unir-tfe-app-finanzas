@@ -46,11 +46,12 @@
                         ItemsSource="{Binding Categorias}"
                         IsVisible="{Binding HasCategorias}">
             <CollectionView.Footer>
-                <BoxView HeightRequest="88" Color="Transparent" />
+                <BoxView HeightRequest="88"
+                         Color="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource OffBlack}}" />
             </CollectionView.Footer>
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="vm:CategoriaFilaItem">
-                    <Grid ColumnDefinitions="*,120,auto,auto"
+                    <Grid ColumnDefinitions="*,120,auto"
                           Padding="20,10"
                           BackgroundColor="{Binding IsEven, Converter={StaticResource FilaParColor}}">
                         <Label Grid.Column="0"
@@ -64,17 +65,6 @@
                                TextColor="{Binding TipoMovimiento, Converter={StaticResource TipoMovimientoColor}}"
                                VerticalOptions="Center" />
                         <Button Grid.Column="2"
-                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CategoriasViewModel}}, Path=EditarCategoriaCommand}"
-                                CommandParameter="{Binding .}"
-                                AutomationProperties.Name="Editar categoría"
-                                Style="{DynamicResource OutlinedButton}"
-                                Text="&#xE5B2;"
-                                FontFamily="FluentIcons"
-                                FontSize="20"
-                                VerticalOptions="Center"
-                                BorderWidth="1"
-                                Padding="8,4" />
-                        <Button Grid.Column="3"
                                 Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CategoriasViewModel}}, Path=EliminarCategoriaCommand}"
                                 CommandParameter="{Binding .}"
                                 SemanticProperties.Description="Eliminar categoría"

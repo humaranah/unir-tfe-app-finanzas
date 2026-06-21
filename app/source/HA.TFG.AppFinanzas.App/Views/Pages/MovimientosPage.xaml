@@ -47,7 +47,8 @@
                         IsGrouped="True"
                         IsVisible="{Binding HasMovimientos}">
             <CollectionView.Footer>
-                <BoxView HeightRequest="88" Color="Transparent" />
+                <BoxView HeightRequest="88"
+                         Color="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource OffBlack}}" />
             </CollectionView.Footer>
             <CollectionView.GroupHeaderTemplate>
                 <DataTemplate x:DataType="vm:MovimientosPorFechaDisplay">

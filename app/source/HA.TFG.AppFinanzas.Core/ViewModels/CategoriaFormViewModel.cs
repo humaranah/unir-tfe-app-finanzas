@@ -28,7 +28,7 @@ public partial class CategoriaFormViewModel(
     }
 
     [ObservableProperty]
-    [NotifyCanExecuteChangedFor("GuardarCommand")]
+    [NotifyCanExecuteChangedFor(nameof(GuardarCommand))]
     public partial string Nombre { get; set; } = string.Empty;
 
     [ObservableProperty]
@@ -42,6 +42,7 @@ public partial class CategoriaFormViewModel(
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsNotBusy))]
+    [NotifyCanExecuteChangedFor(nameof(GuardarCommand))]
     public partial bool IsBusy { get; set; } = false;
 
     public bool IsNotBusy => !IsBusy;
@@ -57,9 +58,9 @@ public partial class CategoriaFormViewModel(
         try
         {
             if (EsModoEdicion)
-                await cuentasService.UpdateCategoriaAsync(_idCuenta, _idCuentaCategoria!.Value, Nombre, TipoSeleccionado, cancellationToken);
+                await cuentasService.UpdateCategoriaAsync(_idCuenta, _idCuentaCategoria!.Value, Nombre.Trim(), TipoSeleccionado, cancellationToken);
             else
-                await cuentasService.CreateCategoriaAsync(_idCuenta, Nombre, TipoSeleccionado, cancellationToken);
+                await cuentasService.CreateCategoriaAsync(_idCuenta, Nombre.Trim(), TipoSeleccionado, cancellationToken);
 
             await navigationService.GoBackAsync();
         }
@@ -76,5 +77,7 @@ public partial class CategoriaFormViewModel(
         }
     }
 
-    private bool CanGuardar() => !string.IsNullOrWhiteSpace(Nombre);
+    private bool CanGuardar() =>
+        IsNotBusy &&
+        !string.IsNullOrWhiteSpace(Nombre);
 }
