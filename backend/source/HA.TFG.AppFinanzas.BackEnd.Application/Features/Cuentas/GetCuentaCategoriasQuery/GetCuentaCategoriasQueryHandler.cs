@@ -7,7 +7,7 @@ namespace HA.TFG.AppFinanzas.BackEnd.Application.Features.Cuentas.GetCuentaCateg
 
 public sealed class GetCuentaCategoriasQueryHandler(
     IUsuarioRepository usuarioRepository,
-    ICuentaRepository cuentaRepository)
+    ICuentaCategoriaRepository cuentaCategoriaRepository)
     : IRequestHandler<GetCuentaCategoriasQuery, IReadOnlyList<GetCuentaCategoriasResultItem>>
 {
     public async ValueTask<IReadOnlyList<GetCuentaCategoriasResultItem>> Handle(
@@ -17,7 +17,7 @@ public sealed class GetCuentaCategoriasQueryHandler(
         var usuario = await usuarioRepository.GetByEmailAsync(request.Email, cancellationToken)
             ?? throw new NotFoundException(nameof(Usuario), request.Email);
 
-        var categorias = await cuentaRepository.GetCategoriasByCuentaAsync(
+        var categorias = await cuentaCategoriaRepository.GetCategoriasByCuentaAsync(
             usuario.IdUsuario, request.IdCuenta, cancellationToken);
 
         if (categorias.Count == 0)

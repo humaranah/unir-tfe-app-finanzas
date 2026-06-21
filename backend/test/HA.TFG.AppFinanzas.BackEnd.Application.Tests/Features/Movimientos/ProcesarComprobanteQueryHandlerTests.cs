@@ -13,7 +13,7 @@ public class ProcesarComprobanteQueryHandlerTests
     private readonly IComprobanteAnalysisService _analysisService = Substitute.For<IComprobanteAnalysisService>();
     private readonly ILlmService _extraccionService = Substitute.For<ILlmService>();
     private readonly IUsuarioRepository _usuarioRepository = Substitute.For<IUsuarioRepository>();
-    private readonly ICuentaRepository _cuentaRepository = Substitute.For<ICuentaRepository>();
+    private readonly ICuentaCategoriaRepository _cuentaCategoriaRepository = Substitute.For<ICuentaCategoriaRepository>();
     private readonly ProcesarComprobanteQueryHandler _sut;
 
     private static readonly Guid IdCuenta = Guid.CreateVersion7();
@@ -50,7 +50,7 @@ public class ProcesarComprobanteQueryHandlerTests
             _analysisService,
             _extraccionService,
             _usuarioRepository,
-            _cuentaRepository);
+            _cuentaCategoriaRepository);
     }
 
     private static ProcesarComprobanteQuery CrearQuery() => new()
@@ -95,7 +95,7 @@ public class ProcesarComprobanteQueryHandlerTests
         _analysisService.AnalyzeAsync(Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(new ComprobanteAnalysisResult { Texto = "Texto del ticket" });
 
-        _cuentaRepository.GetCategoriasByCuentaAsync(IdUsuario, IdCuenta, Arg.Any<CancellationToken>())
+        _cuentaCategoriaRepository.GetCategoriasByCuentaAsync(IdUsuario, IdCuenta, Arg.Any<CancellationToken>())
             .ThrowsAsync(new InvalidOperationException("Fallo de BD"));
 
         var ex = await Assert.ThrowsAsync<ExternalServiceException>(() =>
@@ -110,7 +110,7 @@ public class ProcesarComprobanteQueryHandlerTests
         _analysisService.AnalyzeAsync(Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(new ComprobanteAnalysisResult { Texto = "Texto del ticket" });
 
-        _cuentaRepository.GetCategoriasByCuentaAsync(IdUsuario, IdCuenta, Arg.Any<CancellationToken>())
+        _cuentaCategoriaRepository.GetCategoriasByCuentaAsync(IdUsuario, IdCuenta, Arg.Any<CancellationToken>())
             .Returns(Array.Empty<CuentaCategoria>());
 
         var ex = await Assert.ThrowsAsync<ExternalServiceException>(() =>
@@ -127,7 +127,7 @@ public class ProcesarComprobanteQueryHandlerTests
         _analysisService.AnalyzeAsync(Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(new ComprobanteAnalysisResult { Texto = "Texto del ticket" });
 
-        _cuentaRepository.GetCategoriasByCuentaAsync(IdUsuario, IdCuenta, Arg.Any<CancellationToken>())
+        _cuentaCategoriaRepository.GetCategoriasByCuentaAsync(IdUsuario, IdCuenta, Arg.Any<CancellationToken>())
             .Returns(CategoriasDefault);
 
         _extraccionService.EnviarPromptAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
@@ -145,7 +145,7 @@ public class ProcesarComprobanteQueryHandlerTests
         _analysisService.AnalyzeAsync(Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(new ComprobanteAnalysisResult { Texto = "Texto del ticket" });
 
-        _cuentaRepository.GetCategoriasByCuentaAsync(IdUsuario, IdCuenta, Arg.Any<CancellationToken>())
+        _cuentaCategoriaRepository.GetCategoriasByCuentaAsync(IdUsuario, IdCuenta, Arg.Any<CancellationToken>())
             .Returns(CategoriasDefault);
 
         _extraccionService.EnviarPromptAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
@@ -165,7 +165,7 @@ public class ProcesarComprobanteQueryHandlerTests
         _analysisService.AnalyzeAsync(Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(new ComprobanteAnalysisResult { Texto = "HIPER ASIA\nTotal: 3.90" });
 
-        _cuentaRepository.GetCategoriasByCuentaAsync(IdUsuario, IdCuenta, Arg.Any<CancellationToken>())
+        _cuentaCategoriaRepository.GetCategoriasByCuentaAsync(IdUsuario, IdCuenta, Arg.Any<CancellationToken>())
             .Returns(CategoriasDefault);
 
         _extraccionService.EnviarPromptAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
@@ -185,7 +185,7 @@ public class ProcesarComprobanteQueryHandlerTests
         _analysisService.AnalyzeAsync(Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(new ComprobanteAnalysisResult { Texto = "HIPER ASIA\nTotal: 3.90" });
 
-        _cuentaRepository.GetCategoriasByCuentaAsync(IdUsuario, IdCuenta, Arg.Any<CancellationToken>())
+        _cuentaCategoriaRepository.GetCategoriasByCuentaAsync(IdUsuario, IdCuenta, Arg.Any<CancellationToken>())
             .Returns(CategoriasDefault);
 
         _extraccionService.EnviarPromptAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
@@ -203,7 +203,7 @@ public class ProcesarComprobanteQueryHandlerTests
         _analysisService.AnalyzeAsync(Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(new ComprobanteAnalysisResult { Texto = "Texto del ticket" });
 
-        _cuentaRepository.GetCategoriasByCuentaAsync(IdUsuario, IdCuenta, Arg.Any<CancellationToken>())
+        _cuentaCategoriaRepository.GetCategoriasByCuentaAsync(IdUsuario, IdCuenta, Arg.Any<CancellationToken>())
             .Returns(CategoriasDefault);
 
         _extraccionService.EnviarPromptAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())

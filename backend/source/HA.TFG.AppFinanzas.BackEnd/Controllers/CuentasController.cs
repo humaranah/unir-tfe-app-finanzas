@@ -1,4 +1,6 @@
 ﻿using HA.TFG.AppFinanzas.BackEnd.Application.Features.Cuentas.CreateCuentaCommand;
+using HA.TFG.AppFinanzas.BackEnd.Application.Features.Cuentas.CreateCuentaCategoriaCommand;
+using HA.TFG.AppFinanzas.BackEnd.Application.Features.Cuentas.DeleteCuentaCategoriaCommand;
 using HA.TFG.AppFinanzas.BackEnd.Application.Features.Cuentas.GetCuentaCategoriasQuery;
 using HA.TFG.AppFinanzas.BackEnd.Application.Features.Cuentas.GetCuentasQuery;
 using HA.TFG.AppFinanzas.BackEnd.Application.Features.Movimientos.CreateMovimientoCommand;
@@ -54,6 +56,35 @@ public sealed class CuentasController(IMediator mediator) : ControllerBase
         var email = User.Identity?.Name ?? string.Empty;
         var result = await _mediator.Send(new GetCuentaCategoriasQuery(email, idCuenta), cancellationToken);
         return Ok(result);
+    }
+
+    [HttpPost("{idCuenta:guid}/categorias")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> CreateCategoriaCuenta(
+        [FromRoute] Guid idCuenta,
+        [FromBody] CreateCuentaCategoriaRequest request,
+        CancellationToken cancellationToken)
+    {
+        var email = User.Identity?.Name ?? string.Empty;
+        var command = request.ToCreateCommand(email, idCuenta);
+        await _mediator.Send(command, cancellationToken);
+        return NoContent();
+    }
+
+    [HttpDelete("{idCuenta:guid}/categorias/{idCuentaCategoria:guid}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteCategoriaCuenta(
+        [FromRoute] Guid idCuenta,
+        [FromRoute] Guid idCuentaCategoria,
+        CancellationToken cancellationToken)
+    {
+        var email = User.Identity?.Name ?? string.Empty;
+        await _mediator.Send(new DeleteCuentaCategoriaCommand { Email = email, IdCuenta = idCuenta, IdCuentaCategoria = idCuentaCategoria }, cancellationToken);
+        return NoContent();
     }
 
     [HttpPost]

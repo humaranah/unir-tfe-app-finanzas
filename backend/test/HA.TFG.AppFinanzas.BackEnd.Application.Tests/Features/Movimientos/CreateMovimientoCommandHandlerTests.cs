@@ -13,6 +13,7 @@ public class CreateMovimientoCommandHandlerTests
 {
     private readonly IUsuarioRepository _usuarioRepository = Substitute.For<IUsuarioRepository>();
     private readonly ICuentaRepository _cuentaRepository = Substitute.For<ICuentaRepository>();
+    private readonly ICuentaCategoriaRepository _cuentaCategoriaRepository = Substitute.For<ICuentaCategoriaRepository>();
     private readonly IMovimientoRepository _movimientoRepository = Substitute.For<IMovimientoRepository>();
     private readonly IComprobanteStorageService _comprobanteStorage = Substitute.For<IComprobanteStorageService>();
     private readonly CreateMovimientoCommandHandler _sut;
@@ -30,6 +31,7 @@ public class CreateMovimientoCommandHandlerTests
         _sut = new CreateMovimientoCommandHandler(
             _usuarioRepository,
             _cuentaRepository,
+            _cuentaCategoriaRepository,
             _movimientoRepository,
             _comprobanteStorage,
             NullLogger<CreateMovimientoCommandHandler>.Instance);
@@ -40,7 +42,7 @@ public class CreateMovimientoCommandHandlerTests
 
         _usuarioRepository.GetByEmailAsync(_usuario.Email, Arg.Any<CancellationToken>()).Returns(_usuario);
         _cuentaRepository.GetCuentaByIdAsync(IdUsuario, IdCuenta, Arg.Any<CancellationToken>()).Returns(_cuenta);
-        _cuentaRepository.GetCategoriaByIdAsync(IdCuenta, IdCuentaCategoria, Arg.Any<CancellationToken>()).Returns(_cuentaCategoria);
+        _cuentaCategoriaRepository.GetCategoriaByIdAsync(IdCuenta, IdCuentaCategoria, Arg.Any<CancellationToken>()).Returns(_cuentaCategoria);
     }
 
     private CreateMovimientoCommand BuildCommand(Stream? comprobanteStream = null) => new()

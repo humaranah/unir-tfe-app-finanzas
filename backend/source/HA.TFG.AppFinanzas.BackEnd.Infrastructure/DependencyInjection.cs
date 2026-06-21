@@ -3,6 +3,7 @@ using Azure.Storage.Blobs;
 using HA.TFG.AppFinanzas.BackEnd.Application.Contracts;
 using HA.TFG.AppFinanzas.BackEnd.Infrastructure.ExternalServices.Auth0;
 using HA.TFG.AppFinanzas.BackEnd.Infrastructure.ExternalServices.DocumentIntelligence;
+using HA.TFG.AppFinanzas.BackEnd.Infrastructure.ExternalServices.Diagnostics;
 using HA.TFG.AppFinanzas.BackEnd.Infrastructure.ExternalServices.Foundry;
 using HA.TFG.AppFinanzas.BackEnd.Infrastructure.ExternalServices.Storage;
 using HA.TFG.AppFinanzas.BackEnd.Infrastructure.Persistence;
@@ -26,6 +27,7 @@ public static class DependencyInjection
         services.AddComprobanteStorage(configuration);
         services.AddDocumentIntelligence(configuration);
         services.AddFoundry(configuration);
+        services.AddExternalServicesDiagnostics();
 
         return services;
     }
@@ -54,6 +56,7 @@ public static class DependencyInjection
         services.AddScoped<IUsuarioRepository, UsuarioRepository>();
         services.AddScoped<IRolRepository, RolRepository>();
         services.AddScoped<ICuentaRepository, CuentaRepository>();
+        services.AddScoped<ICuentaCategoriaRepository, CuentaCategoriaRepository>();
         services.AddScoped<ICategoriaRepository, CategoriaRepository>();
         services.AddScoped<IMovimientoRepository, MovimientoRepository>();
     }
@@ -148,5 +151,18 @@ public static class DependencyInjection
         {
             services.AddScoped<ILlmService, NullLlmService>();
         }
+    }
+
+    private static void AddExternalServicesDiagnostics(this IServiceCollection services)
+    {
+        services.AddHealthChecks()
+            .AddCheck<DocumentIntelligenceHealthCheck>(
+                name: "document-intelligence",
+                tags: ["ready", "startup-probe"])
+            .AddCheck<FoundryHealthCheck>(
+                name: "foundry",
+                tags: ["ready", "startup-probe"]);
+
+        services.AddHostedService<AzureExternalServicesStartupProbe>();
     }
 }

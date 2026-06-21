@@ -12,6 +12,7 @@ public class UpdateMovimientoCommandHandlerTests
 {
     private readonly IUsuarioRepository _usuarioRepository = Substitute.For<IUsuarioRepository>();
     private readonly ICuentaRepository _cuentaRepository = Substitute.For<ICuentaRepository>();
+    private readonly ICuentaCategoriaRepository _cuentaCategoriaRepository = Substitute.For<ICuentaCategoriaRepository>();
     private readonly IMovimientoRepository _movimientoRepository = Substitute.For<IMovimientoRepository>();
     private readonly IComprobanteStorageService _comprobanteStorage = Substitute.For<IComprobanteStorageService>();
     private readonly UpdateMovimientoCommandHandler _sut;
@@ -30,13 +31,14 @@ public class UpdateMovimientoCommandHandlerTests
         _sut = new UpdateMovimientoCommandHandler(
             _usuarioRepository,
             _cuentaRepository,
+            _cuentaCategoriaRepository,
             _movimientoRepository,
             _comprobanteStorage,
             NullLogger<UpdateMovimientoCommandHandler>.Instance);
 
         _usuarioRepository.GetByEmailAsync(_usuario.Email, Arg.Any<CancellationToken>()).Returns(_usuario);
         _cuentaRepository.GetCuentaByIdAsync(IdUsuario, IdCuenta, Arg.Any<CancellationToken>()).Returns(_cuenta);
-        _cuentaRepository.GetCategoriaByIdAsync(IdCuenta, IdCuentaCategoriaNew, Arg.Any<CancellationToken>()).Returns(_cuentaCategoriaNew);
+        _cuentaCategoriaRepository.GetCategoriaByIdAsync(IdCuenta, IdCuentaCategoriaNew, Arg.Any<CancellationToken>()).Returns(_cuentaCategoriaNew);
     }
 
     private UpdateMovimientoCommand BuildCommand() => new()
@@ -105,7 +107,7 @@ public class UpdateMovimientoCommandHandlerTests
         }
 
         if (!categoriaExiste)
-            _cuentaRepository.GetCategoriaByIdAsync(IdCuenta, IdCuentaCategoriaNew, Arg.Any<CancellationToken>()).Returns((CuentaCategoria?)null);
+            _cuentaCategoriaRepository.GetCategoriaByIdAsync(IdCuenta, IdCuentaCategoriaNew, Arg.Any<CancellationToken>()).Returns((CuentaCategoria?)null);
 
         await Assert.ThrowsAsync<NotFoundException>(() => _sut.Handle(command, CancellationToken.None).AsTask());
     }

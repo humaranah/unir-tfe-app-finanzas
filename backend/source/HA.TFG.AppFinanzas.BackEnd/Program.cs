@@ -4,6 +4,7 @@ using HA.TFG.AppFinanzas.BackEnd.Infrastructure;
 using HA.TFG.AppFinanzas.BackEnd.Infrastructure.Persistence;
 using HA.TFG.AppFinanzas.BackEnd.Middleware;
 using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.Text.Json.Serialization;
@@ -55,7 +56,6 @@ try
         .AddJsonOptions(options =>
             options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
     builder.Services.AddOpenApiWithAuth0();
-    builder.Services.AddHealthChecks();
 
     var app = builder.Build();
 
@@ -76,6 +76,10 @@ try
     app.UseAuthorization();
     app.UseMiddleware<ResolveUsuarioMiddleware>();
     app.MapHealthChecks("/health");
+    app.MapHealthChecks("/health/ready", new HealthCheckOptions
+    {
+        Predicate = registration => registration.Tags.Contains("ready")
+    });
     app.MapControllers();
 
     using (var scope = app.Services.CreateScope())

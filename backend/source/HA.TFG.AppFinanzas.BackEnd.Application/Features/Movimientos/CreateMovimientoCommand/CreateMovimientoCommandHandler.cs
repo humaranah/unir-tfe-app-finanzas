@@ -9,6 +9,7 @@ namespace HA.TFG.AppFinanzas.BackEnd.Application.Features.Movimientos.CreateMovi
 public class CreateMovimientoCommandHandler(
     IUsuarioRepository usuarioRepository,
     ICuentaRepository cuentaRepository,
+    ICuentaCategoriaRepository cuentaCategoriaRepository,
     IMovimientoRepository movimientoRepository,
     IComprobanteStorageService comprobanteStorage,
     ILogger<CreateMovimientoCommandHandler> logger)
@@ -23,7 +24,7 @@ public class CreateMovimientoCommandHandler(
             ?? throw new NotFoundException(nameof(Cuenta), request.IdCuenta.ToString());
 
         // Validar que la categoría pertenece a la cuenta
-        _ = await cuentaRepository.GetCategoriaByIdAsync(cuenta.IdCuenta, request.IdCuentaCategoria, cancellationToken)
+        _ = await cuentaCategoriaRepository.GetCategoriaByIdAsync(cuenta.IdCuenta, request.IdCuentaCategoria, cancellationToken)
             ?? throw new NotFoundException(nameof(CuentaCategoria), request.IdCuentaCategoria.ToString());
 
         // Subir comprobante antes de persistir en BD
