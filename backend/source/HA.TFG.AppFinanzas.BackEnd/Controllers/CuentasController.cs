@@ -3,7 +3,6 @@ using HA.TFG.AppFinanzas.BackEnd.Application.Features.Cuentas.CreateCuentaCatego
 using HA.TFG.AppFinanzas.BackEnd.Application.Features.Cuentas.DeleteCuentaCategoriaCommand;
 using HA.TFG.AppFinanzas.BackEnd.Application.Features.Cuentas.GetCuentaCategoriasQuery;
 using HA.TFG.AppFinanzas.BackEnd.Application.Features.Cuentas.GetCuentasQuery;
-using HA.TFG.AppFinanzas.BackEnd.Application.Features.Cuentas.UpdateCuentaCategoriaCommand;
 using HA.TFG.AppFinanzas.BackEnd.Application.Features.Movimientos.CreateMovimientoCommand;
 using HA.TFG.AppFinanzas.BackEnd.Application.Features.Movimientos.DeleteMovimientoCommand;
 using HA.TFG.AppFinanzas.BackEnd.Application.Features.Movimientos.GetComprobanteMovimientoQuery;
@@ -71,23 +70,6 @@ public sealed class CuentasController(IMediator mediator) : ControllerBase
     {
         var email = User.Identity?.Name ?? string.Empty;
         var command = request.ToCreateCommand(email, idCuenta);
-        await _mediator.Send(command, cancellationToken);
-        return NoContent();
-    }
-
-    [HttpPut("{idCuenta:guid}/categorias/{idCuentaCategoria:guid}")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> UpdateCategoriaCuenta(
-        [FromRoute] Guid idCuenta,
-        [FromRoute] Guid idCuentaCategoria,
-        [FromBody] CreateCuentaCategoriaRequest request,
-        CancellationToken cancellationToken)
-    {
-        var email = User.Identity?.Name ?? string.Empty;
-        var command = request.ToUpdateCommand(email, idCuenta, idCuentaCategoria);
         await _mediator.Send(command, cancellationToken);
         return NoContent();
     }

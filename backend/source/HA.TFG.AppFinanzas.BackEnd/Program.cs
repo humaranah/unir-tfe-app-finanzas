@@ -3,12 +3,11 @@ using HA.TFG.AppFinanzas.BackEnd.Extensions;
 using HA.TFG.AppFinanzas.BackEnd.Infrastructure;
 using HA.TFG.AppFinanzas.BackEnd.Infrastructure.Persistence;
 using HA.TFG.AppFinanzas.BackEnd.Middleware;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.Text.Json.Serialization;
-using Microsoft.Extensions.Azure;
 
 Log.Logger = new LoggerConfiguration()
     .Enrich.FromLogContext()

@@ -21,7 +21,7 @@
       "connectionId": "APPLICATIONINSIGHTS_CONNECTION_STRING"
     },
     "storage1": {
-      "serviceConnectorResourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('serviceConnectorResourceGroupName')]/providers/Microsoft.Web/sites/ha-tfg-webapp-finanzas/providers/Microsoft.ServiceLinker/linkers/StorageConnection_90DE555CD7, /subscriptions/9f8b571b-dc24-4b8d-9960-bebb7ba26033/resourceGroups/ha-tfg/providers/Microsoft.Web/sites/ha-tfg-webapp-finanzas/providers/Microsoft.ServiceLinker/linkers/StorageConnection_4CB3942116",
+      "serviceConnectorResourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('serviceConnectorResourceGroupName')]/providers/Microsoft.Web/sites/ha-tfg-webapp-finanzas/providers/Microsoft.ServiceLinker/linkers/StorageConnection_90DE555CD7",
       "secretStore": "AzureAppSettings",
       "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Storage/storageAccounts/hatfgappfinanzas",
       "type": "storage.azure",

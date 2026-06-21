@@ -18,7 +18,7 @@ public sealed class CuentaCategoriaRepository(AppDbContext context) : ICuentaCat
             throw new NotFoundException(nameof(Cuenta), idCuenta);
 
         return await context.CuentaCategorias
-            .Where(cc => cc.IdCuenta == idCuenta)
+            .Where(cc => cc.IdCuenta == idCuenta && cc.FechaEliminacion == null)
             .OrderBy(cc => cc.TipoMovimiento)
             .ThenBy(cc => cc.Nombre)
             .ToListAsync(cancellationToken);
@@ -26,12 +26,12 @@ public sealed class CuentaCategoriaRepository(AppDbContext context) : ICuentaCat
 
     public Task<CuentaCategoria?> GetCategoriaByNombreAsync(Guid idCuenta, string nombre, CancellationToken cancellationToken) =>
         context.CuentaCategorias
-            .Where(cc => cc.IdCuenta == idCuenta && cc.Nombre == nombre)
+            .Where(cc => cc.IdCuenta == idCuenta && cc.Nombre == nombre && cc.FechaEliminacion == null)
             .FirstOrDefaultAsync(cancellationToken);
 
     public Task<CuentaCategoria?> GetCategoriaByIdAsync(Guid idCuenta, Guid idCuentaCategoria, CancellationToken cancellationToken) =>
         context.CuentaCategorias
-            .Where(cc => cc.IdCuenta == idCuenta && cc.IdCuentaCategoria == idCuentaCategoria)
+            .Where(cc => cc.IdCuenta == idCuenta && cc.IdCuentaCategoria == idCuentaCategoria && cc.FechaEliminacion == null)
             .FirstOrDefaultAsync(cancellationToken);
 
     public async Task<CuentaCategoria> CreateCategoriaAsync(CuentaCategoria categoria, CancellationToken cancellationToken)

@@ -1,4 +1,4 @@
-using Azure.AI.Projects;
+using Azure.Core;
 using Azure.Identity;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
@@ -9,35 +9,24 @@ internal sealed class FoundryHealthCheck(IOptions<FoundryConfig> options) : IHea
 {
     private readonly FoundryConfig _config = options.Value;
 
+    private static readonly TokenRequestContext TokenContext =
+        new(["https://cognitiveservices.azure.com/.default"]);
+
     public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(_config.ProjectEndpoint))
-        {
             return HealthCheckResult.Degraded("Foundry no configurado (ProjectEndpoint vacío).");
-        }
 
         try
         {
-            var projectClient = new AIProjectClient(
-                new Uri(_config.ProjectEndpoint),
-                new DefaultAzureCredential());
+            var credential = new DefaultAzureCredential();
+            await credential.GetTokenAsync(TokenContext, cancellationToken);
 
-            var agent = projectClient.AsAIAgent(
-                model: _config.DeploymentName,
-                instructions: "health-check");
-
-            var response = await agent.RunAsync("ping", cancellationToken: cancellationToken);
-
-            if (string.IsNullOrWhiteSpace(response?.Text))
-            {
-                return HealthCheckResult.Unhealthy("Foundry respondió vacío en health check.");
-            }
-
-            return HealthCheckResult.Healthy("Conectividad con Foundry OK.");
+            return HealthCheckResult.Healthy("Credenciales Azure AI Foundry OK.");
         }
         catch (Exception ex)
         {
-            return HealthCheckResult.Unhealthy("Error al validar conectividad con Foundry.", ex);
+            return HealthCheckResult.Unhealthy("Error al autenticar con Azure AI Foundry.", ex);
         }
     }
 }
