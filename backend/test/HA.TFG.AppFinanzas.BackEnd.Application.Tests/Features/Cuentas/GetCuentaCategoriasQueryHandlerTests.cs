@@ -11,7 +11,7 @@ namespace HA.TFG.AppFinanzas.BackEnd.Application.Tests.Features.Cuentas;
 public class GetCuentaCategoriasQueryHandlerTests
 {
     private readonly IUsuarioRepository _usuarioRepository = Substitute.For<IUsuarioRepository>();
-    private readonly ICuentaRepository _cuentaRepository = Substitute.For<ICuentaRepository>();
+    private readonly ICuentaCategoriaRepository _cuentaCategoriaRepository = Substitute.For<ICuentaCategoriaRepository>();
     private readonly GetCuentaCategoriasQueryHandler _sut;
 
     private static readonly Guid IdUsuario = Guid.Parse("00000000-0000-7000-8000-000000000001");
@@ -21,7 +21,7 @@ public class GetCuentaCategoriasQueryHandlerTests
     {
         _sut = new GetCuentaCategoriasQueryHandler(
             _usuarioRepository,
-            _cuentaRepository);
+            _cuentaCategoriaRepository);
     }
 
     [Fact]
@@ -36,7 +36,7 @@ public class GetCuentaCategoriasQueryHandlerTests
         };
 
         _usuarioRepository.GetByEmailAsync(usuario.Email, Arg.Any<CancellationToken>()).Returns(usuario);
-        _cuentaRepository.GetCategoriasByCuentaAsync(IdUsuario, IdCuenta, Arg.Any<CancellationToken>())
+        _cuentaCategoriaRepository.GetCategoriasByCuentaAsync(IdUsuario, IdCuenta, Arg.Any<CancellationToken>())
             .Returns(categorias);
 
         var query = new GetCuentaCategoriasQuery(usuario.Email, IdCuenta);
@@ -63,7 +63,7 @@ public class GetCuentaCategoriasQueryHandlerTests
         await Assert.ThrowsAsync<NotFoundException>(() =>
             _sut.Handle(query, CancellationToken.None).AsTask());
 
-        await _cuentaRepository.DidNotReceive()
+        await _cuentaCategoriaRepository.DidNotReceive()
             .GetCategoriasByCuentaAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<CancellationToken>());
     }
 
@@ -74,7 +74,7 @@ public class GetCuentaCategoriasQueryHandlerTests
         var usuario = new Usuario { IdUsuario = IdUsuario, Email = "test@test.com" };
 
         _usuarioRepository.GetByEmailAsync(usuario.Email, Arg.Any<CancellationToken>()).Returns(usuario);
-        _cuentaRepository.GetCategoriasByCuentaAsync(IdUsuario, IdCuenta, Arg.Any<CancellationToken>())
+        _cuentaCategoriaRepository.GetCategoriasByCuentaAsync(IdUsuario, IdCuenta, Arg.Any<CancellationToken>())
             .Returns(new List<CuentaCategoria>());
 
         var query = new GetCuentaCategoriasQuery(usuario.Email, IdCuenta);
@@ -97,7 +97,7 @@ public class GetCuentaCategoriasQueryHandlerTests
         };
 
         _usuarioRepository.GetByEmailAsync(usuario.Email, Arg.Any<CancellationToken>()).Returns(usuario);
-        _cuentaRepository.GetCategoriasByCuentaAsync(IdUsuario, IdCuenta, Arg.Any<CancellationToken>())
+        _cuentaCategoriaRepository.GetCategoriasByCuentaAsync(IdUsuario, IdCuenta, Arg.Any<CancellationToken>())
             .Returns(categorias);
 
         var query = new GetCuentaCategoriasQuery(usuario.Email, IdCuenta);
@@ -106,7 +106,7 @@ public class GetCuentaCategoriasQueryHandlerTests
         await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        await _cuentaRepository.Received(1)
+        await _cuentaCategoriaRepository.Received(1)
             .GetCategoriasByCuentaAsync(IdUsuario, IdCuenta, Arg.Any<CancellationToken>());
     }
 }
