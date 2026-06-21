@@ -25,14 +25,14 @@ internal static class BackendExtensions
         builder.Services.AddSingleton<IComprobantePickerService, ComprobantePickerService>();
         builder.Services.AddTransient<AuthHeaderHandler>();
 
-        builder.Services.AddHttpClient("Backend", client =>
+        builder.Services.AddHttpClient(HttpClientNames.Backend, client =>
         {
             client.BaseAddress = new Uri(baseUrl);
         })
         .AddHttpMessageHandler<AuthHeaderHandler>();
 
         // Cliente sin autenticación, solo para /health
-        builder.Services.AddHttpClient("BackendHealth", client =>
+        builder.Services.AddHttpClient(HttpClientNames.BackendHealth, client =>
         {
             client.BaseAddress = new Uri(baseUrl);
             client.Timeout = TimeSpan.FromSeconds(5);

@@ -14,6 +14,7 @@ internal sealed class CuentasApiClient(IHttpClientFactory httpClientFactory) : I
     };
 
     private record CreateCuentaRequest(string Moneda, string Descripcion);
+    private record CreateCategoriaRequest(string Nombre, TipoMovimiento TipoMovimiento);
     private record CuentaResponse(Guid Id, string Moneda, string Descripcion);
     private record CategoriaResponse(Guid IdCuentaCategoria, string Nombre, TipoMovimiento TipoMovimiento);
 
@@ -31,7 +32,7 @@ internal sealed class CuentasApiClient(IHttpClientFactory httpClientFactory) : I
 
     private async Task<List<CuentaResponse>> GetCuentasAsync(CancellationToken cancellationToken)
     {
-        var client = httpClientFactory.CreateClient("Backend");
+        var client = httpClientFactory.CreateClient(HttpClientNames.Backend);
 
         using var response = await client.GetAsync("api/cuentas", cancellationToken);
 
@@ -47,7 +48,7 @@ internal sealed class CuentasApiClient(IHttpClientFactory httpClientFactory) : I
 
     public async Task CreateCuentaAsync(string descripcion, string moneda, CancellationToken cancellationToken = default)
     {
-        var client = httpClientFactory.CreateClient("Backend");
+        var client = httpClientFactory.CreateClient(HttpClientNames.Backend);
 
         using var response = await client.PostAsJsonAsync(
             "api/cuentas",
@@ -64,7 +65,7 @@ internal sealed class CuentasApiClient(IHttpClientFactory httpClientFactory) : I
 
     public async Task<IReadOnlyList<CategoriaItem>> GetCategoriasAsync(Guid idCuenta, CancellationToken cancellationToken = default)
     {
-        var client = httpClientFactory.CreateClient("Backend");
+        var client = httpClientFactory.CreateClient(HttpClientNames.Backend);
 
         using var response = await client.GetAsync($"api/cuentas/{idCuenta}/categorias", cancellationToken);
 
@@ -83,5 +84,57 @@ internal sealed class CuentasApiClient(IHttpClientFactory httpClientFactory) : I
             Nombre = c.Nombre,
             TipoMovimiento = c.TipoMovimiento
         })];
+    }
+
+    public async Task CreateCategoriaAsync(Guid idCuenta, string nombre, TipoMovimiento tipoMovimiento, CancellationToken cancellationToken = default)
+    {
+        var client = httpClientFactory.CreateClient(HttpClientNames.Backend);
+
+        using var response = await client.PostAsJsonAsync(
+            $"api/cuentas/{idCuenta}/categorias",
+            new CreateCategoriaRequest(nombre, tipoMovimiento),
+            JsonOptions,
+            cancellationToken);
+
+        if (response.IsSuccessStatusCode)
+            return;
+
+        var body = await response.Content.ReadAsStringAsync(cancellationToken);
+        throw new HttpRequestException(
+            $"Error al crear categoría. Status={(int)response.StatusCode}. Body={body}");
+    }
+
+    public async Task UpdateCategoriaAsync(Guid idCuenta, Guid idCuentaCategoria, string nombre, TipoMovimiento tipoMovimiento, CancellationToken cancellationToken = default)
+    {
+        var client = httpClientFactory.CreateClient(HttpClientNames.Backend);
+
+        using var response = await client.PutAsJsonAsync(
+            $"api/cuentas/{idCuenta}/categorias/{idCuentaCategoria}",
+            new CreateCategoriaRequest(nombre, tipoMovimiento),
+            JsonOptions,
+            cancellationToken);
+
+        if (response.IsSuccessStatusCode)
+            return;
+
+        var body = await response.Content.ReadAsStringAsync(cancellationToken);
+        throw new HttpRequestException(
+            $"Error al actualizar categoría. Status={(int)response.StatusCode}. Body={body}");
+    }
+
+    public async Task DeleteCategoriaAsync(Guid idCuenta, Guid idCuentaCategoria, CancellationToken cancellationToken = default)
+    {
+        var client = httpClientFactory.CreateClient(HttpClientNames.Backend);
+
+        using var response = await client.DeleteAsync(
+            $"api/cuentas/{idCuenta}/categorias/{idCuentaCategoria}",
+            cancellationToken);
+
+        if (response.IsSuccessStatusCode)
+            return;
+
+        var body = await response.Content.ReadAsStringAsync(cancellationToken);
+        throw new HttpRequestException(
+            $"Error al eliminar categoría. Status={(int)response.StatusCode}. Body={body}");
     }
 }

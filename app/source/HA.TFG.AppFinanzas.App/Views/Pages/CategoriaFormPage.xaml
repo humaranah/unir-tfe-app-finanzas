@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="clr-namespace:HA.TFG.AppFinanzas.Core.ViewModels;assembly=HA.TFG.AppFinanzas.Core"
+             x:Class="HA.TFG.AppFinanzas.App.Views.Pages.CategoriaFormPage"
+             x:DataType="viewModels:CategoriaFormViewModel"
+             Title="{Binding Titulo}">
+
+    <Shell.TitleView>
+        <Grid HorizontalOptions="Fill">
+            <Label Text="{Binding Titulo}"
+                   Style="{StaticResource PageTitleLabel}"
+                   HorizontalOptions="Center"
+                   HorizontalTextAlignment="Center" />
+        </Grid>
+    </Shell.TitleView>
+
+    <VerticalStackLayout Padding="40" Spacing="24" VerticalOptions="Center" MaximumWidthRequest="600">
+
+        <Label Text="{Binding Titulo}"
+               FontSize="32"
+               FontAttributes="Bold"
+               HorizontalOptions="Center" />
+
+        <Entry Placeholder="Nombre"
+               Text="{Binding Nombre}"
+               HorizontalOptions="Fill" />
+
+        <Picker Title="Tipo"
+                ItemsSource="{Binding Tipos}"
+                SelectedItem="{Binding TipoSeleccionado}"
+                HorizontalOptions="Fill" />
+
+        <Label Text="{Binding Error}"
+               TextColor="OrangeRed"
+               HorizontalOptions="Center"
+               IsVisible="{Binding HasError}" />
+
+        <ActivityIndicator IsRunning="{Binding IsBusy}"
+                           IsVisible="{Binding IsBusy}"
+                           HorizontalOptions="Center" />
+
+        <Button Text="Guardar"
+                Command="{Binding GuardarCommand}"
+                HorizontalOptions="Fill" />
+
+    </VerticalStackLayout>
+
+</ContentPage>

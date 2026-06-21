@@ -8,7 +8,7 @@ internal sealed class BackendHealthClient(IHttpClientFactory httpClientFactory) 
     {
         try
         {
-            var client = httpClientFactory.CreateClient("BackendHealth");
+            var client = httpClientFactory.CreateClient(HttpClientNames.BackendHealth);
             using var response = await client.GetAsync("health", cancellationToken);
             return response.IsSuccessStatusCode;
         }

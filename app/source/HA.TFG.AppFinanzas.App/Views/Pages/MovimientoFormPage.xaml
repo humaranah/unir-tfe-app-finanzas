@@ -28,18 +28,15 @@
                            TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}" />
                 </HorizontalStackLayout>
                 <Button Grid.Column="1"
-                        Text="Escanear"
-                        ContentLayout="Left,8"
+                        Text="&#xEA65;"
+                        FontFamily="FluentIcons"
+                        FontSize="20"
                         Command="{Binding ScanComprobanteCommand}"
                         Style="{DynamicResource OutlinedButton}"
-                        HorizontalOptions="End">
-                    <Button.ImageSource>
-                        <FontImageSource FontFamily="FluentIcons"
-                                         Glyph="&#xEA65;"
-                                         Size="20"
-                                         Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
-                    </Button.ImageSource>
-                </Button>
+                        AutomationProperties.Name="Escanear comprobante"
+                        HorizontalOptions="End"
+                        WidthRequest="44"
+                        Padding="8,4" />
             </Grid>
 
             <BoxView Style="{StaticResource SectionSeparator}" Margin="0,0,0,16" />
@@ -183,18 +180,10 @@
                     <Label Text="Comprobante" FontAttributes="Bold" />
 
                     <Button Text="Adjuntar comprobante"
-                            ContentLayout="Left,8"
                             Command="{Binding OpenComprobanteOptionsCommand}"
                             Style="{DynamicResource OutlinedButton}"
                             HorizontalOptions="Fill"
-                            IsVisible="{Binding NoTieneComprobante}">
-                        <Button.ImageSource>
-                            <FontImageSource FontFamily="FluentIcons"
-                                             Glyph="&#xF157;"
-                                             Size="18"
-                                             Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
-                        </Button.ImageSource>
-                    </Button>
+                            IsVisible="{Binding NoTieneComprobante}" />
 
                     <Grid ColumnDefinitions="*,auto" ColumnSpacing="8"
                           IsVisible="{Binding TieneComprobante}">

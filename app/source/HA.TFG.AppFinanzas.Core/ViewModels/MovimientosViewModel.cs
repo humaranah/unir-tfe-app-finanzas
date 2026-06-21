@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using HA.TFG.AppFinanzas.Core.Cuentas;
+using HA.TFG.AppFinanzas.Core.Models.Enums;
 using HA.TFG.AppFinanzas.Core.Movimientos;
 using HA.TFG.AppFinanzas.Core.Navigation;
 using HA.TFG.AppFinanzas.Core.Services;
@@ -22,7 +23,7 @@ public partial class MovimientosViewModel(
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(SinMovimientos))]
     [NotifyPropertyChangedFor(nameof(HasMovimientos))]
-    public partial ObservableCollection<MovimientosPorFecha> Movimientos { get; set; } = [];
+    public partial ObservableCollection<MovimientosPorFechaDisplay> Movimientos { get; set; } = [];
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsNotBusy))]
@@ -147,13 +148,14 @@ public partial class MovimientosViewModel(
 
             var items = await movimientosService.GetMovimientosAsync(idCuenta.Value, filtros, cancellationToken);
 
-            Movimientos = new ObservableCollection<MovimientosPorFecha>(
+            Movimientos = new ObservableCollection<MovimientosPorFechaDisplay>(
                 items
                     .GroupBy(m => m.FechaMovimiento)
                     .OrderByDescending(g => g.Key)
-                    .Select(g => new MovimientosPorFecha(
+                    .Select(g => new MovimientosPorFechaDisplay(
                         g.Key,
-                        g.OrderByDescending(m => m.FechaMovimiento))));
+                        g.OrderByDescending(m => m.FechaMovimiento)
+                         .Select((item, i) => new MovimientoFilaItem(item, i % 2 == 0)))));
         }
         catch (Exception ex)
         {
@@ -165,4 +167,19 @@ public partial class MovimientosViewModel(
             IsBusy = false;
         }
     }
+}
+
+public sealed record MovimientoFilaItem(MovimientoItem Movimiento, bool IsEven)
+{
+    public string Concepto => Movimiento.Concepto;
+    public TipoMovimiento TipoMovimiento => Movimiento.TipoMovimiento;
+    public decimal Importe => Movimiento.Importe;
+    public string Moneda => Movimiento.Moneda;
+    public DateOnly FechaMovimiento => Movimiento.FechaMovimiento;
+}
+
+public sealed class MovimientosPorFechaDisplay(DateOnly fecha, IEnumerable<MovimientoFilaItem> items)
+    : List<MovimientoFilaItem>(items)
+{
+    public DateOnly Fecha { get; } = fecha;
 }

@@ -12,7 +12,7 @@ internal sealed class RecomendacionesApiClient(IHttpClientFactory httpClientFact
         string? query = null,
         CancellationToken cancellationToken = default)
     {
-        var client = httpClientFactory.CreateClient("Backend");
+        var client = httpClientFactory.CreateClient(HttpClientNames.Backend);
 
         using var response = await client.PostAsJsonAsync(
             "api/recomendaciones",

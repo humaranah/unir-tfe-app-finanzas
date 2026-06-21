@@ -47,6 +47,11 @@
         Route="movimientos" />
 
     <ShellContent
+        Title="Categorías"
+        ContentTemplate="{DataTemplate pages:CategoriasPage}"
+        Route="categorias" />
+
+    <ShellContent
         Title="Recomendaciones"
         ContentTemplate="{DataTemplate pages:RecomendacionesPage}"
         Route="recomendaciones" />

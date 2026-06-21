@@ -2,8 +2,8 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:HA.TFG.AppFinanzas.Core.ViewModels;assembly=HA.TFG.AppFinanzas.Core"
-             xmlns:model="clr-namespace:HA.TFG.AppFinanzas.Core.Movimientos;assembly=HA.TFG.AppFinanzas.Core"
              xmlns:converters="clr-namespace:HA.TFG.AppFinanzas.App.Converters"
+             xmlns:behaviors="clr-namespace:HA.TFG.AppFinanzas.App.Behaviors"
              xmlns:controls="clr-namespace:HA.TFG.AppFinanzas.App.Views.Controls"
              x:DataType="vm:MovimientosViewModel"
              x:Class="HA.TFG.AppFinanzas.App.Views.Pages.MovimientosPage"
@@ -11,6 +11,7 @@
     <ContentPage.Resources>
         <converters:TipoMovimientoColorConverter x:Key="TipoMovimientoColor" />
         <converters:TipoMovimientoSignoConverter x:Key="TipoMovimientoSigno" />
+        <converters:FilaParColorConverter x:Key="FilaParColor" />
     </ContentPage.Resources>
 
     <Shell.TitleView>
@@ -44,72 +45,70 @@
         <CollectionView Grid.Row="1"
                         ItemsSource="{Binding Movimientos}"
                         IsGrouped="True"
-                        IsVisible="{Binding HasMovimientos}"
-                        Margin="20">
+                        IsVisible="{Binding HasMovimientos}">
+            <CollectionView.Footer>
+                <BoxView HeightRequest="88"
+                         Color="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource OffBlack}}" />
+            </CollectionView.Footer>
             <CollectionView.GroupHeaderTemplate>
-                <DataTemplate x:DataType="model:MovimientosPorFecha">
+                <DataTemplate x:DataType="vm:MovimientosPorFechaDisplay">
                     <Label Text="{Binding Fecha, StringFormat='{0:dd/MM/yyyy}'}"
                            FontAttributes="Bold"
-                           Padding="10,5" />
+                           Padding="20,8" />
                 </DataTemplate>
             </CollectionView.GroupHeaderTemplate>
             <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="model:MovimientoItem">
-                    <Border Stroke="LightGray" Padding="10" Margin="0,0,0,10">
-                        <Grid ColumnDefinitions="*,auto,auto">
-                            <StackLayout Grid.Column="0">
-                                <StackLayout.GestureRecognizers>
-                                    <TapGestureRecognizer
-                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MovimientosViewModel}}, Path=VerDetalleMovimientoCommand}"
-                                        CommandParameter="{Binding .}" />
-                                </StackLayout.GestureRecognizers>
-                                <Label Text="{Binding Concepto}" FontSize="16" FontAttributes="Bold" />
-                                <Label Text="{Binding FechaMovimiento, StringFormat='Fecha: {0:dd/MM/yyyy}'}" FontSize="14" TextColor="Gray" />
-                                <Label FontSize="16"
-                                       TextColor="{Binding TipoMovimiento, Converter={StaticResource TipoMovimientoColor}}">
-                                    <Label.FormattedText>
-                                        <FormattedString>
-                                            <Span Text="{Binding TipoMovimiento, Converter={StaticResource TipoMovimientoSigno}}" />
-                                            <Span Text="{Binding Importe, StringFormat='{0:N2}'}" />
-                                            <Span Text=" " />
-                                            <Span Text="{Binding Moneda}" />
-                                        </FormattedString>
-                                    </Label.FormattedText>
-                                </Label>
-                            </StackLayout>
-                            <Button Grid.Column="1"
-                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MovimientosViewModel}}, Path=EditarMovimientoCommand}"
-                                    CommandParameter="{Binding .}"
-                                    AutomationProperties.Name="Editar movimiento"
-                                    Style="{DynamicResource OutlinedButton}"
-                                    VerticalOptions="Center"
-                                    BorderWidth="1"
-                                    Padding="8,4">
-                                <Button.ImageSource>
-                                    <FontImageSource FontFamily="FluentIcons"
-                                                     Glyph="&#xE5B2;"
-                                                     Size="24"
-                                                     Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
-                                </Button.ImageSource>
-                            </Button>
-                            <Button Grid.Column="2"
-                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MovimientosViewModel}}, Path=EliminarMovimientoCommand}"
-                                    CommandParameter="{Binding .}"
-                                    SemanticProperties.Description="Eliminar movimiento"
-                                    Style="{StaticResource DangerOutlinedButton}"
-                                    VerticalOptions="Center"
-                                    BorderWidth="1"
-                                    Margin="4,0,0,0"
-                                    Padding="8,4">
-                                <Button.ImageSource>
-                                    <FontImageSource FontFamily="FluentIcons"
-                                                     Glyph="&#xE47B;"
-                                                     Size="24"
-                                                     Color="{AppThemeBinding Light=#D32F2F, Dark=#FF6B6B}" />
-                                </Button.ImageSource>
-                            </Button>
-                        </Grid>
-                    </Border>
+                <DataTemplate x:DataType="vm:MovimientoFilaItem">
+                    <Grid ColumnDefinitions="*,auto,auto"
+                          Padding="20,12"
+                          BackgroundColor="{Binding IsEven, Converter={StaticResource FilaParColor}}">
+                        <Grid.Behaviors>
+                            <behaviors:HoverBackgroundBehavior />
+                        </Grid.Behaviors>
+                        <StackLayout Grid.Column="0">
+                            <StackLayout.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MovimientosViewModel}}, Path=VerDetalleMovimientoCommand}"
+                                    CommandParameter="{Binding Movimiento}" />
+                            </StackLayout.GestureRecognizers>
+                            <Label Text="{Binding Concepto}" FontSize="16" FontAttributes="Bold" />
+                            <Label Text="{Binding FechaMovimiento, StringFormat='Fecha: {0:dd/MM/yyyy}'}" FontSize="14" TextColor="Gray" />
+                            <Label FontSize="16"
+                                   TextColor="{Binding TipoMovimiento, Converter={StaticResource TipoMovimientoColor}}">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="{Binding TipoMovimiento, Converter={StaticResource TipoMovimientoSigno}}" />
+                                        <Span Text="{Binding Importe, StringFormat='{0:N2}'}" />
+                                        <Span Text=" " />
+                                        <Span Text="{Binding Moneda}" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                        </StackLayout>
+                        <Button Grid.Column="1"
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MovimientosViewModel}}, Path=EditarMovimientoCommand}"
+                                CommandParameter="{Binding Movimiento}"
+                                AutomationProperties.Name="Editar movimiento"
+                                Style="{DynamicResource OutlinedButton}"
+                                Text="&#xE5B2;"
+                                FontFamily="FluentIcons"
+                                FontSize="20"
+                                VerticalOptions="Center"
+                                BorderWidth="1"
+                                Padding="8,4" />
+                        <Button Grid.Column="2"
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MovimientosViewModel}}, Path=EliminarMovimientoCommand}"
+                                CommandParameter="{Binding Movimiento}"
+                                SemanticProperties.Description="Eliminar movimiento"
+                                Style="{StaticResource DangerOutlinedButton}"
+                                Text="&#xE47B;"
+                                FontFamily="FluentIcons"
+                                FontSize="20"
+                                VerticalOptions="Center"
+                                BorderWidth="1"
+                                Margin="4,0,0,0"
+                                Padding="8,4" />
+                    </Grid>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
