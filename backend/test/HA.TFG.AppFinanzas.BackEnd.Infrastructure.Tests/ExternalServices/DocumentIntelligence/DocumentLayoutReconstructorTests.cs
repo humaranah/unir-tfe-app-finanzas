@@ -6,79 +6,94 @@ namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.Tests.ExternalServices.Docum
 
 public class DocumentLayoutReconstructorTests
 {
-    // ─── AgruparEnFilas ───────────────────────────────────────────────────────
+    // ─── GroupIntoRows ────────────────────────────────────────────────────────
 
     [Fact]
-    public void AgruparEnFilas_LineasConMismaY_SeAgrupaEnUnaFila()
+    public void GroupIntoRows_WithLinesAtSameY_GroupsInSingleRow()
     {
-        var lineas = new List<LineaProyectada>
+        // Arrange
+        var lines = new List<ProjectedLine>
         {
             new("Concepto",  0.05, 0.10),
             new("Precio",    0.50, 0.10),
             new("Cantidad",  0.75, 0.10),
         };
 
-        var filas = AgruparEnFilas(lineas, 0.012);
+        // Act
+        var rows = GroupIntoRows(lines, 0.012);
 
-        Assert.Single(filas);
-        Assert.Equal(3, filas[0].Count);
+        // Assert
+        Assert.Single(rows);
+        Assert.Equal(3, rows[0].Count);
     }
 
     [Fact]
-    public void AgruparEnFilas_LineasConDiferenteY_SeAgrupaEnFilasSeparadas()
+    public void GroupIntoRows_WithLinesAtDifferentY_GroupsInSeparateRows()
     {
-        var lineas = new List<LineaProyectada>
+        // Arrange
+        var lines = new List<ProjectedLine>
         {
-            new("Encabezado", 0.05, 0.05),
-            new("Detalle",    0.05, 0.30),
-            new("Total",      0.05, 0.60),
+            new("Header", 0.05, 0.05),
+            new("Detail", 0.05, 0.30),
+            new("Total",  0.05, 0.60),
         };
 
-        var filas = AgruparEnFilas(lineas, 0.012);
+        // Act
+        var rows = GroupIntoRows(lines, 0.012);
 
-        Assert.Equal(3, filas.Count);
+        // Assert
+        Assert.Equal(3, rows.Count);
     }
 
     [Fact]
-    public void AgruparEnFilas_YDentroDelUmbral_SeAgrupaEnMismaFila()
+    public void GroupIntoRows_WithYWithinThreshold_GroupsInSameRow()
     {
-        // Diferencia de Y de 0.005, menor que el umbral de fila (~50% del alto de línea)
-        var lineas = new List<LineaProyectada>
+        // Y difference of 0.005, less than row threshold (~50% of line height)
+        // Arrange
+        var lines = new List<ProjectedLine>
         {
             new("A", 0.05, 0.100),
             new("B", 0.50, 0.105),
         };
 
-        var filas = AgruparEnFilas(lineas, 0.012);
+        // Act
+        var rows = GroupIntoRows(lines, 0.012);
 
-        Assert.Single(filas);
+        // Assert
+        Assert.Single(rows);
     }
 
     [Fact]
-    public void AgruparEnFilas_ListaVacia_DevuelveListaVacia()
+    public void GroupIntoRows_WithEmptyList_ReturnsEmptyRows()
     {
-        var filas = AgruparEnFilas([], 0.012);
+        // Act
+        var rows = GroupIntoRows([], 0.012);
 
-        Assert.Empty(filas);
+        // Assert
+        Assert.Empty(rows);
     }
 
-    // ─── RenderizarFila ───────────────────────────────────────────────────────
+    // ─── RenderRow ────────────────────────────────────────────────────────────
 
     [Fact]
-    public void RenderizarFila_FilaSimple_DevuelveContenidoSinEspacios()
+    public void RenderRow_WithSingleLine_RendersContentTrimmed()
     {
-        var fila = new List<LineaProyectada> { new("  Hiper Asia  ", 0.3, 0.1) };
+        // Arrange
+        var row = new List<ProjectedLine> { new("  Hiper Asia  ", 0.3, 0.1) };
         var sb = new StringBuilder();
 
-        RenderizarFila(fila, sb);
+        // Act
+        RenderRow(row, sb);
 
+        // Assert
         Assert.Equal("Hiper Asia", sb.ToString().Trim());
     }
 
     [Fact]
-    public void RenderizarFila_FilaMultiColumna_SeparaConPipe()
+    public void RenderRow_WithMultipleColumns_SeparatesWithPipe()
     {
-        var fila = new List<LineaProyectada>
+        // Arrange
+        var row = new List<ProjectedLine>
         {
             new("Leche entera", 0.05, 0.10),
             new("1ud",          0.55, 0.10),
@@ -86,17 +101,19 @@ public class DocumentLayoutReconstructorTests
         };
         var sb = new StringBuilder();
 
-        RenderizarFila(fila, sb);
+        // Act
+        RenderRow(row, sb);
 
-        var resultado = sb.ToString().Trim();
-        Assert.Equal("Leche entera | 1ud | 0.95€", resultado);
+        // Assert
+        var result = sb.ToString().Trim();
+        Assert.Equal("Leche entera | 1ud | 0.95€", result);
     }
 
     [Fact]
-    public void RenderizarFila_FilaMultiColumnaDesordenada_OrdenaDeLaIzquierdaADerecha()
+    public void RenderRow_WithUnorderedColumns_OrdersLeftToRight()
     {
-        // Los fragmentos llegan en orden inverso de X
-        var fila = new List<LineaProyectada>
+        // Arrange - fragments arrive in reverse X order
+        var row = new List<ProjectedLine>
         {
             new("Importe", 0.80, 0.10),
             new("Cantidad", 0.55, 0.10),
@@ -104,40 +121,43 @@ public class DocumentLayoutReconstructorTests
         };
         var sb = new StringBuilder();
 
-        RenderizarFila(fila, sb);
+        // Act
+        RenderRow(row, sb);
 
+        // Assert
         Assert.Equal("Concepto | Cantidad | Importe", sb.ToString().Trim());
     }
 
-    // ─── ReconstruirPagina: salto de bloque ──────────────────────────────────
+    // ─── ReconstructPage: block jump handling ────────────────────────────────
 
     [Fact]
-    public void AgruparEnFilas_SaltoPorEncimaDelUmbral_InsertaFilaVaciaEntreBloques()
+    public void ReconstructPage_WithJumpAboveThreshold_InsertsBlankLinesBetweenBlocks()
     {
-        // Diferencia de Y de 0.05, mayor que umbralSalto (1.5x el alto de línea)
-        var lineas = new List<LineaProyectada>
+        // Y difference of 0.05, greater than jumpThreshold (1.5x line height)
+        // Arrange
+        var lines = new List<ProjectedLine>
         {
-            new("Encabezado", 0.05, 0.10),
-            new("Total",      0.05, 0.15), // salto de 0.05 > umbralSalto
+            new("Header", 0.05, 0.10),
+            new("Total",  0.05, 0.15), // jump of 0.05 > jumpThreshold
         };
 
-        const double umbralFila  = 0.012;
-        const double umbralSalto = 0.030;
+        const double rowThreshold = 0.012;
+        const double jumpThreshold = 0.030;
 
         var sb = new StringBuilder();
-        // Simular el loop de ReconstruirPagina manualmente
-        var filas = AgruparEnFilas(lineas, umbralFila);
-        double? yAnterior = null;
-        foreach (var fila in filas)
+        // Simulate ReconstructPage loop manually
+        var rows = GroupIntoRows(lines, rowThreshold);
+        double? previousY = null;
+        foreach (var row in rows)
         {
-            if (yAnterior.HasValue && fila[0].YRel - yAnterior.Value > umbralSalto)
+            if (previousY.HasValue && row[0].YRel - previousY.Value > jumpThreshold)
                 sb.AppendLine();
-            RenderizarFila(fila, sb);
-            yAnterior = fila[0].YRel;
+            RenderRow(row, sb);
+            previousY = row[0].YRel;
         }
 
-        var lineasResultado = sb.ToString().Split(Environment.NewLine, StringSplitOptions.None);
-        // Debe haber al menos una línea vacía entre los dos bloques
-        Assert.Contains(lineasResultado, l => l == string.Empty);
+        // Assert - should have at least one blank line between blocks
+        var outputLines = sb.ToString().Split(Environment.NewLine, StringSplitOptions.None);
+        Assert.Contains(outputLines, l => l == string.Empty);
     }
 }

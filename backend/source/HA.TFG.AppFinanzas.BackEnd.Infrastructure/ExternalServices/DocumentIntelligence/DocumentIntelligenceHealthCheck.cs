@@ -1,5 +1,5 @@
 using Azure;
-using Azure.AI.FormRecognizer.DocumentAnalysis;
+using Azure.AI.DocumentIntelligence;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 
@@ -18,7 +18,7 @@ internal sealed class DocumentIntelligenceHealthCheck(IOptions<DocumentIntellige
 
         try
         {
-            var adminClient = new DocumentModelAdministrationClient(
+            var adminClient = new DocumentIntelligenceAdministrationClient(
                 new Uri(_config.Endpoint),
                 new AzureKeyCredential(_config.ApiKey));
 
