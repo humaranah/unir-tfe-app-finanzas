@@ -338,6 +338,61 @@ public class ProcesarComprobanteQueryHandlerTests
         Assert.Equal(3.90m, result.Importe);
     }
 
+    // ─── Merge concepto: DI (single item) vs LLM ─────────────────────────────
+
+    [Fact]
+    public async Task Handle_WithSingleItemDescription_UsesDirectDescriptionIgnoringLlm()
+    {
+        // Arrange: DI extracts a single item with description
+        _analysisService.AnalyzeAsync(Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(new ComprobanteAnalysisResult
+            {
+                Texto = "Ticket de compra",
+                Items = [new ReceiptItemResult { Description = "Zapatillas deportivas", TotalPrice = 89.99m }]
+            });
+
+        _cuentaCategoriaRepository.GetCategoriasByCuentaAsync(IdUsuario, IdCuenta, Arg.Any<CancellationToken>())
+            .Returns(CategoriasDefault);
+
+        // LLM returns a different concepto; DI's should prevail
+        _extraccionService.EnviarPromptAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(JsonLlmCompleto); // contains "concepto": "Bolsa de regalo"
+
+        // Act
+        var result = await _sut.Handle(CrearQuery(), CancellationToken.None);
+
+        // Assert
+        Assert.Equal("Zapatillas deportivas", result.Concepto);
+    }
+
+    [Fact]
+    public async Task Handle_WithMultipleItemsOrSingleItemWithoutDescription_UsesLlmConcepto()
+    {
+        // Arrange: multiple items
+        _analysisService.AnalyzeAsync(Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(new ComprobanteAnalysisResult
+            {
+                Texto = "Ticket de compra",
+                Items =
+                [
+                    new ReceiptItemResult { Description = "Pan", TotalPrice = 1.20m },
+                    new ReceiptItemResult { Description = "Leche", TotalPrice = 0.90m },
+                ]
+            });
+
+        _cuentaCategoriaRepository.GetCategoriasByCuentaAsync(IdUsuario, IdCuenta, Arg.Any<CancellationToken>())
+            .Returns(CategoriasDefault);
+
+        _extraccionService.EnviarPromptAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(JsonLlmCompleto);
+
+        // Act
+        var result = await _sut.Handle(CrearQuery(), CancellationToken.None);
+
+        // Assert
+        Assert.Equal("Bolsa de regalo", result.Concepto);
+    }
+
     [Fact]
     public async Task Handle_ElPromptContieneCategoriasYDatosDi_PromptEnviadoAFoundry()
     {
