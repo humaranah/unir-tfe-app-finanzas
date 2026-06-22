@@ -45,7 +45,20 @@ public sealed record ComprobanteAnalysisResult
     /// Descripción directa cuando hay exactamente un artículo con descripción conocida.
     /// Null en cualquier otro caso; el LLM debe inferirlo.
     /// </summary>
-    public string? Concepto => Items.Count == 1 ? Items[0].Description : null;
+    public string? Concepto => Items.Count == 1 && !string.IsNullOrWhiteSpace(Items[0].Description)
+        ? Items[0].Description
+        : null;
+
+    /// <summary>
+    /// Indica si se extrajeron datos estructurados del comprobante (MerchantName, Total, etc.).
+    /// </summary>
+    public bool HasStructuredData =>
+        MerchantName is not null ||
+        Total is not null ||
+        TransactionDate is not null ||
+        Currency is not null ||
+        CountryRegion is not null ||
+        Items.Count > 0;
 }
 
 /// <summary>Artículo individual extraído del comprobante por Document Intelligence.</summary>

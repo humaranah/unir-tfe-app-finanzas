@@ -47,7 +47,7 @@ internal static class ComprobantePromptBuilder
     /// </summary>
     private static string BuildJsonSchema(ComprobanteAnalysisResult di)
     {
-        var fields = new List<string>();
+        List<string> fields = [];
 
         if (di.MerchantName is null) fields.Add("  \"establecimiento\": \"<string|null>\"");
         if (di.Concepto is null) fields.Add("  \"concepto\": \"<string|null>\"");
@@ -121,10 +121,10 @@ internal static class ComprobantePromptBuilder
 
         if (di.Concepto is null)
         {
-            var conceptoHint = di.Items.Count > 0
+            var conceptHint = di.Items.Count > 0
                 ? "resumir los artículos DI"
                 : "extraer del texto del comprobante";
-            sb.AppendLine($"- concepto: descripción principal del gasto ({conceptoHint}).");
+            sb.AppendLine($"- concepto: descripción principal del gasto ({conceptHint}).");
         }
 
         if (di.Total is null)
@@ -132,8 +132,8 @@ internal static class ComprobantePromptBuilder
 
         if (di.Currency is null)
         {
-            var regionHint = di.CountryRegion is not null ? $" del país {di.CountryRegion}" : "";
-            sb.AppendLine($"- moneda: código ISO 4217; derivar{regionHint} o del texto del comprobante.");
+            var regionContext = di.CountryRegion is not null ? $" del país {di.CountryRegion}" : "";
+            sb.AppendLine($"- moneda: código ISO 4217; derivar{regionContext} o del texto del comprobante.");
         }
 
         if (di.TransactionDate is null)
@@ -141,8 +141,8 @@ internal static class ComprobantePromptBuilder
 
         sb.AppendLine($"- tipoMovimiento: compras→{TipoMovimiento.Gasto}; ingresos→{TipoMovimiento.Ingreso}; entre cuentas→{TipoMovimiento.Transferencia}.");
 
-        var ctxCategoria = di.MerchantName is not null ? $" para el comercio \"{di.MerchantName}\"" : "";
-        sb.AppendLine($"- idCuentaCategoria: categoría más relacionada{ctxCategoria}; si no es claro, usar \"{idDefault}\".");
+        var categoryContext = di.MerchantName is not null ? $" para el comercio \"{di.MerchantName}\"" : "";
+        sb.AppendLine($"- idCuentaCategoria: categoría más relacionada{categoryContext}; si no es claro, usar \"{idDefault}\".");
         sb.AppendLine($"- categoriaPropuesta: si idCuentaCategoria es \"{idDefault}\", sugerir nombre; si no, null.");
         sb.AppendLine("- nota: método de pago, tienda u otro detalle útil, expresivo y conciso.");
 

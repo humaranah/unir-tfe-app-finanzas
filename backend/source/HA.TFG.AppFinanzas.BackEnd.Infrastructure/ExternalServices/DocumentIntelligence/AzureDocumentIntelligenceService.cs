@@ -22,13 +22,10 @@ internal sealed class AzureDocumentIntelligenceService(
     {
         try
         {
-            using var ms = new MemoryStream();
-            await stream.CopyToAsync(ms, cancellationToken);
-
             var operation = await client.AnalyzeDocumentAsync(
                 WaitUntil.Completed,
                 _config.ModelId,
-                BinaryData.FromBytes(ms.ToArray()),
+                BinaryData.FromStream(stream),
                 cancellationToken);
 
             var result = operation.Value;
@@ -37,12 +34,8 @@ internal sealed class AzureDocumentIntelligenceService(
             foreach (var page in result.Pages ?? [])
             {
                 if (sb.Length > 0) sb.AppendLine();
-                DocumentLayoutReconstructor.ReconstruirPagina(page, sb);
+                DocumentLayoutReconstructor.ReconstructPage(page, sb);
             }
-
-            if (logger.IsEnabled(LogLevel.Debug))
-                logger.LogDebug("DI: modelo={ModelId}, páginas={Pages}, documentos={Docs}",
-                    _config.ModelId, result.Pages?.Count ?? 0, result.Documents?.Count ?? 0);
 
             DocumentFieldDictionary? fields = result.Documents?.Count > 0
                 ? result.Documents[0].Fields
@@ -51,12 +44,6 @@ internal sealed class AzureDocumentIntelligenceService(
             if (fields is null)
             {
                 logger.LogWarning("Document Intelligence no reconoció un comprobante en el documento analizado.");
-            }
-            else if (logger.IsEnabled(LogLevel.Debug))
-            {
-                foreach (var kv in fields)
-                    logger.LogDebug("DI campo: {Key} | tipo={Type} | contenido={Content}",
-                        kv.Key, kv.Value.FieldType, kv.Value.Content);
             }
 
             var analysisResult = new ComprobanteAnalysisResult
@@ -71,8 +58,11 @@ internal sealed class AzureDocumentIntelligenceService(
                 Items = ExtractItems(fields),
             };
 
-            logger.LogDebug("Documento analizado: {@AnalisisResult}",
-                analysisResult with { Texto = $"Texto con {analysisResult.Texto.Length} caracteres" });
+            if (logger.IsEnabled(LogLevel.Debug))
+            {
+                logger.LogDebug("Documento analizado: {@AnalisisResult}",
+                    analysisResult with { Texto = $"Texto con {analysisResult.Texto.Length} caracteres" });
+            }
 
             return analysisResult;
         }
@@ -134,7 +124,7 @@ internal sealed class AzureDocumentIntelligenceService(
         if (fields is null || !fields.TryGetValue("Items", out var f) || f.FieldType != DocumentFieldType.List)
             return [];
 
-        var items = new List<ReceiptItemResult>();
+        List<ReceiptItemResult> items = [];
         foreach (var element in f.ValueList ?? [])
         {
             if (element.FieldType != DocumentFieldType.Dictionary) continue;

@@ -31,10 +31,7 @@ public class ProcesarComprobanteQueryHandler(
                 "DocumentIntelligence",
                 "No se pudo extraer texto del comprobante. Comprueba la configuración del servicio o el archivo enviado.");
 
-        var tieneTexto = !string.IsNullOrWhiteSpace(analysisResult.Texto);
-        var tieneDatos = analysisResult.MerchantName is not null || analysisResult.Total is not null;
-
-        if (!tieneTexto && !tieneDatos)
+        if (!analysisResult.HasStructuredData && string.IsNullOrWhiteSpace(analysisResult.Texto))
             throw new ExternalServiceException(
                 "DocumentIntelligence",
                 "No se pudo extraer texto del comprobante. Comprueba la configuración del servicio o el archivo enviado.");
