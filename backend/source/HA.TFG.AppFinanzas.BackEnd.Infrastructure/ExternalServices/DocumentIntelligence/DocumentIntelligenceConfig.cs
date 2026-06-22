@@ -10,6 +10,6 @@ public sealed class DocumentIntelligenceConfig
     /// <summary>Clave de API del recurso Azure Document Intelligence.</summary>
     public string? ApiKey { get; init; }
 
-    /// <summary>Identificador del modelo a usar. Por defecto "prebuilt-layout".</summary>
-    public string ModelId { get; init; } = "prebuilt-layout";
+    /// <summary>Identificador del modelo a usar. Por defecto "prebuilt-receipt".</summary>
+    public string ModelId { get; init; } = "prebuilt-receipt";
 }

@@ -1,4 +1,4 @@
-using Azure.AI.FormRecognizer.DocumentAnalysis;
+using Azure.AI.DocumentIntelligence;
 using Azure.Storage.Blobs;
 using HA.TFG.AppFinanzas.BackEnd.Application.Contracts;
 using HA.TFG.AppFinanzas.BackEnd.Infrastructure.ExternalServices.Auth0;
@@ -122,7 +122,7 @@ public static class DependencyInjection
         if (!string.IsNullOrWhiteSpace(diConfig.Endpoint) && !string.IsNullOrWhiteSpace(diConfig.ApiKey))
         {
             services.AddSingleton(_ =>
-                new DocumentAnalysisClient(
+                new DocumentIntelligenceClient(
                     new Uri(diConfig.Endpoint),
                     new Azure.AzureKeyCredential(diConfig.ApiKey)));
 

@@ -1,4 +1,4 @@
-using Azure.AI.FormRecognizer.DocumentAnalysis;
+using Azure.AI.DocumentIntelligence;
 using System.Text;
 
 namespace HA.TFG.AppFinanzas.BackEnd.Infrastructure.ExternalServices.DocumentIntelligence;
@@ -22,10 +22,10 @@ internal static class DocumentLayoutReconstructor
 
     internal static void ReconstruirPagina(DocumentPage page, StringBuilder sb)
     {
-        if (page.Lines.Count == 0) return;
+        if (!(page.Lines?.Count > 0)) return;
 
-        var pageWidth  = page.Width.GetValueOrDefault(1f)  is float pw and > 0 ? pw : 1f;
-        var pageHeight = page.Height.GetValueOrDefault(1f) is float ph and > 0 ? ph : 1f;
+        var pageWidth  = page.Width  is float pw and > 0 ? pw : 1f;
+        var pageHeight = page.Height is float ph and > 0 ? ph : 1f;
 
         var proyectadas = ProyectarLineas(page, pageWidth, pageHeight);
 
@@ -49,15 +49,15 @@ internal static class DocumentLayoutReconstructor
     }
 
     /// <summary>
-    /// Calcula el alto promedio de las líneas de la página en coordenadas relativas,
-    /// usando los vértices superior e inferior del BoundingPolygon (índices 0 y 3).
+    /// Calcula el alto promedio de las líneas de la página en coordenadas relativas.
+    /// Polygon es una lista plana [x0,y0, x1,y1, x2,y2, x3,y3]: índices 1 (y top) y 7 (y bottom-left).
     /// Si no hay líneas con suficientes vértices, devuelve un valor de reserva.
     /// </summary>
     internal static double CalcularAltoPromedio(DocumentPage page, float pageHeight)
     {
-        var lineasConAltura = page.Lines
-            .Where(l => l.BoundingPolygon.Count >= 4)
-            .Select(l => Math.Abs((double)(l.BoundingPolygon[3].Y - l.BoundingPolygon[0].Y) / pageHeight))
+        var lineasConAltura = (page.Lines ?? [])
+            .Where(l => (l.Polygon?.Count ?? 0) >= 8)
+            .Select(l => Math.Abs((l.Polygon![7] - l.Polygon![1]) / (double)pageHeight))
             .Where(h => h > 0)
             .ToList();
 
@@ -67,12 +67,12 @@ internal static class DocumentLayoutReconstructor
 
     /// <summary>Convierte cada línea del SDK a coordenadas relativas y las ordena arriba→abajo, izquierda→derecha.</summary>
     internal static List<LineaProyectada> ProyectarLineas(DocumentPage page, float pageWidth, float pageHeight) =>
-        [.. page.Lines
-            .Where(l => l.BoundingPolygon.Count >= 1)
+        [.. (page.Lines ?? [])
+            .Where(l => (l.Polygon?.Count ?? 0) >= 2)
             .Select(l => new LineaProyectada(
                 l.Content,
-                (double)l.BoundingPolygon[0].X / pageWidth,
-                (double)l.BoundingPolygon[0].Y / pageHeight))
+                l.Polygon![0] / pageWidth,
+                l.Polygon![1] / pageHeight))
             .OrderBy(l => l.YRel)
             .ThenBy(l => l.XRel)];
 
