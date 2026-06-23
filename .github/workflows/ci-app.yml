@@ -30,5 +30,8 @@ jobs:
       - name: Build (Android)
         run: dotnet build app/source/HA.TFG.AppFinanzas.App/HA.TFG.AppFinanzas.App.csproj -f net10.0-android -c Release --no-restore -p:RuntimeIdentifier=android-arm64
 
-      - name: Test
-        run: dotnet test app/test/HA.TFG.AppFinanzas.App.UnitTests/HA.TFG.AppFinanzas.App.UnitTests.csproj -f net10.0 -c Release --verbosity normal
+      - name: Test (Core)
+        run: dotnet test app/test/HA.TFG.AppFinanzas.Core.Tests/HA.TFG.AppFinanzas.Core.Tests.csproj -f net10.0 -c Release --verbosity normal
+
+      - name: Test (Infrastructure)
+        run: dotnet test app/test/HA.TFG.AppFinanzas.Infrastructure.Tests/HA.TFG.AppFinanzas.Infrastructure.Tests.csproj -f net10.0 -c Release --verbosity normal

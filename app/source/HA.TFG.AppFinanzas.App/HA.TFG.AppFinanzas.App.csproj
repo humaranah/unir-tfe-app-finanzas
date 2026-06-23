@@ -82,6 +82,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\HA.TFG.AppFinanzas.Core\HA.TFG.AppFinanzas.Core.csproj" />
+		<ProjectReference Include="..\HA.TFG.AppFinanzas.Infrastructure\HA.TFG.AppFinanzas.Infrastructure.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

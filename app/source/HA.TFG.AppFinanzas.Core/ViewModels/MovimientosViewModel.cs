@@ -168,18 +168,3 @@ public partial class MovimientosViewModel(
         }
     }
 }
-
-public sealed record MovimientoFilaItem(MovimientoItem Movimiento, bool IsEven)
-{
-    public string Concepto => Movimiento.Concepto;
-    public TipoMovimiento TipoMovimiento => Movimiento.TipoMovimiento;
-    public decimal Importe => Movimiento.Importe;
-    public string Moneda => Movimiento.Moneda;
-    public DateOnly FechaMovimiento => Movimiento.FechaMovimiento;
-}
-
-public sealed class MovimientosPorFechaDisplay(DateOnly fecha, IEnumerable<MovimientoFilaItem> items)
-    : List<MovimientoFilaItem>(items)
-{
-    public DateOnly Fecha { get; } = fecha;
-}
