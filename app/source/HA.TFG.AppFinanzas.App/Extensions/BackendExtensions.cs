@@ -1,9 +1,13 @@
-using HA.TFG.AppFinanzas.App.Http;
 using HA.TFG.AppFinanzas.App.Services;
 using HA.TFG.AppFinanzas.Core.Authentication;
 using HA.TFG.AppFinanzas.Core.Cuentas;
 using HA.TFG.AppFinanzas.Core.Movimientos;
 using HA.TFG.AppFinanzas.Core.Recomendaciones;
+using HA.TFG.AppFinanzas.Infrastructure;
+using HA.TFG.AppFinanzas.Infrastructure.Authentication;
+using HA.TFG.AppFinanzas.Infrastructure.Clients;
+using HA.TFG.AppFinanzas.Infrastructure.Http;
+using HA.TFG.AppFinanzas.Infrastructure.Services;
 
 namespace HA.TFG.AppFinanzas.App.Extensions;
 

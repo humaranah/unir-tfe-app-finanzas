@@ -1,9 +1,9 @@
 using HA.TFG.AppFinanzas.Core.Recomendaciones;
 using System.Net.Http.Json;
 
-namespace HA.TFG.AppFinanzas.App.Http;
+namespace HA.TFG.AppFinanzas.Infrastructure.Clients;
 
-internal sealed class RecomendacionesApiClient(IHttpClientFactory httpClientFactory) : IRecomendacionesService
+public sealed class RecomendacionesApiClient(IHttpClientFactory httpClientFactory) : IRecomendacionesService
 {
     private record ObtenerRecomendacionesRequest(Guid IdCuenta, string? Query);
 

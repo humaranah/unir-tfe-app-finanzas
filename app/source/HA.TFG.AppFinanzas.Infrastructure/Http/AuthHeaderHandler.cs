@@ -1,9 +1,9 @@
 using HA.TFG.AppFinanzas.Core.Authentication;
 using System.Net.Http.Headers;
 
-namespace HA.TFG.AppFinanzas.App.Http;
+namespace HA.TFG.AppFinanzas.Infrastructure.Http;
 
-internal sealed partial class AuthHeaderHandler(ITokenProvider tokenProvider) : DelegatingHandler
+public sealed partial class AuthHeaderHandler(ITokenProvider tokenProvider) : DelegatingHandler
 {
     protected override async Task<HttpResponseMessage> SendAsync(
         HttpRequestMessage request,

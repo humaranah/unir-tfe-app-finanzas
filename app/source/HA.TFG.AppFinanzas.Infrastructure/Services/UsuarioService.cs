@@ -1,10 +1,11 @@
 using Auth0.OidcClient;
+using HA.TFG.AppFinanzas.Core.Authentication;
 using HA.TFG.AppFinanzas.Core.Models;
 using System.Buffers.Text;
 using System.Text;
 using System.Text.Json;
 
-namespace HA.TFG.AppFinanzas.Core.Authentication;
+namespace HA.TFG.AppFinanzas.Infrastructure.Services;
 
 public class UsuarioService(
     IAuth0Client auth0Client,

@@ -1,8 +1,8 @@
 using HA.TFG.AppFinanzas.Core.Authentication;
 
-namespace HA.TFG.AppFinanzas.App.Http;
+namespace HA.TFG.AppFinanzas.Infrastructure.Clients;
 
-internal sealed class BackendHealthClient(IHttpClientFactory httpClientFactory) : IBackendHealthService
+public sealed class BackendHealthClient(IHttpClientFactory httpClientFactory) : IBackendHealthService
 {
     public async Task<bool> IsAvailableAsync(CancellationToken cancellationToken = default)
     {

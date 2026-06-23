@@ -1,8 +1,8 @@
 using HA.TFG.AppFinanzas.Core.Authentication;
 
-namespace HA.TFG.AppFinanzas.App.Http;
+namespace HA.TFG.AppFinanzas.Infrastructure.Clients;
 
-internal sealed class UsuariosApiClient(IHttpClientFactory httpClientFactory) : IUsuarioEnsureService
+public sealed class UsuariosApiClient(IHttpClientFactory httpClientFactory) : IUsuarioEnsureService
 {
     public async Task EnsureUsuarioAsync(CancellationToken cancellationToken = default)
     {

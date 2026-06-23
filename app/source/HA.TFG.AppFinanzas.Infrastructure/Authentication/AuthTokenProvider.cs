@@ -1,6 +1,7 @@
 using Auth0.OidcClient;
+using HA.TFG.AppFinanzas.Core.Authentication;
 
-namespace HA.TFG.AppFinanzas.Core.Authentication;
+namespace HA.TFG.AppFinanzas.Infrastructure.Authentication;
 
 public sealed class AuthTokenProvider(IAuth0Client auth0Client, ISessionStore sessionStore) : ITokenProvider
 {

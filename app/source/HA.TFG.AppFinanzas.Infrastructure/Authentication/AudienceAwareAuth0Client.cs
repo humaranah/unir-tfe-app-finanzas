@@ -3,7 +3,7 @@ using Duende.IdentityModel.OidcClient;
 using Duende.IdentityModel.OidcClient.Browser;
 using Duende.IdentityModel.OidcClient.Results;
 
-namespace HA.TFG.AppFinanzas.Core.Authentication;
+namespace HA.TFG.AppFinanzas.Infrastructure.Authentication;
 
 public sealed class AudienceAwareAuth0Client(IAuth0Client innerClient, string audience) : IAuth0Client
 {

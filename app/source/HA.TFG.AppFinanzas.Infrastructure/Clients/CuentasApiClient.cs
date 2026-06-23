@@ -4,9 +4,9 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace HA.TFG.AppFinanzas.App.Http;
+namespace HA.TFG.AppFinanzas.Infrastructure.Clients;
 
-internal sealed class CuentasApiClient(IHttpClientFactory httpClientFactory) : ICuentasService
+public sealed class CuentasApiClient(IHttpClientFactory httpClientFactory) : ICuentasService
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)
     {

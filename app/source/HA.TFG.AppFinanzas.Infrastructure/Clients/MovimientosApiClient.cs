@@ -1,13 +1,13 @@
-using HA.TFG.AppFinanzas.App.Http.Mappers;
 using HA.TFG.AppFinanzas.Core.Models.Enums;
 using HA.TFG.AppFinanzas.Core.Movimientos;
+using HA.TFG.AppFinanzas.Infrastructure.Mappers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace HA.TFG.AppFinanzas.App.Http;
+namespace HA.TFG.AppFinanzas.Infrastructure.Clients;
 
-internal sealed record MovimientoResponse(
+public sealed record MovimientoResponse(
     Guid IdMovimiento,
     Guid IdCuenta,
     Guid? IdCategoria,
@@ -18,7 +18,7 @@ internal sealed record MovimientoResponse(
     string Moneda,
     DateOnly FechaMovimiento);
 
-internal sealed record MovimientoDetalleResponse(
+public sealed record MovimientoDetalleResponse(
     Guid IdMovimiento,
     Guid IdCuenta,
     Guid IdCuentaCategoria,
@@ -32,7 +32,7 @@ internal sealed record MovimientoDetalleResponse(
     string Nota,
     DateTime FechaMovimiento);
 
-internal sealed class MovimientosApiClient(IHttpClientFactory httpClientFactory) : IMovimientosService
+public sealed class MovimientosApiClient(IHttpClientFactory httpClientFactory) : IMovimientosService
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)
     {
