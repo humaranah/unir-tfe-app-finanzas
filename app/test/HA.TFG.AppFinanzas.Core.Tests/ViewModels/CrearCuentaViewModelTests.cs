@@ -4,7 +4,7 @@ using HA.TFG.AppFinanzas.Core.ViewModels;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 
-namespace HA.TFG.AppFinanzas.App.UnitTests.ViewModels;
+namespace HA.TFG.AppFinanzas.Core.Tests.ViewModels;
 
 public class CrearCuentaViewModelTests
 {
@@ -12,9 +12,7 @@ public class CrearCuentaViewModelTests
 
     private CrearCuentaViewModel CreateSut() => new(_cuentasService);
 
-    // ---------------------------------------------------------------------------
-    // Estado inicial
-    // ---------------------------------------------------------------------------
+    #region Estado inicial
 
     [Fact]
     public void Constructor_InitialState_MatchesExpectedSnapshot()
@@ -29,13 +27,12 @@ public class CrearCuentaViewModelTests
             () => Assert.Empty(sut.Error),
             () => Assert.False(sut.HasError),
             () => Assert.False(sut.IsBusy),
-            () => Assert.True(sut.IsNotBusy)
-        );
+            () => Assert.True(sut.IsNotBusy));
     }
 
-    // ---------------------------------------------------------------------------
-    // CrearCuentaAsync — caso feliz
-    // ---------------------------------------------------------------------------
+    #endregion
+
+    #region CrearCuentaAsync — caso feliz
 
     [Fact]
     public async Task CrearCuentaAsync_WhenSuccessful_CallsServiceWithCorrectParameters()
@@ -47,14 +44,11 @@ public class CrearCuentaViewModelTests
         await sut.CrearCuentaCommand.ExecuteAsync(null);
 
         await _cuentasService.Received(1).CreateCuentaAsync(
-            "Cuenta de vacaciones",
-            "USD",
-            Arg.Any<CancellationToken>());
+            "Cuenta de vacaciones", "USD", Arg.Any<CancellationToken>());
         Assert.Multiple(
             () => Assert.Empty(sut.Error),
             () => Assert.False(sut.HasError),
-            () => Assert.False(sut.IsBusy)
-        );
+            () => Assert.False(sut.IsBusy));
     }
 
     [Fact]
@@ -69,9 +63,9 @@ public class CrearCuentaViewModelTests
         Assert.True(eventRaised);
     }
 
-    // ---------------------------------------------------------------------------
-    // CrearCuentaAsync — caso de error
-    // ---------------------------------------------------------------------------
+    #endregion
+
+    #region CrearCuentaAsync — caso de error
 
     [Fact]
     public async Task CrearCuentaAsync_WhenServiceThrows_SetsError()
@@ -81,14 +75,12 @@ public class CrearCuentaViewModelTests
             .ThrowsAsync(new HttpRequestException("Error al crear cuenta. Status=500."));
 
         var sut = CreateSut();
-
         await sut.CrearCuentaCommand.ExecuteAsync(null);
 
         Assert.Multiple(
             () => Assert.NotEmpty(sut.Error),
             () => Assert.True(sut.HasError),
-            () => Assert.False(sut.IsBusy)
-        );
+            () => Assert.False(sut.IsBusy));
     }
 
     [Fact]
@@ -116,16 +108,15 @@ public class CrearCuentaViewModelTests
 
         var sut = CreateSut();
         await sut.CrearCuentaCommand.ExecuteAsync(null);
-
         Assert.NotEmpty(sut.Error);
 
-        // Segunda llamada, ahora el servicio tiene éxito
         _cuentasService
             .CreateCuentaAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(Task.CompletedTask);
-
         await sut.CrearCuentaCommand.ExecuteAsync(null);
 
         Assert.Empty(sut.Error);
     }
+
+    #endregion
 }

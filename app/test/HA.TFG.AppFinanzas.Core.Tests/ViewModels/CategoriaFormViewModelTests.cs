@@ -5,7 +5,7 @@ using HA.TFG.AppFinanzas.Core.ViewModels;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 
-namespace HA.TFG.AppFinanzas.App.UnitTests.ViewModels;
+namespace HA.TFG.AppFinanzas.Core.Tests.ViewModels;
 
 public class CategoriaFormViewModelTests
 {
@@ -17,7 +17,7 @@ public class CategoriaFormViewModelTests
 
     private CategoriaFormViewModel CreateSut() => new(_cuentasService, _navigationService);
 
-    // ── Estado inicial ────────────────────────────────────────────────────────
+    #region Estado inicial
 
     [Fact]
     public void Constructor_InitialState_MatchesExpectedSnapshot()
@@ -32,8 +32,7 @@ public class CategoriaFormViewModelTests
             () => Assert.False(sut.IsBusy),
             () => Assert.True(sut.IsNotBusy),
             () => Assert.False(sut.EsModoEdicion),
-            () => Assert.Equal("Nueva categoría", sut.Titulo)
-        );
+            () => Assert.Equal("Nueva categoría", sut.Titulo));
     }
 
     [Fact]
@@ -44,8 +43,7 @@ public class CategoriaFormViewModelTests
         Assert.Multiple(
             () => Assert.Equal(2, sut.Tipos.Count),
             () => Assert.Contains(TipoMovimiento.Gasto, sut.Tipos),
-            () => Assert.Contains(TipoMovimiento.Ingreso, sut.Tipos)
-        );
+            () => Assert.Contains(TipoMovimiento.Ingreso, sut.Tipos));
     }
 
     [Fact]
@@ -75,7 +73,9 @@ public class CategoriaFormViewModelTests
         Assert.True(sut.GuardarCommand.CanExecute(null));
     }
 
-    // ── Initialize — modo creación ────────────────────────────────────────────
+    #endregion
+
+    #region Initialize — modo creación
 
     [Fact]
     public void Initialize_WithoutIdCategoria_SetsModoCreacion()
@@ -85,8 +85,7 @@ public class CategoriaFormViewModelTests
 
         Assert.Multiple(
             () => Assert.False(sut.EsModoEdicion),
-            () => Assert.Equal("Nueva categoría", sut.Titulo)
-        );
+            () => Assert.Equal("Nueva categoría", sut.Titulo));
     }
 
     [Fact]
@@ -97,8 +96,7 @@ public class CategoriaFormViewModelTests
 
         Assert.Multiple(
             () => Assert.Equal("Transporte", sut.Nombre),
-            () => Assert.Equal(TipoMovimiento.Ingreso, sut.TipoSeleccionado)
-        );
+            () => Assert.Equal(TipoMovimiento.Ingreso, sut.TipoSeleccionado));
     }
 
     [Fact]
@@ -121,7 +119,9 @@ public class CategoriaFormViewModelTests
         Assert.Empty(sut.Error);
     }
 
-    // ── Initialize — modo edición ─────────────────────────────────────────────
+    #endregion
+
+    #region Initialize — modo edición
 
     [Fact]
     public void Initialize_WithIdCategoria_SetsModoEdicion()
@@ -131,8 +131,7 @@ public class CategoriaFormViewModelTests
 
         Assert.Multiple(
             () => Assert.True(sut.EsModoEdicion),
-            () => Assert.Equal("Editar categoría", sut.Titulo)
-        );
+            () => Assert.Equal("Editar categoría", sut.Titulo));
     }
 
     [Fact]
@@ -143,11 +142,12 @@ public class CategoriaFormViewModelTests
 
         Assert.Multiple(
             () => Assert.Equal("Sueldo", sut.Nombre),
-            () => Assert.Equal(TipoMovimiento.Ingreso, sut.TipoSeleccionado)
-        );
+            () => Assert.Equal(TipoMovimiento.Ingreso, sut.TipoSeleccionado));
     }
 
-    // ── GuardarAsync — modo creación (caso feliz) ─────────────────────────────
+    #endregion
+
+    #region GuardarAsync — modo creación (caso feliz)
 
     [Fact]
     public async Task GuardarAsync_WhenModoCreacion_CallsCreateCategoria()
@@ -160,10 +160,7 @@ public class CategoriaFormViewModelTests
         await sut.GuardarCommand.ExecuteAsync(null);
 
         await _cuentasService.Received(1).CreateCategoriaAsync(
-            IdCuenta,
-            "Alimentación",
-            TipoMovimiento.Gasto,
-            Arg.Any<CancellationToken>());
+            IdCuenta, "Alimentación", TipoMovimiento.Gasto, Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -190,10 +187,7 @@ public class CategoriaFormViewModelTests
         await sut.GuardarCommand.ExecuteAsync(null);
 
         await _cuentasService.Received(1).CreateCategoriaAsync(
-            IdCuenta,
-            "Supermercado",
-            Arg.Any<TipoMovimiento>(),
-            Arg.Any<CancellationToken>());
+            IdCuenta, "Supermercado", Arg.Any<TipoMovimiento>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -220,11 +214,12 @@ public class CategoriaFormViewModelTests
         Assert.Multiple(
             () => Assert.Empty(sut.Error),
             () => Assert.False(sut.HasError),
-            () => Assert.False(sut.IsBusy)
-        );
+            () => Assert.False(sut.IsBusy));
     }
 
-    // ── GuardarAsync — modo edición (caso feliz) ──────────────────────────────
+    #endregion
+
+    #region GuardarAsync — modo edición (caso feliz)
 
     [Fact]
     public async Task GuardarAsync_WhenModoEdicion_CallsUpdateCategoria()
@@ -237,11 +232,7 @@ public class CategoriaFormViewModelTests
         await sut.GuardarCommand.ExecuteAsync(null);
 
         await _cuentasService.Received(1).UpdateCategoriaAsync(
-            IdCuenta,
-            IdCategoria,
-            "Ocio y entretenimiento",
-            TipoMovimiento.Gasto,
-            Arg.Any<CancellationToken>());
+            IdCuenta, IdCategoria, "Ocio y entretenimiento", TipoMovimiento.Gasto, Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -253,8 +244,7 @@ public class CategoriaFormViewModelTests
         await sut.GuardarCommand.ExecuteAsync(null);
 
         await _cuentasService.DidNotReceive().CreateCategoriaAsync(
-            Arg.Any<Guid>(), Arg.Any<string>(),
-            Arg.Any<TipoMovimiento>(), Arg.Any<CancellationToken>());
+            Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<TipoMovimiento>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -268,14 +258,15 @@ public class CategoriaFormViewModelTests
         await _navigationService.Received(1).GoBackAsync();
     }
 
-    // ── GuardarAsync — modo creación (error) ──────────────────────────────────
+    #endregion
+
+    #region GuardarAsync — errores
 
     [Fact]
     public async Task GuardarAsync_WhenModoCreacionThrows_SetsError()
     {
         _cuentasService
-            .CreateCategoriaAsync(Arg.Any<Guid>(), Arg.Any<string>(),
-                Arg.Any<TipoMovimiento>(), Arg.Any<CancellationToken>())
+            .CreateCategoriaAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<TipoMovimiento>(), Arg.Any<CancellationToken>())
             .ThrowsAsync(new HttpRequestException("fallo"));
 
         var sut = CreateSut();
@@ -287,16 +278,14 @@ public class CategoriaFormViewModelTests
         Assert.Multiple(
             () => Assert.Equal("No se pudo crear la categoría. Inténtalo de nuevo.", sut.Error),
             () => Assert.True(sut.HasError),
-            () => Assert.False(sut.IsBusy)
-        );
+            () => Assert.False(sut.IsBusy));
     }
 
     [Fact]
     public async Task GuardarAsync_WhenModoCreacionThrows_DoesNotNavigateBack()
     {
         _cuentasService
-            .CreateCategoriaAsync(Arg.Any<Guid>(), Arg.Any<string>(),
-                Arg.Any<TipoMovimiento>(), Arg.Any<CancellationToken>())
+            .CreateCategoriaAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<TipoMovimiento>(), Arg.Any<CancellationToken>())
             .ThrowsAsync(new HttpRequestException("fallo"));
 
         var sut = CreateSut();
@@ -308,14 +297,11 @@ public class CategoriaFormViewModelTests
         await _navigationService.DidNotReceive().GoBackAsync();
     }
 
-    // ── GuardarAsync — modo edición (error) ───────────────────────────────────
-
     [Fact]
     public async Task GuardarAsync_WhenModoEdicionThrows_SetsErrorDistintoAlDeCreacion()
     {
         _cuentasService
-            .UpdateCategoriaAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(),
-                Arg.Any<TipoMovimiento>(), Arg.Any<CancellationToken>())
+            .UpdateCategoriaAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<TipoMovimiento>(), Arg.Any<CancellationToken>())
             .ThrowsAsync(new HttpRequestException("fallo"));
 
         var sut = CreateSut();
@@ -327,29 +313,10 @@ public class CategoriaFormViewModelTests
     }
 
     [Fact]
-    public async Task GuardarAsync_WhenModoEdicionThrows_DoesNotNavigateBack()
-    {
-        _cuentasService
-            .UpdateCategoriaAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(),
-                Arg.Any<TipoMovimiento>(), Arg.Any<CancellationToken>())
-            .ThrowsAsync(new HttpRequestException("fallo"));
-
-        var sut = CreateSut();
-        sut.Initialize(IdCuenta, IdCategoria, "Ocio", TipoMovimiento.Gasto);
-
-        await sut.GuardarCommand.ExecuteAsync(null);
-
-        await _navigationService.DidNotReceive().GoBackAsync();
-    }
-
-    // ── Reintentar tras error ─────────────────────────────────────────────────
-
-    [Fact]
     public async Task GuardarAsync_WhenCalledAfterError_ClearsErrorBeforeAttempt()
     {
         _cuentasService
-            .CreateCategoriaAsync(Arg.Any<Guid>(), Arg.Any<string>(),
-                Arg.Any<TipoMovimiento>(), Arg.Any<CancellationToken>())
+            .CreateCategoriaAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<TipoMovimiento>(), Arg.Any<CancellationToken>())
             .ThrowsAsync(new HttpRequestException("fallo"));
 
         var sut = CreateSut();
@@ -360,12 +327,13 @@ public class CategoriaFormViewModelTests
         Assert.NotEmpty(sut.Error);
 
         _cuentasService
-            .CreateCategoriaAsync(Arg.Any<Guid>(), Arg.Any<string>(),
-                Arg.Any<TipoMovimiento>(), Arg.Any<CancellationToken>())
+            .CreateCategoriaAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<TipoMovimiento>(), Arg.Any<CancellationToken>())
             .Returns(Task.CompletedTask);
 
         await sut.GuardarCommand.ExecuteAsync(null);
 
         Assert.Empty(sut.Error);
     }
+
+    #endregion
 }

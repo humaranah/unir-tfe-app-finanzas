@@ -7,7 +7,7 @@ using HA.TFG.AppFinanzas.Core.ViewModels;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 
-namespace HA.TFG.AppFinanzas.App.UnitTests.ViewModels;
+namespace HA.TFG.AppFinanzas.Core.Tests.ViewModels;
 
 public class MovimientosViewModelTests
 {
@@ -37,7 +37,7 @@ public class MovimientosViewModelTests
         FechaMovimiento = fecha
     };
 
-    // ── Estado inicial ────────────────────────────────────────────────────────
+    #region Estado inicial
 
     [Fact]
     public void Constructor_InitialState_MatchesExpectedSnapshot()
@@ -54,11 +54,12 @@ public class MovimientosViewModelTests
             () => Assert.Equal(now.Month, sut.Fecha.Month),
             () => Assert.True(sut.SinMovimientos),
             () => Assert.False(sut.HasMovimientos),
-            () => Assert.False(sut.HasError)
-        );
+            () => Assert.False(sut.HasError));
     }
 
-    // ── SinMovimientos / HasMovimientos ───────────────────────────────────────
+    #endregion
+
+    #region SinMovimientos / HasMovimientos
 
     [Fact]
     public async Task CargarMovimientosAsync_WhenMovimientosLoaded_UpdatesMovimientosFlags()
@@ -72,8 +73,7 @@ public class MovimientosViewModelTests
 
         Assert.Multiple(
             () => Assert.False(sut.SinMovimientos),
-            () => Assert.True(sut.HasMovimientos)
-        );
+            () => Assert.True(sut.HasMovimientos));
     }
 
     [Fact]
@@ -86,11 +86,12 @@ public class MovimientosViewModelTests
 
         Assert.Multiple(
             () => Assert.False(sut.SinMovimientos),
-            () => Assert.False(sut.HasMovimientos)
-        );
+            () => Assert.False(sut.HasMovimientos));
     }
 
-    // ── HasError ──────────────────────────────────────────────────────────────
+    #endregion
+
+    #region HasError
 
     [Fact]
     public async Task HasError_WhenServiceThrows_IsTrue()
@@ -122,7 +123,9 @@ public class MovimientosViewModelTests
         Assert.False(sut.HasError);
     }
 
-    // ── CargarMovimientosAsync ────────────────────────────────────────────────
+    #endregion
+
+    #region CargarMovimientosAsync
 
     [Fact]
     public async Task CargarMovimientosAsync_WhenNoCuenta_MovimientosIsEmpty()
@@ -149,8 +152,7 @@ public class MovimientosViewModelTests
         Assert.Multiple(
             () => Assert.NotEmpty(sut.Movimientos),
             () => Assert.Equal(2, sut.Movimientos.Sum(g => g.Count())),
-            () => Assert.False(sut.IsBusy)
-        );
+            () => Assert.False(sut.IsBusy));
     }
 
     [Fact]
@@ -177,8 +179,7 @@ public class MovimientosViewModelTests
         Assert.Multiple(
             () => Assert.Equal("Error de red", sut.Error),
             () => Assert.True(sut.HasError),
-            () => Assert.False(sut.IsBusy)
-        );
+            () => Assert.False(sut.IsBusy));
     }
 
     [Fact]
@@ -205,8 +206,7 @@ public class MovimientosViewModelTests
         var primerDia = new DateOnly(ahora.Year, ahora.Month, 1);
         var ultimoDia = new DateOnly(ahora.Year, ahora.Month, DateTime.DaysInMonth(ahora.Year, ahora.Month));
         ConfigurarCuenta();
-        _movimientosService.GetMovimientosAsync(IdCuenta, Arg.Any<GetMovimientosFilters?>())
-            .Returns([]);
+        _movimientosService.GetMovimientosAsync(IdCuenta, Arg.Any<GetMovimientosFilters?>()).Returns([]);
 
         var sut = CreateSut();
         await sut.CargarMovimientosAsync();
@@ -217,14 +217,15 @@ public class MovimientosViewModelTests
                 f != null && f.FechaDesde == primerDia && f.FechaHasta == ultimoDia));
     }
 
-    // ── Navegación de meses ───────────────────────────────────────────────────
+    #endregion
+
+    #region Navegación de meses
 
     [Fact]
     public async Task AnteriorCommand_DecrementsFechaByOneMonth()
     {
         ConfigurarCuenta();
-        _movimientosService.GetMovimientosAsync(IdCuenta, Arg.Any<GetMovimientosFilters?>())
-            .Returns([]);
+        _movimientosService.GetMovimientosAsync(IdCuenta, Arg.Any<GetMovimientosFilters?>()).Returns([]);
 
         var sut = CreateSut();
         var fechaInicial = sut.Fecha;
@@ -237,8 +238,7 @@ public class MovimientosViewModelTests
     public async Task SiguienteCommand_IncrementsFechaByOneMonth()
     {
         ConfigurarCuenta();
-        _movimientosService.GetMovimientosAsync(IdCuenta, Arg.Any<GetMovimientosFilters?>())
-            .Returns([]);
+        _movimientosService.GetMovimientosAsync(IdCuenta, Arg.Any<GetMovimientosFilters?>()).Returns([]);
 
         var sut = CreateSut();
         sut.Fecha = DateTime.Now.AddMonths(-2);
@@ -251,17 +251,17 @@ public class MovimientosViewModelTests
     public async Task AnteriorCommand_ReloadsMovimientos()
     {
         ConfigurarCuenta();
-        _movimientosService.GetMovimientosAsync(IdCuenta, Arg.Any<GetMovimientosFilters?>())
-            .Returns([]);
+        _movimientosService.GetMovimientosAsync(IdCuenta, Arg.Any<GetMovimientosFilters?>()).Returns([]);
 
         var sut = CreateSut();
         await sut.AnteriorCommand.ExecuteAsync(null);
 
-        await _movimientosService.Received().GetMovimientosAsync(
-            IdCuenta, Arg.Any<GetMovimientosFilters?>());
+        await _movimientosService.Received().GetMovimientosAsync(IdCuenta, Arg.Any<GetMovimientosFilters?>());
     }
 
-    // ── Propiedades calculadas ────────────────────────────────────────────────
+    #endregion
+
+    #region Propiedades calculadas
 
     [Fact]
     public void Mes_ReturnsFormattedCurrentMonth()
@@ -301,21 +301,21 @@ public class MovimientosViewModelTests
         Assert.True(sut.IsSiguienteEnabled);
     }
 
-    // ── NuevoMovimientoCommand ────────────────────────────────────────────────
+    #endregion
+
+    #region NuevoMovimientoCommand
 
     [Fact]
     public async Task NuevoMovimientoCommand_WhenCuentaLoaded_NavigatesToCrearMovimientoWithCorrectId()
     {
         ConfigurarCuenta();
-        _movimientosService.GetMovimientosAsync(IdCuenta, Arg.Any<GetMovimientosFilters?>())
-            .Returns([]);
+        _movimientosService.GetMovimientosAsync(IdCuenta, Arg.Any<GetMovimientosFilters?>()).Returns([]);
 
         var sut = CreateSut();
         await sut.CargarMovimientosAsync();
         await sut.NuevoMovimientoCommand.ExecuteAsync(null);
 
-        await _navigationService.Received(1).GoToAsync(
-            $"crear-movimiento?idCuenta={IdCuenta}");
+        await _navigationService.Received(1).GoToAsync($"crear-movimiento?idCuenta={IdCuenta}");
     }
 
     [Fact]
@@ -328,24 +328,23 @@ public class MovimientosViewModelTests
         await _navigationService.DidNotReceive().GoToAsync(Arg.Any<string>());
     }
 
-    // ── Eliminar movimiento ────────────────────────────────────────────────
+    #endregion
+
+    #region EliminarMovimientoCommand
 
     [Fact]
     public async Task EliminarMovimientoCommand_WhenExecuted_CallsDeleteService()
     {
         var movimiento = CrearMovimiento(DateOnly.FromDateTime(DateTime.Now));
         ConfigurarCuenta();
-        _movimientosService.GetMovimientosAsync(IdCuenta, Arg.Any<GetMovimientosFilters?>())
-            .Returns([movimiento]);
+        _movimientosService.GetMovimientosAsync(IdCuenta, Arg.Any<GetMovimientosFilters?>()).Returns([movimiento]);
         _confirmationService.ConfirmAsync(Arg.Any<string>(), Arg.Any<string>()).Returns(true);
 
         var sut = CreateSut();
         await sut.CargarMovimientosAsync();
         await sut.EliminarMovimientoCommand.ExecuteAsync(movimiento);
 
-        await _movimientosService.Received(1).DeleteMovimientoAsync(
-            movimiento.IdCuenta,
-            movimiento.IdMovimiento);
+        await _movimientosService.Received(1).DeleteMovimientoAsync(movimiento.IdCuenta, movimiento.IdMovimiento);
     }
 
     [Fact]
@@ -353,8 +352,7 @@ public class MovimientosViewModelTests
     {
         var movimiento = CrearMovimiento(DateOnly.FromDateTime(DateTime.Now));
         ConfigurarCuenta();
-        _movimientosService.GetMovimientosAsync(IdCuenta, Arg.Any<GetMovimientosFilters?>())
-            .Returns([movimiento]);
+        _movimientosService.GetMovimientosAsync(IdCuenta, Arg.Any<GetMovimientosFilters?>()).Returns([movimiento]);
         _confirmationService.ConfirmAsync(Arg.Any<string>(), Arg.Any<string>()).Returns(true);
 
         var sut = CreateSut();
@@ -369,11 +367,9 @@ public class MovimientosViewModelTests
     {
         var movimiento = CrearMovimiento(DateOnly.FromDateTime(DateTime.Now));
         ConfigurarCuenta();
-        _movimientosService.GetMovimientosAsync(IdCuenta, Arg.Any<GetMovimientosFilters?>())
-            .Returns([movimiento]);
+        _movimientosService.GetMovimientosAsync(IdCuenta, Arg.Any<GetMovimientosFilters?>()).Returns([movimiento]);
         _confirmationService.ConfirmAsync(Arg.Any<string>(), Arg.Any<string>()).Returns(true);
-        _movimientosService.DeleteMovimientoAsync(Arg.Any<Guid>(), Arg.Any<Guid>())
-            .Throws<Exception>();
+        _movimientosService.DeleteMovimientoAsync(Arg.Any<Guid>(), Arg.Any<Guid>()).Throws<Exception>();
 
         var sut = CreateSut();
         await sut.CargarMovimientosAsync();
@@ -381,5 +377,6 @@ public class MovimientosViewModelTests
 
         Assert.Equal("No se pudo eliminar el movimiento. Inténtalo de nuevo.", sut.Error);
     }
-}
 
+    #endregion
+}

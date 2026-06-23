@@ -1,13 +1,14 @@
 using Auth0.OidcClient;
 using Duende.IdentityModel.OidcClient.Results;
 using HA.TFG.AppFinanzas.Core.Authentication;
+using HA.TFG.AppFinanzas.Infrastructure.Services;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
 
-namespace HA.TFG.AppFinanzas.App.UnitTests.Authentication;
+namespace HA.TFG.AppFinanzas.Infrastructure.Tests.Services;
 
 public class UsuarioServiceTests
 {
@@ -18,8 +19,6 @@ public class UsuarioServiceTests
 
     private UsuarioService CreateSut() =>
         new(_auth0Client, _sessionStore, _ensureService, _healthService);
-
-    // ── Helpers ────────────────────────────────────────────────────────────────
 
     private static string BuildIdToken(string nombre = "Hugo", string email = "hugo@test.com")
     {
@@ -59,7 +58,7 @@ public class UsuarioServiceTests
         }
     }
 
-    // ── TryRestoreSessionAsync: sin token ─────────────────────────────────────
+    #region TryRestoreSessionAsync — sin token
 
     [Fact]
     public async Task TryRestoreSessionAsync_WhenNoToken_ReturnsNull()
@@ -72,7 +71,9 @@ public class UsuarioServiceTests
         await _auth0Client.DidNotReceive().RefreshTokenAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
     }
 
-    // ── TryRestoreSessionAsync: refresh falla ────────────────────────────────
+    #endregion
+
+    #region TryRestoreSessionAsync — refresh falla
 
     [Fact]
     public async Task TryRestoreSessionAsync_WhenRefreshFails_ClearsSessionAndReturnsNull()
@@ -87,7 +88,9 @@ public class UsuarioServiceTests
         await _sessionStore.Received(1).ClearAsync();
     }
 
-    // ── TryRestoreSessionAsync: backend no disponible ─────────────────────────
+    #endregion
+
+    #region TryRestoreSessionAsync — backend no disponible
 
     [Fact]
     public async Task TryRestoreSessionAsync_WhenBackendUnavailable_ReturnsInfoWithoutCallingEnsure()
@@ -117,7 +120,9 @@ public class UsuarioServiceTests
         await _sessionStore.DidNotReceive().ClearAsync();
     }
 
-    // ── TryRestoreSessionAsync: backend disponible, Ensure falla ─────────────
+    #endregion
+
+    #region TryRestoreSessionAsync — backend disponible, Ensure falla
 
     [Fact]
     public async Task TryRestoreSessionAsync_WhenEnsureFails_ClearsSessionAndReturnsNull()
@@ -135,7 +140,9 @@ public class UsuarioServiceTests
         await _sessionStore.Received(1).ClearAsync();
     }
 
-    // ── TryRestoreSessionAsync: éxito completo ────────────────────────────────
+    #endregion
+
+    #region TryRestoreSessionAsync — éxito completo
 
     [Fact]
     public async Task TryRestoreSessionAsync_WhenSuccessful_ReturnsUserInfo()
@@ -165,4 +172,6 @@ public class UsuarioServiceTests
         await _sessionStore.Received(1).SaveRefreshTokenAsync("rt_new");
         await _sessionStore.Received(1).SaveAccessTokenAsync("at_new");
     }
+
+    #endregion
 }

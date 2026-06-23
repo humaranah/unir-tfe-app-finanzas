@@ -7,7 +7,7 @@ using HA.TFG.AppFinanzas.Core.ViewModels;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 
-namespace HA.TFG.AppFinanzas.App.UnitTests.ViewModels;
+namespace HA.TFG.AppFinanzas.Core.Tests.ViewModels;
 
 public class MovimientoViewModelTests
 {
@@ -38,7 +38,7 @@ public class MovimientoViewModelTests
         return sut;
     }
 
-    // ── Estado inicial ────────────────────────────────────────────────────────
+    #region Estado inicial
 
     [Fact]
     public void Constructor_InitialState_MatchesExpectedSnapshot()
@@ -54,11 +54,12 @@ public class MovimientoViewModelTests
             () => Assert.False(sut.IsBusy),
             () => Assert.Null(sut.CategoriaSeleccionada),
             () => Assert.Equal(MonedasHelper.DefaultMoneda, sut.MonedaSeleccionada),
-            () => Assert.Equal([TipoMovimiento.Gasto, TipoMovimiento.Ingreso, TipoMovimiento.Transferencia], sut.Tipos)
-        );
+            () => Assert.Equal([TipoMovimiento.Gasto, TipoMovimiento.Ingreso, TipoMovimiento.Transferencia], sut.Tipos));
     }
 
-    // ── Reset ─────────────────────────────────────────────────────────────────
+    #endregion
+
+    #region Reset
 
     [Fact]
     public void Reset_ClearsAllFields()
@@ -80,11 +81,12 @@ public class MovimientoViewModelTests
             () => Assert.Equal(DateTime.Today, sut.Fecha),
             () => Assert.Equal(string.Empty, sut.Error),
             () => Assert.Null(sut.CategoriaSeleccionada),
-            () => Assert.Equal(MonedasHelper.DefaultMoneda, sut.MonedaSeleccionada)
-        );
+            () => Assert.Equal(MonedasHelper.DefaultMoneda, sut.MonedaSeleccionada));
     }
 
-    // ── CategoriasFiltradas ───────────────────────────────────────────────────
+    #endregion
+
+    #region CategoriasFiltradas
 
     [Fact]
     public async Task IdCuenta_WhenSet_CargaCategoriasDesdeServicio()
@@ -111,7 +113,6 @@ public class MovimientoViewModelTests
         var sut = CreateSut();
         sut.IdCuenta = IdCuenta;
         await sut.CargandoCategoriasTask;
-
         sut.TipoSeleccionado = TipoMovimiento.Gasto;
 
         Assert.Equal([gastoId], sut.CategoriasFiltradas.Select(c => c.IdCuentaCategoria));
@@ -129,13 +130,14 @@ public class MovimientoViewModelTests
         var sut = CreateSut();
         sut.IdCuenta = IdCuenta;
         await sut.CargandoCategoriasTask;
-
         sut.TipoSeleccionado = TipoMovimiento.Ingreso;
 
         Assert.Equal(["Nómina"], sut.CategoriasFiltradas.Select(c => c.Nombre));
     }
 
-    // ── CargarMovimientoAsync ─────────────────────────────────────────────────
+    #endregion
+
+    #region CargarMovimientoAsync
 
     [Fact]
     public async Task CargarMovimientoAsync_WhenSuccessful_EntersEditModeAndPopulatesFields()
@@ -175,8 +177,7 @@ public class MovimientoViewModelTests
             () => Assert.Equal(fechaMovimiento.Date, sut.Fecha),
             () => Assert.Equal(fechaMovimiento.TimeOfDay, sut.Hora),
             () => Assert.Equal(categoriaId, sut.CategoriaSeleccionada?.IdCuentaCategoria),
-            () => Assert.Null(sut.Comprobante)
-        );
+            () => Assert.Null(sut.Comprobante));
     }
 
     [Fact]
@@ -191,11 +192,12 @@ public class MovimientoViewModelTests
 
         Assert.Multiple(
             () => Assert.Equal("No se pudo cargar el movimiento. Inténtalo de nuevo.", sut.Error),
-            () => Assert.False(sut.IsBusy)
-        );
+            () => Assert.False(sut.IsBusy));
     }
 
-    // ── GuardarMovimientoCommand (crear) ──────────────────────────────────────
+    #endregion
+
+    #region GuardarMovimientoCommand — crear
 
     [Fact]
     public async Task GuardarMovimientoAsync_WhenSuccessful_CallsServiceAndNavigatesBack()
@@ -249,8 +251,7 @@ public class MovimientoViewModelTests
 
         Assert.Multiple(
             () => Assert.NotEmpty(sut.Error),
-            () => Assert.False(sut.IsBusy)
-        );
+            () => Assert.False(sut.IsBusy));
         await _navigationService.DidNotReceive().GoBackAsync();
     }
 
@@ -262,17 +263,19 @@ public class MovimientoViewModelTests
             .ThrowsAsyncForAnyArgs(new HttpRequestException("Error"));
 
         var sut = CreateSutWithValidForm();
-        await sut.GuardarMovimientoCommand.ExecuteAsync(null); // primer intento fallido
+        await sut.GuardarMovimientoCommand.ExecuteAsync(null);
 
         _movimientosService
             .CreateMovimientoAsync(Arg.Any<CreateMovimientoDto>())
             .ReturnsForAnyArgs(Task.CompletedTask);
-        await sut.GuardarMovimientoCommand.ExecuteAsync(null); // segundo intento exitoso
+        await sut.GuardarMovimientoCommand.ExecuteAsync(null);
 
         Assert.Equal(string.Empty, sut.Error);
     }
 
-    // ── GuardarMovimientoCommand (editar) ─────────────────────────────────────
+    #endregion
+
+    #region GuardarMovimientoCommand — editar
 
     [Fact]
     public async Task GuardarMovimientoAsync_WhenEditSuccessful_CallsUpdateAndNavigatesBack()
@@ -311,7 +314,9 @@ public class MovimientoViewModelTests
         await _navigationService.Received(1).GoBackAsync();
     }
 
-    // ── Comprobante ───────────────────────────────────────────────────────────
+    #endregion
+
+    #region Comprobante
 
     [Fact]
     public async Task OpenComprobanteOptionsCommand_WhenUserSelectsFile_SetsComprobante()
@@ -404,11 +409,12 @@ public class MovimientoViewModelTests
             () => Assert.Equal("12.30", sut.ImporteTexto),
             () => Assert.Equal(TipoMovimiento.Gasto, sut.TipoSeleccionado),
             () => Assert.Equal(categoriaId, sut.CategoriaSeleccionada?.IdCuentaCategoria),
-            () => Assert.False(sut.IsBusy)
-        );
+            () => Assert.False(sut.IsBusy));
     }
 
-    // ── CancelCommand ─────────────────────────────────────────────────────────
+    #endregion
+
+    #region CancelCommand
 
     [Fact]
     public async Task CancelCommand_NavigatesBack()
@@ -419,4 +425,6 @@ public class MovimientoViewModelTests
 
         await _navigationService.Received(1).GoBackAsync();
     }
+
+    #endregion
 }

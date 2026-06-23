@@ -6,7 +6,7 @@ using HA.TFG.AppFinanzas.Core.ViewModels;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 
-namespace HA.TFG.AppFinanzas.App.UnitTests.ViewModels;
+namespace HA.TFG.AppFinanzas.Core.Tests.ViewModels;
 
 public class CategoriasViewModelTests
 {
@@ -30,7 +30,7 @@ public class CategoriasViewModelTests
         TipoMovimiento = tipo
     };
 
-    // ── Estado inicial ────────────────────────────────────────────────────────
+    #region Estado inicial
 
     [Fact]
     public void Constructor_InitialState_MatchesExpectedSnapshot()
@@ -44,11 +44,12 @@ public class CategoriasViewModelTests
             () => Assert.Equal(string.Empty, sut.NombreCuenta),
             () => Assert.True(sut.SinCategorias),
             () => Assert.False(sut.HasCategorias),
-            () => Assert.False(sut.HasError)
-        );
+            () => Assert.False(sut.HasError));
     }
 
-    // ── SinCategorias / HasCategorias ─────────────────────────────────────────
+    #endregion
+
+    #region SinCategorias / HasCategorias
 
     [Fact]
     public async Task CargarCategoriasAsync_WhenCategoriasLoaded_UpdatesCategoriasFlags()
@@ -62,8 +63,7 @@ public class CategoriasViewModelTests
 
         Assert.Multiple(
             () => Assert.False(sut.SinCategorias),
-            () => Assert.True(sut.HasCategorias)
-        );
+            () => Assert.True(sut.HasCategorias));
     }
 
     [Fact]
@@ -76,11 +76,12 @@ public class CategoriasViewModelTests
 
         Assert.Multiple(
             () => Assert.False(sut.SinCategorias),
-            () => Assert.False(sut.HasCategorias)
-        );
+            () => Assert.False(sut.HasCategorias));
     }
 
-    // ── HasError ──────────────────────────────────────────────────────────────
+    #endregion
+
+    #region HasError
 
     [Fact]
     public async Task HasError_WhenServiceThrows_IsTrue()
@@ -105,7 +106,9 @@ public class CategoriasViewModelTests
         Assert.False(sut.HasError);
     }
 
-    // ── NombreCuenta ──────────────────────────────────────────────────────────
+    #endregion
+
+    #region NombreCuenta
 
     [Fact]
     public async Task CargarCategoriasAsync_WhenCuentaLoaded_SetsNombreCuenta()
@@ -119,7 +122,9 @@ public class CategoriasViewModelTests
         Assert.Equal("Cuenta personal", sut.NombreCuenta);
     }
 
-    // ── Sin cuenta ────────────────────────────────────────────────────────────
+    #endregion
+
+    #region Sin cuenta
 
     [Fact]
     public async Task CargarCategoriasAsync_WhenNoCuenta_CategoriasSinCategorias()
@@ -132,11 +137,12 @@ public class CategoriasViewModelTests
         Assert.Multiple(
             () => Assert.Empty(sut.Categorias),
             () => Assert.True(sut.SinCategorias),
-            () => Assert.False(sut.HasError)
-        );
+            () => Assert.False(sut.HasError));
     }
 
-    // ── Ordenación ───────────────────────────────────────────────────────────
+    #endregion
+
+    #region Ordenación
 
     [Fact]
     public async Task CargarCategoriasAsync_WhenMultipleCategorias_SortsbyTipoThenNombre()
@@ -157,7 +163,9 @@ public class CategoriasViewModelTests
         Assert.Equal(["Inversión", "Sueldo", "Alimentación", "Transporte"], nombres);
     }
 
-    // ── IsBusy ───────────────────────────────────────────────────────────────
+    #endregion
+
+    #region IsBusy
 
     [Fact]
     public async Task CargarCategoriasAsync_AfterCompletion_IsBusyIsFalse()
@@ -181,4 +189,6 @@ public class CategoriasViewModelTests
 
         Assert.False(sut.IsBusy);
     }
+
+    #endregion
 }

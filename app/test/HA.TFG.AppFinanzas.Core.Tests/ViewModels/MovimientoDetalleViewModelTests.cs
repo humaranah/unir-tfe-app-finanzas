@@ -8,7 +8,7 @@ using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using System.Globalization;
 
-namespace HA.TFG.AppFinanzas.App.UnitTests.ViewModels;
+namespace HA.TFG.AppFinanzas.Core.Tests.ViewModels;
 
 public class MovimientoDetalleViewModelTests
 {
@@ -48,15 +48,11 @@ public class MovimientoDetalleViewModelTests
 
     private void ConfigurarServiciosOk(MovimientoDetalleItem? detalle = null)
     {
-        _movimientosService
-            .GetMovimientoDetalleAsync(IdCuenta, IdMovimiento)
-            .Returns(detalle ?? DetalleDefault);
-        _cuentasService
-            .GetCategoriasAsync(IdCuenta)
-            .Returns([CategoriaDefault]);
+        _movimientosService.GetMovimientoDetalleAsync(IdCuenta, IdMovimiento).Returns(detalle ?? DetalleDefault);
+        _cuentasService.GetCategoriasAsync(IdCuenta).Returns([CategoriaDefault]);
     }
 
-    // ── Estado inicial ────────────────────────────────────────────────────────
+    #region Estado inicial
 
     [Fact]
     public void Constructor_InitialState_MatchesExpectedSnapshot()
@@ -76,11 +72,12 @@ public class MovimientoDetalleViewModelTests
             () => Assert.False(sut.TieneNota),
             () => Assert.False(sut.TieneComprobante),
             () => Assert.False(sut.IsBusyComprobante),
-            () => Assert.True(sut.IsNotBusyComprobante)
-        );
+            () => Assert.True(sut.IsNotBusyComprobante));
     }
 
-    // ── CargarDetalleAsync – happy path ──────────────────────────────────────
+    #endregion
+
+    #region CargarDetalleAsync — happy path
 
     [Fact]
     public async Task CargarDetalleAsync_CuandoExito_PopulaTodasLasPropiedades()
@@ -104,8 +101,7 @@ public class MovimientoDetalleViewModelTests
             () => Assert.False(sut.TieneComprobante),
             () => Assert.Equal(string.Empty, sut.Error),
             () => Assert.False(sut.IsBusy),
-            () => Assert.True(sut.HasDetalle)
-        );
+            () => Assert.True(sut.HasDetalle));
     }
 
     [Fact]
@@ -143,19 +139,18 @@ public class MovimientoDetalleViewModelTests
 
         Assert.Multiple(
             () => Assert.False(sut.TieneEstablecimiento),
-            () => Assert.False(sut.TieneNota)
-        );
+            () => Assert.False(sut.TieneNota));
     }
 
-    // ── IsBusy ────────────────────────────────────────────────────────────────
+    #endregion
+
+    #region IsBusy
 
     [Fact]
     public async Task CargarDetalleAsync_MientrasEjecuta_IsBusyEsTrue()
     {
         var tcs = new TaskCompletionSource<MovimientoDetalleItem>();
-        _movimientosService
-            .GetMovimientoDetalleAsync(IdCuenta, IdMovimiento)
-            .Returns(tcs.Task);
+        _movimientosService.GetMovimientoDetalleAsync(IdCuenta, IdMovimiento).Returns(tcs.Task);
 
         var sut = CreateSut();
         var cargandoTask = sut.CargarDetalleAsync(IdCuenta, IdMovimiento);
@@ -166,8 +161,9 @@ public class MovimientoDetalleViewModelTests
         await cargandoTask;
     }
 
+    #endregion
 
-    // ── Error ─────────────────────────────────────────────────────────────────
+    #region Error
 
     [Fact]
     public async Task CargarDetalleAsync_CuandoServicioLanzaExcepcion_SetError()
@@ -183,11 +179,12 @@ public class MovimientoDetalleViewModelTests
             () => Assert.True(sut.HasError),
             () => Assert.NotEmpty(sut.Error),
             () => Assert.False(sut.IsBusy),
-            () => Assert.False(sut.HasDetalle)
-        );
+            () => Assert.False(sut.HasDetalle));
     }
 
-    // ── ImporteFormateado ─────────────────────────────────────────────────────
+    #endregion
+
+    #region ImporteFormateado
 
     [Theory]
     [InlineData(TipoMovimiento.Gasto, 10.0, "EUR")]
@@ -214,12 +211,8 @@ public class MovimientoDetalleViewModelTests
             Moneda = moneda,
             FechaMovimiento = DateTime.Today
         };
-        _movimientosService
-            .GetMovimientoDetalleAsync(IdCuenta, IdMovimiento)
-            .Returns(detalle);
-        _cuentasService
-            .GetCategoriasAsync(IdCuenta)
-            .Returns([]);
+        _movimientosService.GetMovimientoDetalleAsync(IdCuenta, IdMovimiento).Returns(detalle);
+        _cuentasService.GetCategoriasAsync(IdCuenta).Returns([]);
 
         var sut = CreateSut();
         await sut.CargarDetalleAsync(IdCuenta, IdMovimiento);
@@ -227,7 +220,9 @@ public class MovimientoDetalleViewModelTests
         Assert.Equal(esperado, sut.ImporteFormateado, StringComparer.InvariantCulture);
     }
 
-    // ── MostrarHora ───────────────────────────────────────────────────────────
+    #endregion
+
+    #region MostrarHora
 
     [Fact]
     public async Task MostrarHora_CuandoHoraEsCero_EsFalse()
@@ -252,7 +247,9 @@ public class MovimientoDetalleViewModelTests
         Assert.True(sut.MostrarHora);
     }
 
-    // ── VerComprobante ────────────────────────────────────────────────────────
+    #endregion
+
+    #region VerComprobante
 
     [Fact]
     public async Task CargarDetalleAsync_CuandoMovimientoTieneComprobante_TieneComprobanteEsTrue()
@@ -273,8 +270,7 @@ public class MovimientoDetalleViewModelTests
         _movimientosService
             .GetComprobanteAsync(Arg.Is(IdCuenta), Arg.Is(IdMovimiento), Arg.Any<CancellationToken>())
             .Returns(comprobante);
-        var detalleConComprobante = DetalleDefault with { TieneComprobante = true };
-        ConfigurarServiciosOk(detalleConComprobante);
+        ConfigurarServiciosOk(DetalleDefault with { TieneComprobante = true });
         var sut = CreateSut();
         await sut.CargarDetalleAsync(IdCuenta, IdMovimiento);
 
@@ -286,16 +282,15 @@ public class MovimientoDetalleViewModelTests
     [Fact]
     public async Task VerComprobanteCommand_CuandoServicioDevuelveNull_NoLlamaViewerService()
     {
-        _movimientosService
-            .GetComprobanteAsync(IdCuenta, IdMovimiento)
-            .Returns((ComprobanteResult?)null);
+        _movimientosService.GetComprobanteAsync(IdCuenta, IdMovimiento).Returns((ComprobanteResult?)null);
         ConfigurarServiciosOk(DetalleDefault with { TieneComprobante = true });
         var sut = CreateSut();
         await sut.CargarDetalleAsync(IdCuenta, IdMovimiento);
 
         await sut.VerComprobanteCommand.ExecuteAsync(CancellationToken.None);
 
-        await _comprobanteViewerService.DidNotReceive().AbrirComprobanteAsync(Arg.Any<ComprobanteResult>(), Arg.Any<CancellationToken>());
+        await _comprobanteViewerService.DidNotReceive()
+            .AbrirComprobanteAsync(Arg.Any<ComprobanteResult>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -312,11 +307,12 @@ public class MovimientoDetalleViewModelTests
 
         Assert.Multiple(
             () => Assert.NotEmpty(sut.Error),
-            () => Assert.False(sut.IsBusyComprobante)
-        );
+            () => Assert.False(sut.IsBusyComprobante));
     }
 
-    // ── Navegación ────────────────────────────────────────────────────────────
+    #endregion
+
+    #region Navegación
 
     [Fact]
     public async Task EditarMovimientoCommand_NavegaAEditarMovimientoConParametrosCorrectos()
@@ -341,7 +337,9 @@ public class MovimientoDetalleViewModelTests
         await _navigationService.Received(1).GoBackAsync();
     }
 
-    // ── Eliminar movimiento ────────────────────────────────────────────────
+    #endregion
+
+    #region Eliminar movimiento
 
     [Fact]
     public async Task EliminarMovimientoCommand_WhenExecuted_CallsDeleteService()
@@ -374,17 +372,16 @@ public class MovimientoDetalleViewModelTests
     {
         ConfigurarServiciosOk();
         _confirmationService.ConfirmAsync(Arg.Any<string>(), Arg.Any<string>()).Returns(true);
-        _movimientosService.DeleteMovimientoAsync(Arg.Any<Guid>(), Arg.Any<Guid>())
-            .Throws<Exception>();
-
+        _movimientosService.DeleteMovimientoAsync(Arg.Any<Guid>(), Arg.Any<Guid>()).Throws<Exception>();
         var sut = CreateSut();
         await sut.CargarDetalleAsync(IdCuenta, IdMovimiento);
+
         await sut.EliminarMovimientoCommand.ExecuteAsync(null);
 
         Assert.Multiple(
             () => Assert.Equal("No se pudo eliminar el movimiento. Inténtalo de nuevo.", sut.Error),
-            () => Assert.False(sut.IsBusy)
-        );
+            () => Assert.False(sut.IsBusy));
     }
-}
 
+    #endregion
+}

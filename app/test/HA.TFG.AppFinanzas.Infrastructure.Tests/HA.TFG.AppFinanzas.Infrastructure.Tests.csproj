@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -8,7 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Auth0.OidcClient.Core" Version="4.2.0" />
     <PackageReference Include="coverlet.collector" Version="6.0.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -24,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\source\HA.TFG.AppFinanzas.Core\HA.TFG.AppFinanzas.Core.csproj" />
+    <ProjectReference Include="..\..\source\HA.TFG.AppFinanzas.Infrastructure\HA.TFG.AppFinanzas.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>
