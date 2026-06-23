@@ -7,31 +7,6 @@ using System.Text.Json.Serialization;
 
 namespace HA.TFG.AppFinanzas.Infrastructure.Clients;
 
-public sealed record MovimientoResponse(
-    Guid IdMovimiento,
-    Guid IdCuenta,
-    Guid? IdCategoria,
-    string? NombreCategoria,
-    TipoMovimiento TipoMovimiento,
-    string Concepto,
-    decimal Importe,
-    string Moneda,
-    DateOnly FechaMovimiento);
-
-public sealed record MovimientoDetalleResponse(
-    Guid IdMovimiento,
-    Guid IdCuenta,
-    Guid IdCuentaCategoria,
-    string? NombreCategoria,
-    TipoMovimiento TipoMovimiento,
-    string Concepto,
-    string? Establecimiento,
-    decimal Importe,
-    string Moneda,
-    string? IdComprobante,
-    string Nota,
-    DateTime FechaMovimiento);
-
 public sealed class MovimientosApiClient(IHttpClientFactory httpClientFactory) : IMovimientosService
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)

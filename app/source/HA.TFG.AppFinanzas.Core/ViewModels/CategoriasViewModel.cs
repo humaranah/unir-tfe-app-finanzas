@@ -117,10 +117,3 @@ public partial class CategoriasViewModel(
         }
     }
 }
-
-public sealed record CategoriaFilaItem(CategoriaItem Categoria, bool IsEven)
-{
-    public Guid IdCuentaCategoria => Categoria.IdCuentaCategoria;
-    public string Nombre => Categoria.Nombre;
-    public TipoMovimiento TipoMovimiento => Categoria.TipoMovimiento;
-}

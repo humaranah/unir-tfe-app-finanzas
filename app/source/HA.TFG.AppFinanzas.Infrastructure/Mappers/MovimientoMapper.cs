@@ -5,7 +5,7 @@ using Riok.Mapperly.Abstractions;
 namespace HA.TFG.AppFinanzas.Infrastructure.Mappers;
 
 [Mapper]
-public static partial class MovimientoMapper
+internal static partial class MovimientoMapper
 {
-    public static partial MovimientoItem ToMovimientoItem(MovimientoResponse response);
+    internal static partial MovimientoItem ToMovimientoItem(MovimientoResponse response);
 }
