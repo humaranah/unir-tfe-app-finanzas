@@ -2,6 +2,7 @@ using HA.TFG.AppFinanzas.Core.Cuentas;
 using HA.TFG.AppFinanzas.Core.Models.Enums;
 using HA.TFG.AppFinanzas.Core.Movimientos;
 using HA.TFG.AppFinanzas.Core.Navigation;
+using HA.TFG.AppFinanzas.Core.Tests.Fixtures;
 using HA.TFG.AppFinanzas.Core.Utilities;
 using HA.TFG.AppFinanzas.Core.ViewModels;
 using NSubstitute;
@@ -18,12 +19,9 @@ public class MovimientoViewModelTests
 
     private static readonly Guid IdCuenta = Guid.NewGuid();
 
-    private static readonly CategoriaItem CategoriaDefault = new()
-    {
-        IdCuentaCategoria = Guid.NewGuid(),
-        Nombre = "Alimentación",
-        TipoMovimiento = TipoMovimiento.Gasto
-    };
+    private static readonly CategoriaItem CategoriaDefault = TestDataBuilder.Categoria
+        .WithName("Alimentación")
+        .Build();
 
     private MovimientoViewModel CreateSut() =>
         new(_cuentasService, _movimientosService, _navigationService, _comprobantePickerService);

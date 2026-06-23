@@ -2,6 +2,7 @@ using HA.TFG.AppFinanzas.Core.Cuentas;
 using HA.TFG.AppFinanzas.Core.Models.Enums;
 using HA.TFG.AppFinanzas.Core.Navigation;
 using HA.TFG.AppFinanzas.Core.Services;
+using HA.TFG.AppFinanzas.Core.Tests.Fixtures;
 using HA.TFG.AppFinanzas.Core.ViewModels;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
@@ -22,13 +23,6 @@ public class CategoriasViewModelTests
 
     private void ConfigurarSinCuenta()
         => _cuentasService.GetDefaultCuentaAsync().Returns(((Guid?)null, (string?)null));
-
-    private static CategoriaItem CrearCategoria(string nombre, TipoMovimiento tipo) => new()
-    {
-        IdCuentaCategoria = Guid.NewGuid(),
-        Nombre = nombre,
-        TipoMovimiento = tipo
-    };
 
     #region Estado inicial
 
@@ -56,7 +50,7 @@ public class CategoriasViewModelTests
     {
         ConfigurarCuenta();
         _cuentasService.GetCategoriasAsync(IdCuenta)
-            .Returns([CrearCategoria("Alimentación", TipoMovimiento.Gasto)]);
+            .Returns([TestDataBuilder.Categoria.WithName("Alimentación").WithType(TipoMovimiento.Gasto).Build()]);
 
         var sut = CreateSut();
         await sut.CargarCategoriasAsync();
@@ -150,10 +144,10 @@ public class CategoriasViewModelTests
         ConfigurarCuenta();
         _cuentasService.GetCategoriasAsync(IdCuenta).Returns(
         [
-            CrearCategoria("Sueldo", TipoMovimiento.Ingreso),
-            CrearCategoria("Alimentación", TipoMovimiento.Gasto),
-            CrearCategoria("Transporte", TipoMovimiento.Gasto),
-            CrearCategoria("Inversión", TipoMovimiento.Ingreso),
+            TestDataBuilder.Categoria.WithName("Sueldo").WithType(TipoMovimiento.Ingreso).Build(),
+            TestDataBuilder.Categoria.WithName("Alimentación").WithType(TipoMovimiento.Gasto).Build(),
+            TestDataBuilder.Categoria.WithName("Transporte").WithType(TipoMovimiento.Gasto).Build(),
+            TestDataBuilder.Categoria.WithName("Inversión").WithType(TipoMovimiento.Ingreso).Build(),
         ]);
 
         var sut = CreateSut();

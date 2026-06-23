@@ -9,6 +9,12 @@ public class CategoriaItemBuilder
     private string _nombre = "Test Category";
     private TipoMovimiento _tipo = TipoMovimiento.Gasto;
 
+    public CategoriaItemBuilder WithIdCuentaCategoria(Guid id)
+    {
+        _idCuentaCategoria = id;
+        return this;
+    }
+
     public CategoriaItemBuilder WithName(string nombre)
     {
         _nombre = nombre;

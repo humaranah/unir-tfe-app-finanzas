@@ -15,6 +15,18 @@ public class MovimientoItemBuilder
     private string _moneda = "USD";
     private DateOnly _fecha = DateOnly.FromDateTime(DateTime.Now);
 
+    public MovimientoItemBuilder WithIdCuenta(Guid idCuenta)
+    {
+        _idCuenta = idCuenta;
+        return this;
+    }
+
+    public MovimientoItemBuilder WithMoneda(string moneda)
+    {
+        _moneda = moneda;
+        return this;
+    }
+
     public MovimientoItemBuilder WithConcept(string concepto)
     {
         _concepto = concepto;

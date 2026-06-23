@@ -3,6 +3,7 @@ using HA.TFG.AppFinanzas.Core.Models.Enums;
 using HA.TFG.AppFinanzas.Core.Movimientos;
 using HA.TFG.AppFinanzas.Core.Navigation;
 using HA.TFG.AppFinanzas.Core.Services;
+using HA.TFG.AppFinanzas.Core.Tests.Fixtures;
 using HA.TFG.AppFinanzas.Core.ViewModels;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
@@ -26,16 +27,13 @@ public class MovimientosViewModelTests
     private void ConfigurarSinCuenta()
         => _cuentasService.GetDefaultCuentaAsync().Returns((null, null));
 
-    private static MovimientoItem CrearMovimiento(DateOnly fecha, decimal importe = 10m) => new()
-    {
-        IdMovimiento = Guid.NewGuid(),
-        IdCuenta = IdCuenta,
-        Concepto = "Test",
-        Importe = importe,
-        Moneda = "EUR",
-        TipoMovimiento = TipoMovimiento.Gasto,
-        FechaMovimiento = fecha
-    };
+    private static MovimientoItem CrearMovimiento(DateOnly fecha, decimal importe = 10m)
+        => TestDataBuilder.Movimiento
+            .WithIdCuenta(IdCuenta)
+            .WithMoneda("EUR")
+            .WithDate(fecha)
+            .WithAmount(importe)
+            .Build();
 
     #region Estado inicial
 
