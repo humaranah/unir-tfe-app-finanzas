@@ -1,6 +1,7 @@
 ﻿using HA.TFG.AppFinanzas.App.Views.Pages;
-using HA.TFG.AppFinanzas.Core.Cuentas;
-using HA.TFG.AppFinanzas.Core.ViewModels;
+using HA.TFG.AppFinanzas.Core.Features.Cuentas;
+using HA.TFG.AppFinanzas.Core.Features.Authentication;
+using HA.TFG.AppFinanzas.Core.Features.Cuentas;
 using System.Diagnostics;
 
 namespace HA.TFG.AppFinanzas.App

@@ -1,7 +1,7 @@
-using HA.TFG.AppFinanzas.Core.Authentication;
+﻿using HA.TFG.AppFinanzas.Core.Features.Authentication;
 using HA.TFG.AppFinanzas.Core.Models;
 using HA.TFG.AppFinanzas.Core.Tests.Fixtures;
-using HA.TFG.AppFinanzas.Core.ViewModels;
+using HA.TFG.AppFinanzas.Core.Features.Authentication;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 

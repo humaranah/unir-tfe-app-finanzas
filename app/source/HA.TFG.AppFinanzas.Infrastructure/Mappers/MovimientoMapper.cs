@@ -1,4 +1,4 @@
-using HA.TFG.AppFinanzas.Core.Movimientos;
+﻿using HA.TFG.AppFinanzas.Core.Features.Movimientos.Models;
 using HA.TFG.AppFinanzas.Infrastructure.Clients;
 using Riok.Mapperly.Abstractions;
 

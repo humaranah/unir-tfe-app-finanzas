@@ -1,5 +1,5 @@
-using Auth0.OidcClient;
-using HA.TFG.AppFinanzas.Core.Authentication;
+﻿using Auth0.OidcClient;
+using HA.TFG.AppFinanzas.Core.Features.Authentication;
 using HA.TFG.AppFinanzas.Core.Models;
 using System.Buffers.Text;
 using System.Text;

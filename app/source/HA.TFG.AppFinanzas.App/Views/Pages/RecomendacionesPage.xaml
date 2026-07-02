@@ -1,9 +1,11 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:vm="clr-namespace:HA.TFG.AppFinanzas.Core.ViewModels;assembly=HA.TFG.AppFinanzas.Core"
+             xmlns:vm="clr-namespace:HA.TFG.AppFinanzas.Core.Features.Recomendaciones;assembly=HA.TFG.AppFinanzas.Core"
+             xmlns:recom="clr-namespace:HA.TFG.AppFinanzas.Core.Features.Recomendaciones;assembly=HA.TFG.AppFinanzas.Core"
              xmlns:markdown="clr-namespace:Indiko.Maui.Controls.Markdown;assembly=Indiko.Maui.Controls.Markdown"
              xmlns:controls="clr-namespace:HA.TFG.AppFinanzas.App.Views.Controls"
+             xmlns:selectors="clr-namespace:HA.TFG.AppFinanzas.App.Views.Selectors"
              x:DataType="vm:RecomendacionesViewModel"
              x:Class="HA.TFG.AppFinanzas.App.Views.Pages.RecomendacionesPage"
              Title="Recomendaciones">
@@ -14,28 +16,57 @@
         </Grid>
     </Shell.TitleView>
 
+    <ContentPage.Resources>
+        <DataTemplate x:Key="UserTemplate" x:DataType="recom:ChatMessage">
+            <Grid Padding="0,4">
+                <Border BackgroundColor="{StaticResource Primary}"
+                        HorizontalOptions="End"
+                        MaximumWidthRequest="560"
+                        Padding="12,8"
+                        Stroke="Transparent"
+                        StrokeShape="RoundRectangle 16,16,4,16">
+                    <Label Text="{Binding Content}" TextColor="White" />
+                </Border>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="AssistantTemplate" x:DataType="recom:ChatMessage">
+            <Grid Padding="0,4">
+                <Border BackgroundColor="{AppThemeBinding Light=#F0F0F0, Dark=#2C2C2C}"
+                        HorizontalOptions="Start"
+                        MaximumWidthRequest="560"
+                        Padding="12,8"
+                        Stroke="Transparent"
+                        StrokeShape="RoundRectangle 4,16,16,16">
+                    <markdown:MarkdownView MarkdownText="{Binding Content}"
+                                           UseAppTheme="True" />
+                </Border>
+            </Grid>
+        </DataTemplate>
+
+        <selectors:ChatBubbleTemplateSelector x:Key="ChatBubbleSelector"
+                                               UserTemplate="{StaticResource UserTemplate}"
+                                               AssistantTemplate="{StaticResource AssistantTemplate}" />
+    </ContentPage.Resources>
+
     <Grid MaximumWidthRequest="800" RowSpacing="12" Padding="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <ScrollView Grid.Row="0">
-            <VerticalStackLayout Spacing="12">
-
-                <markdown:MarkdownView x:Name="markdownView"
-                                       MarkdownText="{Binding Content}"
-                                       UseAppTheme="True"
-                                       IsVisible="{Binding HasContent}" />
-
-                <controls:EmptyStateView IsVisible="{Binding HasError}"
-                                         HorizontalOptions="Center"
-                                         VerticalOptions="Center"
-                                         Titulo="Algo salió mal"
-                                         Descripcion="No pudimos obtener tus recomendaciones. Comprueba tu conexión e intenta de nuevo." />
-
-            </VerticalStackLayout>
+        <ScrollView Grid.Row="0" x:Name="chatScrollView">
+            <VerticalStackLayout Spacing="8"
+                                 BindableLayout.ItemsSource="{Binding Messages}"
+                                 BindableLayout.ItemTemplateSelector="{StaticResource ChatBubbleSelector}" />
         </ScrollView>
+
+        <controls:EmptyStateView Grid.Row="0"
+                                 IsVisible="{Binding HasError}"
+                                 HorizontalOptions="Center"
+                                 VerticalOptions="Center"
+                                 Titulo="Algo salió mal"
+                                 Descripcion="No pudimos obtener tus recomendaciones. Comprueba tu conexión e intenta de nuevo." />
 
         <ActivityIndicator Grid.Row="0"
                            IsRunning="{Binding IsBusy}"

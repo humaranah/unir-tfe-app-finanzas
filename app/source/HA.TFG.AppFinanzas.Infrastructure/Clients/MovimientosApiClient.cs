@@ -1,5 +1,7 @@
-using HA.TFG.AppFinanzas.Core.Models.Enums;
-using HA.TFG.AppFinanzas.Core.Movimientos;
+﻿using HA.TFG.AppFinanzas.Core.Models.Enums;
+using HA.TFG.AppFinanzas.Core.Features.Movimientos;
+using HA.TFG.AppFinanzas.Core.Features.Movimientos.Dtos;
+using HA.TFG.AppFinanzas.Core.Features.Movimientos.Models;
 using HA.TFG.AppFinanzas.Infrastructure.Mappers;
 using System.Net.Http.Json;
 using System.Text.Json;

@@ -1,4 +1,4 @@
-using HA.TFG.AppFinanzas.Core.Recomendaciones;
+﻿using HA.TFG.AppFinanzas.Core.Features.Recomendaciones;
 using System.Net.Http.Json;
 
 namespace HA.TFG.AppFinanzas.Infrastructure.Clients;

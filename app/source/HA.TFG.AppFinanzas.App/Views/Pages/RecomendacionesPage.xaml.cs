@@ -1,5 +1,5 @@
-using HA.TFG.AppFinanzas.Core.ViewModels;
-using Indiko.Maui.Controls.Markdown.Theming;
+﻿using HA.TFG.AppFinanzas.Core.Features.Recomendaciones;
+using System.Collections.Specialized;
 
 namespace HA.TFG.AppFinanzas.App.Views.Pages;
 
@@ -13,7 +13,7 @@ public partial class RecomendacionesPage : ContentPage
         InitializeComponent();
         _viewModel = viewModel;
         BindingContext = viewModel;
-        markdownView.Theme = MarkdownThemeDefaults.DotNetPurple;
+        viewModel.Messages.CollectionChanged += OnMessagesChanged;
     }
 
     protected override async void OnAppearing()
@@ -23,7 +23,13 @@ public partial class RecomendacionesPage : ContentPage
         if (_resumenCargado)
             return;
 
-        _resumenCargado = _viewModel.HasContent;
+        _resumenCargado = _viewModel.HasMessages;
         await _viewModel.CargarResumenAsync();
+    }
+
+    private async void OnMessagesChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        await Task.Yield();
+        await chatScrollView.ScrollToAsync(0, double.MaxValue, animated: true);
     }
 }

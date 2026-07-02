@@ -1,5 +1,5 @@
-using HA.TFG.AppFinanzas.Core.Models.Enums;
-using HA.TFG.AppFinanzas.Core.Cuentas;
+﻿using HA.TFG.AppFinanzas.Core.Models.Enums;
+using HA.TFG.AppFinanzas.Core.Features.Cuentas;
 
 namespace HA.TFG.AppFinanzas.Core.Tests.Fixtures;
 
