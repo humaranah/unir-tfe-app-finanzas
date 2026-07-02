@@ -1,10 +1,12 @@
-using HA.TFG.AppFinanzas.Core.Cuentas;
+﻿using HA.TFG.AppFinanzas.Core.Features.Cuentas;
 using HA.TFG.AppFinanzas.Core.Models.Enums;
-using HA.TFG.AppFinanzas.Core.Movimientos;
+using HA.TFG.AppFinanzas.Core.Features.Movimientos;
+using HA.TFG.AppFinanzas.Core.Features.Movimientos.Dtos;
+using HA.TFG.AppFinanzas.Core.Features.Movimientos.Models;
 using HA.TFG.AppFinanzas.Core.Navigation;
 using HA.TFG.AppFinanzas.Core.Tests.Fixtures;
 using HA.TFG.AppFinanzas.Core.Utilities;
-using HA.TFG.AppFinanzas.Core.ViewModels;
+using HA.TFG.AppFinanzas.Core.Features.Movimientos;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 

@@ -1,6 +1,6 @@
-using Auth0.OidcClient;
+﻿using Auth0.OidcClient;
 using Duende.IdentityModel.OidcClient.Results;
-using HA.TFG.AppFinanzas.Core.Authentication;
+using HA.TFG.AppFinanzas.Core.Features.Authentication;
 using HA.TFG.AppFinanzas.Infrastructure.Services;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;

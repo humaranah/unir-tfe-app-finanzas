@@ -1,6 +1,6 @@
-using HA.TFG.AppFinanzas.Core.Cuentas;
+﻿using HA.TFG.AppFinanzas.Core.Features.Cuentas;
 using HA.TFG.AppFinanzas.Core.Utilities;
-using HA.TFG.AppFinanzas.Core.ViewModels;
+using HA.TFG.AppFinanzas.Core.Features.Cuentas;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 

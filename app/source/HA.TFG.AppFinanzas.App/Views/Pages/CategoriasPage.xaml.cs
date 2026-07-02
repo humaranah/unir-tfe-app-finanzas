@@ -1,4 +1,4 @@
-using HA.TFG.AppFinanzas.Core.ViewModels;
+﻿using HA.TFG.AppFinanzas.Core.Features.Cuentas;
 
 namespace HA.TFG.AppFinanzas.App.Views.Pages;
 

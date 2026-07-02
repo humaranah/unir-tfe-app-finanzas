@@ -1,10 +1,13 @@
 ﻿using HA.TFG.AppFinanzas.App.Extensions;
 using HA.TFG.AppFinanzas.App.Navigation;
 using HA.TFG.AppFinanzas.App.Services;
-using HA.TFG.AppFinanzas.Core.Movimientos;
+using HA.TFG.AppFinanzas.Core.Features.Movimientos;
 using HA.TFG.AppFinanzas.Core.Navigation;
 using HA.TFG.AppFinanzas.Core.Services;
-using HA.TFG.AppFinanzas.Core.ViewModels;
+using HA.TFG.AppFinanzas.Core.Features.Authentication;
+using HA.TFG.AppFinanzas.Core.Features.Cuentas;
+using HA.TFG.AppFinanzas.Core.Features.Movimientos;
+using HA.TFG.AppFinanzas.Core.Features.Recomendaciones;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 

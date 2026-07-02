@@ -1,4 +1,5 @@
-using HA.TFG.AppFinanzas.Core.Movimientos;
+﻿using HA.TFG.AppFinanzas.Core.Features.Movimientos;
+using HA.TFG.AppFinanzas.Core.Features.Movimientos.Models;
 
 namespace HA.TFG.AppFinanzas.App.Services;
 

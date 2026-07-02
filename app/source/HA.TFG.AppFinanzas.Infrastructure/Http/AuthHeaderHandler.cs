@@ -1,4 +1,4 @@
-using HA.TFG.AppFinanzas.Core.Authentication;
+﻿using HA.TFG.AppFinanzas.Core.Features.Authentication;
 using System.Net.Http.Headers;
 
 namespace HA.TFG.AppFinanzas.Infrastructure.Http;

@@ -1,5 +1,5 @@
-using Auth0.OidcClient;
-using HA.TFG.AppFinanzas.Core.Authentication;
+﻿using Auth0.OidcClient;
+using HA.TFG.AppFinanzas.Core.Features.Authentication;
 
 namespace HA.TFG.AppFinanzas.Infrastructure.Authentication;
 

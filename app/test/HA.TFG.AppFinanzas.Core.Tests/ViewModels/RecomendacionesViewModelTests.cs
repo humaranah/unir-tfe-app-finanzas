@@ -1,6 +1,6 @@
-using HA.TFG.AppFinanzas.Core.Cuentas;
-using HA.TFG.AppFinanzas.Core.Recomendaciones;
-using HA.TFG.AppFinanzas.Core.ViewModels;
+﻿using HA.TFG.AppFinanzas.Core.Features.Cuentas;
+using HA.TFG.AppFinanzas.Core.Features.Recomendaciones;
+using HA.TFG.AppFinanzas.Core.Features.Recomendaciones;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 
@@ -33,10 +33,10 @@ public class RecomendacionesViewModelTests
 
         Assert.Multiple(
             () => Assert.False(sut.IsBusy),
-            () => Assert.Empty(sut.Content),
+            () => Assert.Empty(sut.Messages),
             () => Assert.Empty(sut.Error),
             () => Assert.Empty(sut.Query),
-            () => Assert.False(sut.HasContent),
+            () => Assert.False(sut.HasMessages),
             () => Assert.False(sut.HasError),
             () => Assert.True(sut.IsNotBusy));
     }
@@ -46,7 +46,7 @@ public class RecomendacionesViewModelTests
     #region CargarResumenAsync
 
     [Fact]
-    public async Task CargarResumenAsync_WhenSuccessful_LoadsRecommendation()
+    public async Task CargarResumenAsync_WhenSuccessful_AddsAssistantMessage()
     {
         var recomendacion = CrearRecomendacion("Este es un resumen de tus gastos");
         ConfigurarCuentaPorDefecto();
@@ -57,10 +57,12 @@ public class RecomendacionesViewModelTests
         await sut.CargarResumenCommand.ExecuteAsync(null);
 
         Assert.Multiple(
-            () => Assert.Equal(recomendacion.Content, sut.Content),
+            () => Assert.Single(sut.Messages),
+            () => Assert.False(sut.Messages[0].IsUser),
+            () => Assert.Equal(recomendacion.Content, sut.Messages[0].Content),
             () => Assert.Empty(sut.Error),
             () => Assert.False(sut.IsBusy),
-            () => Assert.True(sut.HasContent));
+            () => Assert.True(sut.HasMessages));
     }
 
     [Fact]
@@ -73,7 +75,7 @@ public class RecomendacionesViewModelTests
 
         Assert.Multiple(
             () => Assert.NotEmpty(sut.Error),
-            () => Assert.Empty(sut.Content),
+            () => Assert.Empty(sut.Messages),
             () => Assert.False(sut.IsBusy));
         _ = _recomendacionesService.DidNotReceive()
             .GetRecomendacionAsync(Arg.Any<Guid>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
@@ -91,6 +93,7 @@ public class RecomendacionesViewModelTests
 
         Assert.Multiple(
             () => Assert.NotEmpty(sut.Error),
+            () => Assert.Empty(sut.Messages),
             () => Assert.False(sut.IsBusy));
     }
 
@@ -99,7 +102,7 @@ public class RecomendacionesViewModelTests
     #region PreguntarAsync
 
     [Fact]
-    public async Task PreguntarAsync_WhenSuccessful_LoadsResponse()
+    public async Task PreguntarAsync_WhenSuccessful_AddsUserAndAssistantMessages()
     {
         var recomendacion = CrearRecomendacion("Respuesta a tu pregunta");
         ConfigurarCuentaPorDefecto();
@@ -111,7 +114,11 @@ public class RecomendacionesViewModelTests
         await sut.PreguntarCommand.ExecuteAsync(null);
 
         Assert.Multiple(
-            () => Assert.Equal(recomendacion.Content, sut.Content),
+            () => Assert.Equal(2, sut.Messages.Count),
+            () => Assert.True(sut.Messages[0].IsUser),
+            () => Assert.Equal("¿Cómo ahorrar dinero?", sut.Messages[0].Content),
+            () => Assert.False(sut.Messages[1].IsUser),
+            () => Assert.Equal(recomendacion.Content, sut.Messages[1].Content),
             () => Assert.Empty(sut.Query),
             () => Assert.Empty(sut.Error),
             () => Assert.False(sut.IsBusy));
@@ -129,7 +136,7 @@ public class RecomendacionesViewModelTests
     }
 
     [Fact]
-    public async Task PreguntarAsync_WhenServiceThrows_CapturesError()
+    public async Task PreguntarAsync_WhenServiceThrows_KeepsUserMessageAndCapturesError()
     {
         ConfigurarCuentaPorDefecto();
         _recomendacionesService.GetRecomendacionAsync(Arg.Any<Guid>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
@@ -140,6 +147,8 @@ public class RecomendacionesViewModelTests
         await sut.PreguntarCommand.ExecuteAsync(null);
 
         Assert.Multiple(
+            () => Assert.Single(sut.Messages),
+            () => Assert.True(sut.Messages[0].IsUser),
             () => Assert.NotEmpty(sut.Error),
             () => Assert.False(sut.IsBusy));
     }
@@ -175,14 +184,14 @@ public class RecomendacionesViewModelTests
             .Returns(recomendacion);
 
         var sut = CreateSut();
-        Assert.False(sut.HasContent);
+        Assert.False(sut.HasMessages);
         Assert.False(sut.HasError);
         Assert.True(sut.IsNotBusy);
 
         await sut.CargarResumenCommand.ExecuteAsync(null);
 
         Assert.Multiple(
-            () => Assert.True(sut.HasContent),
+            () => Assert.True(sut.HasMessages),
             () => Assert.False(sut.HasError),
             () => Assert.True(sut.IsNotBusy));
     }

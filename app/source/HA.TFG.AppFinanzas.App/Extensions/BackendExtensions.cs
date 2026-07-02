@@ -1,8 +1,8 @@
-using HA.TFG.AppFinanzas.App.Services;
-using HA.TFG.AppFinanzas.Core.Authentication;
-using HA.TFG.AppFinanzas.Core.Cuentas;
-using HA.TFG.AppFinanzas.Core.Movimientos;
-using HA.TFG.AppFinanzas.Core.Recomendaciones;
+﻿using HA.TFG.AppFinanzas.App.Services;
+using HA.TFG.AppFinanzas.Core.Features.Authentication;
+using HA.TFG.AppFinanzas.Core.Features.Cuentas;
+using HA.TFG.AppFinanzas.Core.Features.Movimientos;
+using HA.TFG.AppFinanzas.Core.Features.Recomendaciones;
 using HA.TFG.AppFinanzas.Infrastructure;
 using HA.TFG.AppFinanzas.Infrastructure.Authentication;
 using HA.TFG.AppFinanzas.Infrastructure.Clients;

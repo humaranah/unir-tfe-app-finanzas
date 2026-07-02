@@ -1,4 +1,4 @@
-using HA.TFG.AppFinanzas.Core.Authentication;
+﻿using HA.TFG.AppFinanzas.Core.Features.Authentication;
 
 namespace HA.TFG.AppFinanzas.App.Authentication;
 
